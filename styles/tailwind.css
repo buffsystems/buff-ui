@@ -1,0 +1,23 @@
+/*
+  @buff/ui for a Tailwind v4 app (#561). Import it right after `tailwindcss`:
+    @import 'tailwindcss';
+    @import '@buff/ui/tailwind.css';
+  It adds the colour utilities (bg-primary, text-fg-2, …) on top of the plain design system and
+  the `dark:` variant bound to <html class="dark">.
+*/
+@import './ui.css';
+@import './theme.css';
+@custom-variant dark (&:is(.dark *));
+
+/* The «in work» halo as a utility (animate-status-ping), on the package's keyframes. */
+@theme {
+  --animate-status-ping: ui-halo 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* A scroller without a visible bar (tab strips, chip rows). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -1,0 +1,74 @@
+/*
+  GENERATED from src/tokens/tokens.ts by `make gen` — do not edit by hand (#561).
+  Tailwind v4 colour utilities over the tokens in tokens.css.
+*/
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-fg-2: var(--fg-2);
+  --color-muted-2: var(--muted-2);
+  --color-border-strong: var(--border-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-foreground: var(--brand-soft-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-soft-foreground: var(--destructive-soft-foreground);
+  --color-bar: var(--bar);
+  --color-syntax-comment: var(--syntax-comment);
+  --color-syntax-string: var(--syntax-string);
+  --color-syntax-keyword: var(--syntax-keyword);
+  --color-syntax-number: var(--syntax-number);
+  --color-syntax-func: var(--syntax-func);
+  --color-syntax-var: var(--syntax-var);
+  --color-code-bg: var(--code-bg);
+  --color-code-border: var(--code-border);
+  --color-code-fg: var(--code-fg);
+  --color-code-block-bg: var(--code-block-bg);
+  --color-diff-add-bg: var(--diff-add-bg);
+  --color-diff-del-bg: var(--diff-del-bg);
+  --color-terminal-bg: var(--terminal-bg);
+  --color-terminal-fg: var(--terminal-fg);
+  --color-terminal-border: var(--terminal-border);
+  --color-ansi-black: var(--ansi-black);
+  --color-ansi-red: var(--ansi-red);
+  --color-ansi-green: var(--ansi-green);
+  --color-ansi-yellow: var(--ansi-yellow);
+  --color-ansi-blue: var(--ansi-blue);
+  --color-ansi-magenta: var(--ansi-magenta);
+  --color-ansi-cyan: var(--ansi-cyan);
+  --color-ansi-white: var(--ansi-white);
+  --color-ansi-gray: var(--ansi-gray);
+  --color-avatar-orange: var(--avatar-orange);
+  --color-avatar-yellow: var(--avatar-yellow);
+  --color-avatar-cyan: var(--avatar-cyan);
+  --color-avatar-green: var(--avatar-green);
+  --color-avatar-red: var(--avatar-red);
+  --color-avatar-pink: var(--avatar-pink);
+  --color-avatar-blue: var(--avatar-blue);
+  --color-avatar-purple: var(--avatar-purple);
+  --color-avatar-gray: var(--avatar-gray);
+}
