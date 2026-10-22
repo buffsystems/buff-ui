@@ -1,27 +1,44 @@
-# @buff/ui
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo.svg" alt="Buff Development" width="420">
+  </picture>
+</p>
 
-The single design system of the Buff interfaces (autonomous-dev/cloud-front#561): the app,
-the admin, the deploy wizard, the Buff Code desktop and the connector.
+<p align="center">
+  <b>@buff/ui — дизайн-система интерфейсов Buff.</b><br>
+  Один облик у приложения, админки, мастера установки, десктопа Buff Code и коннектора.
+</p>
 
-## What is inside
+<p align="center">
+  <a href="https://github.com/buffsystems/buff-ui/tags"><img alt="Версия" src="https://img.shields.io/github/v/tag/buffsystems/buff-ui?label=версия&color=2563eb"></a>
+  <a href="LICENSE"><img alt="Лицензия" src="https://img.shields.io/badge/лицензия-MIT-64748b"></a>
+  <a href="https://buff.systems"><img alt="Buff" src="https://img.shields.io/badge/buff.systems-0b0d12"></a>
+</p>
 
-- **Tokens** — `src/tokens/tokens.ts`: platform-neutral data (light + dark palette, radius,
-  fonts). The web gets `styles/tokens.css` (plain custom properties) and `styles/theme.css`
-  (Tailwind colour map) generated from it; a native client imports the object itself.
-- **Composite classes** — `styles/components/*.css`: the whole look of every component as
-  `ui-*` classes (BEM: `ui-btn ui-btn--ghost ui-btn--sm`, `ui-card__title`). Plain CSS in
-  `@layer components`, so any page can use them and a utility class still wins for layout.
-- **React components** — `src/react/*`: thin wrappers that put those classes on the right
-  elements; behaviour (focus, keyboard, portals) comes from Radix.
+<p align="center">
+  <a href="#что-внутри">Что внутри</a> ·
+  <a href="#как-подключить">Как подключить</a> ·
+  <a href="#правила">Правила</a> ·
+  <a href="README.en.md">English</a>
+</p>
 
-## Using it
+---
+
+## Что внутри
+
+- **Токены** — `src/tokens/tokens.ts`: данные без привязки к платформе (светлая и тёмная палитра, скругления, шрифты). Вебу из них генерируются `styles/tokens.css` (обычные CSS-переменные) и `styles/theme.css` (цвета для Tailwind); нативный клиент импортирует сам объект.
+- **Составные классы** — `styles/components/*.css`: весь облик каждого компонента классами `ui-*` (BEM: `ui-btn ui-btn--ghost ui-btn--sm`, `ui-card__title`). Обычный CSS в `@layer components` — любая страница может их использовать, а утилита по-прежнему побеждает в раскладке.
+- **Компоненты React** — `src/react/*`: тонкие обёртки, которые ставят эти классы на нужные элементы; поведение (фокус, клавиатура, порталы) — от Radix.
+
+## Как подключить
 
 ```jsonc
 // package.json
-"@buff/ui": "git+https://github.com/buffsystems/buff-ui.git#v0.1.2"
+"@buff/ui": "git+https://github.com/buffsystems/buff-ui.git#v0.1.4"
 ```
 
-A Tailwind v4 app:
+Приложение на Tailwind v4:
 
 ```css
 @import 'tailwindcss';
@@ -32,28 +49,27 @@ A Tailwind v4 app:
 import { Button } from '@buff/ui/react'
 ```
 
-A page without a build (plain HTML): load `styles/ui.css` and write the same classes.
+Страница без сборки (обычный HTML): подключите `styles/ui.css` и пишите те же классы.
 
-The package ships TypeScript sources, not a build: the app's Vite compiles them as is.
+Пакет поставляется исходниками TypeScript, а не сборкой: Vite приложения компилирует их как есть.
 
-## Rules
+## Правила
 
-- Screens compose components; utilities only lay them out (`flex`, `gap-2`, `mt-4`). A
-  repeated look is a component or a modifier here, never a long utility string in a screen.
-- Colours, radii and fonts come from tokens only — no raw hex, no `blue-500`.
+- Экраны складываются из компонентов; утилиты только раскладывают их (`flex`, `gap-2`, `mt-4`). Повторяющийся облик — это компонент или модификатор здесь, а не длинная строка утилит на экране.
+- Цвета, скругления и шрифты — только из токенов: никаких сырых hex и `blue-500`.
 
-## Icons
+## Иконки
 
-Icons are [lucide-react](https://lucide.dev) — the apps' choice; the package draws its own glyphs
-(chevrons, checks, the search mark) from it too. It ships no icon set and no `<Icon name>`
-component: components take a `LucideIcon` (`leadingIcon`, `icon`) or any node, and screens import
-the glyphs they need from `lucide-react`. Marks that are not glyphs — brand logos, file-type,
-provider and editor-app icons — belong to the app that shows them.
+Иконки — [lucide-react](https://lucide.dev), выбор приложений; свои глифы (шевроны, галочки, знак поиска) пакет рисует из него же. Набора иконок и компонента `<Icon name>` в пакете нет: компоненты принимают `LucideIcon` (`leadingIcon`, `icon`) или любой узел, а экраны импортируют нужные глифы из `lucide-react`. Знаки, которые не глифы, — логотипы, иконки типов файлов, провайдеров и редакторов — принадлежат приложению, которое их показывает.
 
-## Changing tokens
+## Как поменять токены
 
-Edit `src/tokens/tokens.ts`, then `make gen`. A test fails if the generated CSS is stale.
+Правьте `src/tokens/tokens.ts`, затем `make gen`. Тест падает, если сгенерированный CSS устарел.
 
-## Checks
+## Проверки
 
-`make ci` — typecheck, lint, tests.
+`make ci` — типы, линт, тесты. `make storybook` — все компоненты в светлой и тёмной теме.
+
+## Участие и лицензия
+
+Issues и pull request'ы приветствуются — см. [CONTRIBUTING.md](CONTRIBUTING.md) (включая работу с ИИ-помощниками). Репозиторий публикуется снимком на каждый выпуск: принятые изменения выходят в следующем. Лицензия — [MIT](LICENSE).
