@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/buffsystems/buff-ui/tags"><img alt="Версия" src="https://img.shields.io/github/v/tag/buffsystems/buff-ui?label=версия&color=2563eb"></a>
+  <a href="https://github.com/buffsystems/buff-ui/tags"><img alt="Версия" src="https://img.shields.io/github/v/tag/buffsystems/buff-ui?label=%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F&color=2563eb"></a>
   <a href="LICENSE"><img alt="Лицензия" src="https://img.shields.io/badge/лицензия-MIT-64748b"></a>
   <a href="https://buff.systems"><img alt="Buff" src="https://img.shields.io/badge/buff.systems-0b0d12"></a>
 </p>

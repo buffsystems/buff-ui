@@ -1,7 +1,7 @@
 {
   "name": "@buff/ui",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "type": "module",
   "description": "Buff design system: platform-neutral tokens, composite CSS classes, React components (#561). Shipped as source: the consumer's bundler compiles it.",
