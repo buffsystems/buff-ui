@@ -16,7 +16,7 @@ import { shimLayoutApis } from './jsdom-shims.ts'
 beforeAll(shimLayoutApis)
 afterEach(cleanup)
 
-const offer = { link: 'https://app.buff.systems/pair/x', code: '7KQ2M9XA', ttlSeconds: 300 }
+const offer = { link: 'https://buff.systems/pair/x', code: '7KQ2M9XA', ttlSeconds: 300 }
 const policy = {
   enabled: true,
   pairing: 'all' as const,

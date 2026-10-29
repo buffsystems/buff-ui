@@ -3,7 +3,13 @@
 import { afterEach, expect, test } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { ICON_NAMES, NativeProvider, WelcomeScreen, type IconSet } from '../src/native/index.ts'
+import {
+  EnterCodeScreen,
+  ICON_NAMES,
+  NativeProvider,
+  WelcomeScreen,
+  type IconSet,
+} from '../src/native/index.ts'
 
 afterEach(cleanup)
 
@@ -31,4 +37,10 @@ test('adding an install offers the QR and the link with the code, and a way back
   fireEvent.click(screen.getByRole('button', { name: 'Ввести ссылку и код' }))
   fireEvent.click(screen.getByRole('button', { name: 'Назад' }))
   expect(did).toEqual(['scan', 'code', 'back'])
+})
+
+// v0.22.0: the hint named app.buff.systems, while every pairing link is https://buff.systems/pair/….
+test('the link field shows the address pairing links really have', () => {
+  render(wrap(<EnterCodeScreen />))
+  expect(screen.getByPlaceholderText('https://buff.systems/pair/…')).toBeTruthy()
 })

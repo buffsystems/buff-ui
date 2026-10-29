@@ -113,7 +113,7 @@ export function EnterCodeScreen({
           <Input
             icon="link"
             value={link}
-            placeholder="https://app.buff.systems/pair/…"
+            placeholder="https://buff.systems/pair/…"
             autoCapitalize="none"
             autoCorrect={false}
             editable={!busy}
