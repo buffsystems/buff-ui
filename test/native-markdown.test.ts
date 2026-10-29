@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { columnWidths, parseMarkdown } from '../src/native/markdown.ts'
 
@@ -60,4 +62,53 @@ describe('parseMarkdown', () => {
     ).toEqual([72, 96])
     expect(columnWidths([['x'.repeat(100)]])).toEqual([220])
   })
+
+  // Seen on the phone (#628): task #15's approved formulation quotes a section in a
+  // ````markdown fence; the parser never moved past that line, so the card hung on «Loading…»
+  // with the JS thread at 100% and memory climbing. Parsed in a child process with a deadline,
+  // so a relapse fails here instead of hanging the suite.
+  it('parses the real task #15 formulation: a four-backtick fence holds the inner Markdown', () => {
+    const source = readFileSync(
+      new URL('./fixtures/task15-formulation.md', import.meta.url),
+      'utf8',
+    )
+    const blocks = parseBounded(source)
+    expect(blocks.map((b) => b.kind)).toEqual(['heading', 'paragraph', 'code'])
+    expect(blocks[2]).toMatchObject({ kind: 'code', language: 'markdown' })
+    const code = (blocks[2] as { code: string }).code
+    expect(code.startsWith('## Как сообщить об ошибке\n')).toBe(true)
+    expect(code.endsWith('- фактическое поведение.')).toBe(true)
+  })
+
+  it('ends on every line a fence does not open: odd info strings, stray backticks', () => {
+    expect(parseBounded('```c++\nint x;\n```')).toEqual([
+      { kind: 'code', language: 'c++', code: 'int x;' },
+    ])
+    expect(parseBounded('```ts title\nx\n```')).toEqual([
+      { kind: 'code', language: 'ts', code: 'x' },
+    ])
+    expect(parseBounded('```a`b\nтекст')).toEqual([{ kind: 'paragraph', text: '```a`b текст' }])
+    expect(parseBounded('````\n```\ninner\n```\n````')).toEqual([
+      { kind: 'code', language: undefined, code: '```\ninner\n```' },
+    ])
+  })
 })
+
+/** parseMarkdown in a child process, killed past a deadline — a runaway parse fails, not hangs. */
+function parseBounded(source: string): ReturnType<typeof parseMarkdown> {
+  const module = new URL('../src/native/markdown.ts', import.meta.url).href
+  const run = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      '--no-warnings',
+      '--input-type=module',
+      '-e',
+      `import { parseMarkdown } from ${JSON.stringify(module)}
+process.stdout.write(JSON.stringify(parseMarkdown(${JSON.stringify(source)})))`,
+    ],
+    { encoding: 'utf8', timeout: 10_000, maxBuffer: 1 << 20 },
+  )
+  if (run.status !== 0) throw new Error(`parse did not finish (${run.signal ?? run.stderr})`)
+  return JSON.parse(run.stdout) as ReturnType<typeof parseMarkdown>
+}

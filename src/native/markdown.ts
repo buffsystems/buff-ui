@@ -46,13 +46,20 @@ export function parseMarkdown(source: string): Block[] {
       i += 1
       continue
     }
-    const fence = /^```(\w+)?\s*$/.exec(line)
+    // A fence of three or more backticks, closed by a run at least as long — so a ````markdown
+    // fence can quote Markdown with its own ``` fences inside. Its info string has no backtick.
+    const fence = /^(`{3,})([^`]*)$/.exec(line)
     if (fence) {
+      const close = new RegExp(`^\`{${fence[1].length},}\\s*$`)
       const code: string[] = []
       i += 1
-      while (i < lines.length && !/^```\s*$/.test(lines[i])) code.push(lines[i++])
+      while (i < lines.length && !close.test(lines[i])) code.push(lines[i++])
       i += 1
-      blocks.push({ kind: 'code', language: fence[1], code: code.join('\n') })
+      blocks.push({
+        kind: 'code',
+        language: fence[2].trim().split(/\s+/)[0] || undefined,
+        code: code.join('\n'),
+      })
       continue
     }
     // A GFM table: a pipe row, then the alignment row; rows run until a line without a pipe.
@@ -92,7 +99,9 @@ export function parseMarkdown(source: string): Block[] {
       blocks.push({ kind: 'list', ordered, items })
       continue
     }
-    const paragraph: string[] = []
+    // A paragraph takes its first line whatever it looks like: no branch above claimed it, so
+    // leaving it would read the same line again forever.
+    const paragraph: string[] = [lines[i++]]
     while (
       i < lines.length &&
       lines[i].trim() !== '' &&
