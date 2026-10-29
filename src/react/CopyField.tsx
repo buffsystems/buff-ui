@@ -4,6 +4,7 @@ import type { FocusEvent, InputHTMLAttributes, Ref, TextareaHTMLAttributes } fro
 import { Check, Copy } from 'lucide-react'
 import { cx } from './cx.ts'
 import { Tooltip } from './Tooltip.tsx'
+import { useWords } from './words.ts'
 
 export interface CopyFieldProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -53,8 +54,8 @@ async function browserCopy(text: string, input: Control | null): Promise<boolean
  */
 export function CopyField({
   value,
-  copyLabel = 'Копировать',
-  copiedLabel = 'Скопировано',
+  copyLabel: copyLabelProp,
+  copiedLabel: copiedLabelProp,
   mono = false,
   compact = false,
   multiline = false,
@@ -65,6 +66,9 @@ export function CopyField({
   ref,
   ...props
 }: CopyFieldProps) {
+  const words = useWords()
+  const copyLabel = copyLabelProp ?? words.copy
+  const copiedLabel = copiedLabelProp ?? words.copied
   const [copied, setCopied] = useState(false)
   const input = useRef<Control | null>(null)
   const setInput = useCallback(

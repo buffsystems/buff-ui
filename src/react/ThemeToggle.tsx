@@ -8,18 +8,13 @@ import {
 } from './DropdownMenu.tsx'
 import { IconButton } from './IconButton.tsx'
 import { useTheme, type Theme } from './theme.ts'
+import { useWords } from './words.ts'
 
 const OPTIONS: { value: Theme; icon: LucideIcon }[] = [
   { value: 'light', icon: Sun },
   { value: 'dark', icon: Moon },
   { value: 'system', icon: Monitor },
 ]
-
-const LABELS: Record<Theme, string> = {
-  light: 'Светлая',
-  dark: 'Тёмная',
-  system: 'Системная',
-}
 
 /**
  * The light / dark / system switch. The trigger shows the mode actually painted; the menu
@@ -28,7 +23,7 @@ const LABELS: Record<Theme, string> = {
  */
 export function ThemeToggle({
   onChange,
-  label = 'Переключить тему',
+  label: labelProp,
   labels,
   className,
 }: {
@@ -38,6 +33,13 @@ export function ThemeToggle({
   className?: string
 }) {
   const { theme, effective, setTheme } = useTheme()
+  const words = useWords()
+  const label = labelProp ?? words.theme
+  const names: Record<Theme, string> = {
+    light: words.themeLight,
+    dark: words.themeDark,
+    system: words.themeSystem,
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -59,7 +61,7 @@ export function ThemeToggle({
             }}
           >
             <Icon aria-hidden />
-            <span className="ui-menu__text">{labels?.[value] ?? LABELS[value]}</span>
+            <span className="ui-menu__text">{labels?.[value] ?? names[value]}</span>
             {theme === value && <Check aria-hidden className="ui-menu__check" />}
           </DropdownMenuItem>
         ))}

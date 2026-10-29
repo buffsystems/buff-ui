@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { cx } from './cx.ts'
 import { IconButton } from './IconButton.tsx'
+import { useWords } from './words.ts'
 
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl'
 
@@ -34,10 +35,12 @@ export function Dialog({
   size = 'md',
   busy = false,
   hideClose = false,
-  closeLabel = 'Закрыть',
+  closeLabel: closeLabelProp,
   className,
   children,
 }: DialogProps) {
+  const words = useWords()
+  const closeLabel = closeLabelProp ?? words.close
   const change = (next: boolean) => {
     if (!busy || next) onOpenChange(next)
   }

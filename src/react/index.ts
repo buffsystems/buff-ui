@@ -82,6 +82,19 @@ export { PageHeader, SectionHeader } from './PageHeader.tsx'
 export { Callout } from './Callout.tsx'
 export type { CalloutTone } from './Callout.tsx'
 export { ThemeToggle } from './ThemeToggle.tsx'
+export { LanguageToggle } from './LanguageToggle.tsx'
+export {
+  LANGUAGE_STORAGE_KEY,
+  LocaleProvider,
+  readStoredLanguage,
+  systemLanguages,
+  useLanguage,
+  useLocale,
+} from './locale.tsx'
+export { useWords, wordsFor } from './words.ts'
+export type { Words } from './words.ts'
+export { DEFAULT_LOCALE, isLanguageChoice, pickLocale, resolveLocale } from '../shared/locale.ts'
+export type { LanguageChoice, Locale } from '../shared/locale.ts'
 export { applyTheme, readStoredTheme, resolveTheme, THEME_STORAGE_KEY, useTheme } from './theme.ts'
 export type { EffectiveTheme, Theme } from './theme.ts'
 export { Checkbox, Count, EmptyState, IconTile, Panel } from './Surface.tsx'
@@ -115,3 +128,4 @@ export type {
   TabStripTabProps,
   TabStripTriggerProps,
 } from './TabStrip.tsx'
+export * from './pairing/index.ts'

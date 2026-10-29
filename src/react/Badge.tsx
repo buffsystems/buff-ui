@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from 'react'
 import { X } from 'lucide-react'
 import { cx } from './cx.ts'
+import { useWords } from './words.ts'
 
 /** The #270 status vocabulary — soft tinted pairs — plus a solid primary and an outline. */
 export type BadgeTone = 'neutral' | 'info' | 'ok' | 'warn' | 'crit' | 'primary' | 'outline'
@@ -25,12 +26,14 @@ export function Badge({
   dot = false,
   size = 'md',
   onRemove,
-  removeLabel = 'Убрать',
+  removeLabel: removeLabelProp,
   removeDisabled = false,
   className,
   children,
   ...props
 }: BadgeProps) {
+  const words = useWords()
+  const removeLabel = removeLabelProp ?? words.remove
   return (
     <span
       className={cx('ui-badge', `ui-badge--${tone}`, size === 'sm' && 'ui-badge--sm', className)}

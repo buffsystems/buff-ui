@@ -1,0 +1,72 @@
+import { defineStrings } from '../i18n.ts'
+
+/** Words every screen shares: actions, states, time. */
+export const S = defineStrings({
+  'common.ok': { ru: 'Готово', en: 'Done' },
+  'common.cancel': { ru: 'Отмена', en: 'Cancel' },
+  'common.close': { ru: 'Закрыть', en: 'Close' },
+  'common.back': { ru: 'Назад', en: 'Back' },
+  'common.retry': { ru: 'Повторить', en: 'Retry' },
+  'common.save': { ru: 'Сохранить', en: 'Save' },
+  'common.delete': { ru: 'Удалить', en: 'Delete' },
+  'common.rename': { ru: 'Переименовать', en: 'Rename' },
+  'common.send': { ru: 'Отправить', en: 'Send' },
+  'common.share': { ru: 'Поделиться', en: 'Share' },
+  'common.open': { ru: 'Открыть', en: 'Open' },
+  'common.more': { ru: 'Ещё', en: 'More' },
+  'common.search': { ru: 'Поиск', en: 'Search' },
+  'common.filter': { ru: 'Фильтр', en: 'Filter' },
+  'common.loading': { ru: 'Загрузка…', en: 'Loading…' },
+  'common.empty': { ru: 'Пока пусто', en: 'Nothing here yet' },
+  'common.error': { ru: 'Что-то пошло не так', en: 'Something went wrong' },
+  'common.all': { ru: 'Все', en: 'All' },
+  'common.mine': { ru: 'Мои', en: 'Mine' },
+  'common.yes': { ru: 'Да', en: 'Yes' },
+  'common.no': { ru: 'Нет', en: 'No' },
+  'common.online': { ru: 'На связи', en: 'Online' },
+  'common.connecting': { ru: 'Подключаемся…', en: 'Connecting…' },
+  'common.offline': { ru: 'Недоступна', en: 'Unavailable' },
+  'common.offlineSince': { ru: 'Недоступна с {time}', en: 'Unavailable since {time}' },
+  'common.noGatewaySince': {
+    ru: 'Нет связи со шлюзом с {time}',
+    en: 'No connection to the gateway since {time}',
+  },
+  'common.notRespondingSince': { ru: 'Не отвечает с {time}', en: 'Not responding since {time}' },
+  'common.readOnlyNetwork': {
+    ru: 'Телефон не достучался до шлюза. Показано последнее известное состояние, действия недоступны. Проверьте интернет на телефоне — подключимся сами.',
+    en: 'The phone cannot reach the gateway. Showing the last known state; actions are disabled. Check the phone’s internet — we reconnect by ourselves.',
+  },
+  'common.readOnlyInstall': {
+    ru: 'Установка не отвечает: возможно, она выключена или осталась без интернета. Показано последнее известное состояние, действия недоступны. Подключимся сами, когда она вернётся.',
+    en: 'The install does not answer: it may be off or without internet. Showing the last known state; actions are disabled. We reconnect by ourselves once it is back.',
+  },
+  'common.readOnly': {
+    ru: 'Установка недоступна. Показано последнее известное состояние, действия недоступны.',
+    en: 'The install is unavailable. Showing the last known state; actions are disabled.',
+  },
+  'common.repairNeeded': { ru: 'Нужна привязка', en: 'Needs linking' },
+  'common.menu': { ru: 'Меню', en: 'Menu' },
+  'common.blockedByOrg': { ru: 'Запрещено организацией', en: 'Forbidden by the organisation' },
+  'common.blockedByEe': {
+    ru: 'Запрещено администратором установки',
+    en: 'Forbidden by the install administrator',
+  },
+  'common.incompatible': { ru: 'Несовместимая версия', en: 'Incompatible version' },
+  'common.serviceDown': {
+    ru: 'Служба Buff Code не запущена',
+    en: 'Buff Code service is not running',
+  },
+  'common.revokedByAdmin': {
+    ru: 'Сопряжение разорвано администратором. Данные этой установки удалены с телефона.',
+    en: 'Pairing was revoked by an administrator. Data of this install was removed from the phone.',
+  },
+  'common.revokedByOrg': {
+    ru: 'Сопряжение разорвано: организация запретила телефоны. Данные удалены с телефона.',
+    en: 'Pairing was revoked: the organisation forbade phones. Data was removed from the phone.',
+  },
+  'common.justNow': { ru: 'только что', en: 'just now' },
+  'common.minutesAgo': { ru: '{n} мин назад', en: '{n} min ago' },
+  'common.hoursAgo': { ru: '{n} ч назад', en: '{n} h ago' },
+  'common.today': { ru: 'сегодня', en: 'today' },
+  'common.yesterday': { ru: 'вчера', en: 'yesterday' },
+})

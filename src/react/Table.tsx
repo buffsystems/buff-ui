@@ -9,6 +9,7 @@ import {
 } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { cx } from './cx.ts'
+import { useWords } from './words.ts'
 
 /** Whether a horizontal scroller still hides content on its right (2px slack for fractions). */
 function hidesMore(el: HTMLElement): boolean {
@@ -25,7 +26,7 @@ function hidesMore(el: HTMLElement): boolean {
 export function Table({
   framed = false,
   compact = false,
-  moreLabel = 'Прокрутить таблицу вправо',
+  moreLabel: moreLabelProp,
   className,
   children,
   ...props
@@ -36,6 +37,8 @@ export function Table({
   moreLabel?: string
   children: ReactNode
 }) {
+  const words = useWords()
+  const moreLabel = moreLabelProp ?? words.scrollTable
   const box = useRef<HTMLDivElement>(null)
   const [more, setMore] = useState(false)
   const measure = useCallback(() => {

@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import { Button } from './Button.tsx'
 import { Dialog, DialogBody, DialogFooter } from './Dialog.tsx'
+import { useWords } from './words.ts'
 
 export interface ConfirmDialogProps {
   open: boolean
@@ -29,8 +30,8 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Подтвердить',
-  cancelLabel = 'Отмена',
+  confirmLabel: confirmLabelProp,
+  cancelLabel: cancelLabelProp,
   secondaryLabel,
   danger = false,
   busy = false,
@@ -40,6 +41,9 @@ export function ConfirmDialog({
   onSecondary,
   children,
 }: ConfirmDialogProps) {
+  const words = useWords()
+  const confirmLabel = confirmLabelProp ?? words.confirm
+  const cancelLabel = cancelLabelProp ?? words.cancel
   const secondary = Boolean(secondaryLabel && onSecondary)
   return (
     <Dialog

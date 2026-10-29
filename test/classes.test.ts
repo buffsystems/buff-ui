@@ -13,7 +13,9 @@ const css = readdirSync(dir('../styles/components/'))
   .join('\n')
 const defined = new Set([...css.matchAll(/\.(ui-[a-z0-9_-]+)/g)].map((m) => m[1]))
 
-const sources = readdirSync(dir('../src/react/')).filter((file) => file.endsWith('.tsx'))
+const sources = readdirSync(dir('../src/react/'), { recursive: true, encoding: 'utf8' }).filter(
+  (file) => file.endsWith('.tsx'),
+)
 const used = new Set(
   sources.flatMap((file) =>
     [...read(dir(`../src/react/${file}`)).matchAll(/(?<![\w-])(ui-[a-z0-9_-]+)/g)].map((m) => m[1]),

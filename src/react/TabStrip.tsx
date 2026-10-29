@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cx } from './cx.ts'
 import { Tooltip } from './Tooltip.tsx'
+import { useWords } from './words.ts'
 
 export type TabStripOrientation = 'horizontal' | 'vertical'
 
@@ -87,7 +88,7 @@ export function TabStripTab({
   dragging = false,
   drop,
   onClose,
-  closeLabel = 'Закрыть вкладку',
+  closeLabel: closeLabelProp,
   closeProps,
   closeTooltip,
   className,
@@ -95,6 +96,8 @@ export function TabStripTab({
   ref,
   ...props
 }: TabStripTabProps) {
+  const words = useWords()
+  const closeLabel = closeLabelProp ?? words.closeTab
   return (
     <div
       ref={ref}

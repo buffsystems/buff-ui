@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { cx } from './cx.ts'
 import { IconButton } from './IconButton.tsx'
+import { useWords } from './words.ts'
 
 export type DrawerSide = 'bottom' | 'left' | 'right'
 export type DrawerSize = 'sm' | 'md' | 'lg'
@@ -47,10 +48,12 @@ export function Drawer({
   overlayProps,
   contentProps,
   handleProps,
-  closeLabel = 'Закрыть',
+  closeLabel: closeLabelProp,
   className,
   children,
 }: DrawerProps) {
+  const words = useWords()
+  const closeLabel = closeLabelProp ?? words.close
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>

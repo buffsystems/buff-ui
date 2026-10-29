@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { AlertCircle, CheckCircle2, Info, X, type LucideIcon } from 'lucide-react'
 import { Button } from './Button.tsx'
 import { currentToasts, dismissToast, subscribeToasts, type ToastKind } from './toast.ts'
+import { useWords } from './words.ts'
 
 const ICON: Record<ToastKind, LucideIcon> = {
   success: CheckCircle2,
@@ -12,7 +13,9 @@ const ICON: Record<ToastKind, LucideIcon> = {
 }
 
 /** The stack of toasts. Mount it once at the app root. */
-export function Toaster({ closeLabel = 'Закрыть' }: { closeLabel?: string }) {
+export function Toaster({ closeLabel: closeLabelProp }: { closeLabel?: string }) {
+  const words = useWords()
+  const closeLabel = closeLabelProp ?? words.close
   const items = useSyncExternalStore(subscribeToasts, currentToasts, currentToasts)
   if (!items.length) return null
   return createPortal(

@@ -1,13 +1,15 @@
 {
   "name": "@buff/ui",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.2.1",
   "license": "MIT",
   "type": "module",
   "description": "Buff design system: platform-neutral tokens, composite CSS classes, React components (#561). Shipped as source: the consumer's bundler compiles it.",
   "exports": {
     "./react": "./src/react/index.ts",
+    "./native": "./src/native/index.ts",
     "./tokens": "./src/tokens/index.ts",
+    "./locale": "./src/shared/locale.ts",
     "./ui.css": "./styles/ui.css",
     "./tailwind.css": "./styles/tailwind.css",
     "./tokens.css": "./styles/tokens.css"
@@ -43,7 +45,8 @@
     "@radix-ui/react-switch": "^1.4.1",
     "@radix-ui/react-tabs": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.4.1",
-    "lucide-react": "^1.58.0"
+    "lucide-react": "^1.58.0",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -62,6 +65,8 @@
     "prettier": "^3.9.10",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "react-native": "^0.88.0",
+    "react-native-web": "^0.21.3",
     "storybook": "^10.6.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.2",

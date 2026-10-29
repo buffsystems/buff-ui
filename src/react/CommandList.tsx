@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from 'react'
 import type { KeyboardEvent, ReactNode } from 'react'
 import { Check, Search } from 'lucide-react'
 import { cx } from './cx.ts'
+import { useWords } from './words.ts'
 
 export interface CommandItem {
   /** Unique: what onSelect, current and the active row are keyed by. */
@@ -75,12 +76,15 @@ export function CommandList({
   filter = matchesCommand,
   current,
   onActiveChange,
-  emptyText = 'Ничего не найдено',
+  emptyText: emptyTextProp,
   loading = false,
-  loadingText = 'Загрузка…',
+  loadingText: loadingTextProp,
   autoFocus,
   className,
 }: CommandListProps) {
+  const words = useWords()
+  const emptyText = emptyTextProp ?? words.nothingFound
+  const loadingText = loadingTextProp ?? words.loading
   const id = useId()
   const [ownQuery, setOwnQuery] = useState('')
   const query = controlledQuery ?? ownQuery

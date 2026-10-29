@@ -2,6 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import { useWords } from './words.ts'
 
 export interface ComboboxOption {
   value: string
@@ -51,7 +52,7 @@ export function Combobox({
   placeholder,
   disabled,
   onOpen,
-  toggleLabel = 'Показать варианты',
+  toggleLabel: toggleLabelProp,
   'aria-label': ariaLabel,
 }: {
   value: string
@@ -64,6 +65,8 @@ export function Combobox({
   toggleLabel?: string
   'aria-label'?: string
 }) {
+  const words = useWords()
+  const toggleLabel = toggleLabelProp ?? words.showOptions
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const [place, setPlace] = useState<MenuPlace>({ left: 0, width: 0, room: 0 })
