@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   The «Changes» tab of a review (#629): the land error, the development-tools summary, and
@@ -102,7 +103,7 @@ export function ChangesTab({
 }: {
   review: Review
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   disabled?: boolean
   onOpenFile?: (repo: string, path: string) => void
   onPatch?: (repo: string) => void
@@ -121,7 +122,7 @@ export function ChangesTab({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError onRetry={onRetry} />
+        <LoadError error={error} onRetry={onRetry} />
       ) : review.prs.length === 0 && !sp ? (
         <Text tone="muted">{review.closed ? t('review.prsClosed') : t('review.noPrs')}</Text>
       ) : (

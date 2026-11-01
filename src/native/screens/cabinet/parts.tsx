@@ -11,6 +11,7 @@ import { EmptyState, Skeleton } from '../../Feedback.tsx'
 import { Segmented } from '../../Field.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
+import type { LoadFailure } from '../../model.ts'
 import type { ProjectRef } from './model.ts'
 
 export { ProjectLink, ProjectPickerSheet } from './project-pick.tsx'
@@ -125,16 +126,41 @@ export function CreateButton({
   )
 }
 
-/** A list or a detail that failed to load: a sentence and «Retry». */
-export function LoadError({ text, onRetry }: { text?: string; onRetry?: () => void }) {
+/** A list or a detail that failed to load: the reason the install gave (#739) when there is
+ *  one, else the screen's sentence — and «Retry». */
+export function LoadError({
+  error,
+  text,
+  onRetry,
+}: {
+  error?: LoadFailure
+  text?: string
+  onRetry?: () => void
+}) {
   const t = useT()
   return (
     <EmptyState
       icon="alertTriangle"
       title={t('cabinet.errorTitle')}
-      text={text ?? t('common.error')}
+      text={typeof error === 'string' ? error : (text ?? t('common.error'))}
       action={{ label: t('common.retry'), icon: 'refreshCw', onPress: onRetry }}
     />
+  )
+}
+
+/** The next page of a list (#739): shown while the install says there is one. */
+export function MoreButton({
+  onPress,
+  loading = false,
+}: {
+  onPress?: () => void
+  loading?: boolean
+}) {
+  const t = useT()
+  return (
+    <Button variant="ghost" loading={loading} onPress={onPress} style={{ alignSelf: 'center' }}>
+      {t('common.showMore')}
+    </Button>
   )
 }
 

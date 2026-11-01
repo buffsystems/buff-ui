@@ -1,17 +1,17 @@
 /** @jsxRuntime automatic */
 import { Pressable, View } from 'react-native'
 import { Badge } from '../../../Badge.tsx'
-import { Button, IconButton } from '../../../Button.tsx'
+import { IconButton } from '../../../Button.tsx'
 import { Chip, ChipRow } from '../../../Chip.tsx'
 import { EmptyState } from '../../../Feedback.tsx'
 import { Segmented } from '../../../Field.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Text } from '../../../Text.tsx'
 import { useLocale, useT, useTheme } from '../../../theme.tsx'
 import { rubles } from '../../../i18n.ts'
 import { InstallBanner } from '../../status.tsx'
 import type { ProjectRef, ShellProps } from '../model.ts'
-import { inProject, ListSkeleton, LoadError } from '../parts.tsx'
+import { inProject, ListSkeleton, LoadError, MoreButton } from '../parts.tsx'
 import { CabinetShell } from '../shell.tsx'
 import type { TaskRow } from './model.ts'
 import { StagePipe, taskStatus, taskSubtitle } from './stage.tsx'
@@ -96,7 +96,7 @@ export function DevListScreen({
   toolsReady = true,
   canCreate = true,
   canPrepareTools = canCreate,
-  moreCount = 0,
+  loadingMore = false,
   onFilter,
   onState,
   onOpenTask,
@@ -115,19 +115,21 @@ export function DevListScreen({
   filter?: StageFilter
   state?: StateFilter
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   toolsReady?: boolean
   /** May create a task here; a reader sees neither the button nor the invitation. */
   canCreate?: boolean
   /** May start the development-tools preparation (the cabinet's «project.audit»). */
   canPrepareTools?: boolean
-  moreCount?: number
+  /** The next page is being read (#739). */
+  loadingMore?: boolean
   onFilter?: (f: StageFilter) => void
   onState?: (s: StateFilter) => void
   onOpenTask?: (number: number) => void
   onCreate?: () => void
   /** Opens the development-tools preparation (the devprep task). */
   onPrepareTools?: () => void
+  /** Reads the next page of tasks (#739); absent on the last one. */
   onShowMore?: () => void
   onRetry?: () => void
   /** The project the list belongs to: its name heads the screen; it is picked in the drawer. */
@@ -208,7 +210,7 @@ export function DevListScreen({
           {loading ? (
             <ListSkeleton />
           ) : error ? (
-            <LoadError text={t('dev.loadError')} onRetry={onRetry} />
+            <LoadError error={error} text={t('dev.loadError')} onRetry={onRetry} />
           ) : tasks.length === 0 ? (
             <EmptyState
               icon="workflow"
@@ -243,11 +245,7 @@ export function DevListScreen({
                   </View>
                 ))}
               </View>
-              {moreCount > 0 && (
-                <Button variant="ghost" onPress={onShowMore} style={{ alignSelf: 'center' }}>
-                  {t('dev.showMore', { n: moreCount })}
-                </Button>
-              )}
+              {onShowMore && <MoreButton onPress={onShowMore} loading={loadingMore} />}
             </View>
           )}
         </>

@@ -48,7 +48,7 @@ export const List: Story = {
       status={online}
       tasks={tasks}
       state="all"
-      moreCount={3}
+      onShowMore={() => undefined}
       project={{ id: 'shop', name: 'shop' }}
     />
   ),

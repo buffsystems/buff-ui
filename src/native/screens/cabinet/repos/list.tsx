@@ -8,7 +8,7 @@ import { Badge, type Tone } from '../../../Badge.tsx'
 import { Button, IconButton } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
 import { Callout, EmptyState } from '../../../Feedback.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
 import { InstallBanner } from '../../status.tsx'
@@ -76,7 +76,7 @@ export function ReposListScreen({
   repos: Repo[]
   holds?: RepoHold[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canSync?: boolean
   canAdd?: boolean
   onCheck?: (name: string) => void
@@ -129,7 +129,7 @@ export function ReposListScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError text={t('repos.error')} onRetry={onRetry} />
+        <LoadError error={error} text={t('repos.error')} onRetry={onRetry} />
       ) : repos.length === 0 ? (
         <EmptyState
           icon="folderGit"

@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   The «History» and «Metrics» tabs of a task (#629): the event feed, and the four tiles —
@@ -50,7 +51,7 @@ export function HistoryTab({
 }: {
   events: HistoryEvent[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   hasMore?: boolean
   onOpen?: (id: string) => void
   onShowMore?: () => void
@@ -59,7 +60,7 @@ export function HistoryTab({
   const t = useT()
   const theme = useTheme()
   if (loading) return <ListSkeleton />
-  if (error) return <LoadError text={t('devt.historyError')} onRetry={onRetry} />
+  if (error) return <LoadError error={error} text={t('devt.historyError')} onRetry={onRetry} />
   if (events.length === 0) return <EmptyState icon="clock" title={t('devt.historyEmpty')} />
   return (
     <View style={{ paddingHorizontal: theme.space(4), gap: theme.space(2) }}>
@@ -151,14 +152,14 @@ export function MetricsTiles({
 }: {
   metrics?: TaskMetricsData
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onOpenChanges?: () => void
   onRetry?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
   if (loading) return <ListSkeleton rows={2} />
-  if (error) return <LoadError text={t('devt.metricsError')} onRetry={onRetry} />
+  if (error) return <LoadError error={error} text={t('devt.metricsError')} onRetry={onRetry} />
   if (!metrics) return null
   const fmt = (n: number) => n.toLocaleString('ru-RU')
   const tokens = (metrics.tokensIn + metrics.tokensOut) / 1e6

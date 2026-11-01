@@ -14,6 +14,7 @@ export const S = defineStrings({
   'common.share': { ru: 'Поделиться', en: 'Share' },
   'common.open': { ru: 'Открыть', en: 'Open' },
   'common.more': { ru: 'Ещё', en: 'More' },
+  'common.showMore': { ru: 'Показать ещё', en: 'Show more' },
   'common.search': { ru: 'Поиск', en: 'Search' },
   'common.filter': { ru: 'Фильтр', en: 'Filter' },
   'common.loading': { ru: 'Загрузка…', en: 'Loading…' },

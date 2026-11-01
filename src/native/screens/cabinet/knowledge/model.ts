@@ -13,8 +13,8 @@ export interface KnowledgeEntry {
   title: string
   description: string
   type: KnowledgeType
-  /** Markdown. */
-  body: string
+  /** Markdown; absent on a list row (#739) — it comes with the opened entry. */
+  body?: string
   /** The project, or none for the organisation. */
   project?: string
   task?: number

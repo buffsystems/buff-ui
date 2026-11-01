@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 import { View } from 'react-native'
 import { Button } from '../../../Button.tsx'
@@ -13,7 +14,14 @@ import { InstallBanner } from '../../status.tsx'
 import { ThreadRow } from '../ask/list.tsx'
 import { AttachmentRow } from '../attachments.tsx'
 import type { ProjectRef, ShellProps } from '../model.ts'
-import { CreateButton, inProject, ListHeader, ListSkeleton, LoadError } from '../parts.tsx'
+import {
+  CreateButton,
+  inProject,
+  ListHeader,
+  ListSkeleton,
+  LoadError,
+  MoreButton,
+} from '../parts.tsx'
 import { CabinetShell } from '../shell.tsx'
 import type { ResearchRow } from './model.ts'
 
@@ -30,6 +38,8 @@ export function ResearchListScreen({
   onActions,
   onNew,
   onRetry,
+  onShowMore,
+  loadingMore = false,
   mine,
   onMine,
   project,
@@ -40,7 +50,7 @@ export function ResearchListScreen({
   status: InstallStatus
   items: ResearchRow[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canCreate?: boolean
   /** May rename or delete this one (#666): its author or a member with the right. */
   canManage?: (thread: ResearchRow) => boolean
@@ -48,6 +58,9 @@ export function ResearchListScreen({
   onActions?: (id: string) => void
   onNew?: () => void
   onRetry?: () => void
+  /** Reads the next page (#739); absent on the last one. */
+  onShowMore?: () => void
+  loadingMore?: boolean
   mine?: boolean
   onMine?: (mine: boolean) => void
   project?: ProjectRef
@@ -73,7 +86,7 @@ export function ResearchListScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError text={t('research.listError')} onRetry={onRetry} />
+        <LoadError error={error} text={t('research.listError')} onRetry={onRetry} />
       ) : items.length === 0 ? (
         <EmptyState icon="microscope" title={t('research.empty')} text={t('research.emptyText')} />
       ) : (
@@ -89,6 +102,7 @@ export function ResearchListScreen({
               />
             ))}
           </RowGroup>
+          {onShowMore && <MoreButton onPress={onShowMore} loading={loadingMore} />}
         </View>
       )}
     </CabinetShell>

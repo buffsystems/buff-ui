@@ -8,7 +8,7 @@ import { Badge, type Tone } from '../../../Badge.tsx'
 import { Button, IconButton } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
 import { Callout, EmptyState, Spinner } from '../../../Feedback.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Prose } from '../../../Prose.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Text } from '../../../Text.tsx'
@@ -107,7 +107,7 @@ export function AuditSectionScreen({
   status: InstallStatus
   report?: AuditReport
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canRun?: boolean
   onBack?: () => void
   onExport?: () => void
@@ -166,7 +166,7 @@ export function AuditSectionScreen({
         {loading ? (
           <ListSkeleton rows={5} />
         ) : error || !report || !s ? (
-          <LoadError text={t('audit.progressError')} onRetry={onRetry} />
+          <LoadError error={error} text={t('audit.progressError')} onRetry={onRetry} />
         ) : (
           <View
             style={{

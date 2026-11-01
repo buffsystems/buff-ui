@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import { IconButton } from '../../../Button.tsx'
 import { EmptyState, Spinner } from '../../../Feedback.tsx'
 import { Icon } from '../../../Icon.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Row, RowGroup } from '../../../Row.tsx'
 import { ConfirmSheet, Sheet } from '../../../Sheet.tsx'
 import { Input } from '../../../Field.tsx'
@@ -12,7 +12,14 @@ import { Button } from '../../../Button.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
 import { InstallBanner } from '../../status.tsx'
 import type { ShellProps } from '../model.ts'
-import { CreateButton, inProject, ListHeader, ListSkeleton, LoadError } from '../parts.tsx'
+import {
+  CreateButton,
+  inProject,
+  ListHeader,
+  ListSkeleton,
+  LoadError,
+  MoreButton,
+} from '../parts.tsx'
 import { CabinetShell } from '../shell.tsx'
 import type { AskThreadRow } from './model.ts'
 
@@ -73,6 +80,8 @@ export function AskListScreen({
   onActions,
   onNew,
   onRetry,
+  onShowMore,
+  loadingMore = false,
   mine,
   onMine,
   project,
@@ -83,7 +92,7 @@ export function AskListScreen({
   status: InstallStatus
   threads: AskThreadRow[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canCreate?: boolean
   /** May rename or delete this one (#666): its author or a member with the right. */
   canManage?: (thread: AskThreadRow) => boolean
@@ -91,6 +100,9 @@ export function AskListScreen({
   onActions?: (id: string) => void
   onNew?: () => void
   onRetry?: () => void
+  /** Reads the next page (#739); absent on the last one. */
+  onShowMore?: () => void
+  loadingMore?: boolean
   /** «Only mine» (the cabinet's Все / Мои); the switch shows when it can be changed. */
   mine?: boolean
   onMine?: (mine: boolean) => void
@@ -116,7 +128,7 @@ export function AskListScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError text={t('ask.listError')} onRetry={onRetry} />
+        <LoadError error={error} text={t('ask.listError')} onRetry={onRetry} />
       ) : threads.length === 0 ? (
         <EmptyState icon="circleHelp" title={t('ask.empty')} text={t('ask.emptyText')} />
       ) : (
@@ -132,6 +144,7 @@ export function AskListScreen({
               />
             ))}
           </RowGroup>
+          {onShowMore && <MoreButton onPress={onShowMore} loading={loadingMore} />}
         </View>
       )}
     </CabinetShell>

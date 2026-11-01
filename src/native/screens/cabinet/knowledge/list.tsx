@@ -8,12 +8,12 @@ import { IconButton } from '../../../Button.tsx'
 import { EmptyState } from '../../../Feedback.tsx'
 import { Input, Segmented } from '../../../Field.tsx'
 import { Chip, ChipRow } from '../../../Chip.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
 import { InstallBanner } from '../../status.tsx'
 import type { ProjectRef, ShellProps } from '../model.ts'
-import { inProject, ListSkeleton, LoadError } from '../parts.tsx'
+import { inProject, ListSkeleton, LoadError, MoreButton } from '../parts.tsx'
 import { PromptLoadLine, type PromptLoad } from './load.tsx'
 import { CabinetShell } from '../shell.tsx'
 import {
@@ -51,6 +51,8 @@ export function KnowledgeListScreen({
   onRestore,
   onRefresh,
   onRetry,
+  onShowMore,
+  loadingMore = false,
   onQuery,
   onPause,
   onResume,
@@ -69,7 +71,7 @@ export function KnowledgeListScreen({
   pass?: KnowledgePass
   lastManual?: string
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canAdd?: boolean
   canEdit?: boolean
   canRefresh?: boolean
@@ -84,6 +86,9 @@ export function KnowledgeListScreen({
   onRestore?: (id: string) => void
   onRefresh?: () => void
   onRetry?: () => void
+  /** Reads the next page (#739); absent on the last one. */
+  onShowMore?: () => void
+  loadingMore?: boolean
   onQuery?: (text: string) => void
   onPause?: () => void
   onResume?: () => void
@@ -159,7 +164,7 @@ export function KnowledgeListScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError onRetry={onRetry} />
+        <LoadError error={error} onRetry={onRetry} />
       ) : shown.length === 0 ? (
         filters.length > 0 || query ? (
           <Text tone="muted" align="center" style={{ padding: theme.space(6) }}>
@@ -193,6 +198,7 @@ export function KnowledgeListScreen({
               onRestore={() => onRestore?.(e.id)}
             />
           ))}
+          {onShowMore && <MoreButton onPress={onShowMore} loading={loadingMore} />}
         </View>
       )}
     </CabinetShell>

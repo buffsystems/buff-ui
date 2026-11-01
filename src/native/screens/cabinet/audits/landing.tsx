@@ -5,7 +5,7 @@
 import { View } from 'react-native'
 import { IconButton } from '../../../Button.tsx'
 import { Callout, EmptyState } from '../../../Feedback.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
 import { InstallBanner } from '../../status.tsx'
@@ -41,7 +41,7 @@ export function AuditsLandingScreen({
   sections: AuditSection[]
   runs?: AuditRun[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canRun?: boolean
   onOpen?: (id: string) => void
   onRun?: () => void
@@ -89,7 +89,7 @@ export function AuditsLandingScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError text={t('audit.loadError')} onRetry={onRetry} />
+        <LoadError error={error} text={t('audit.loadError')} onRetry={onRetry} />
       ) : firstRun ? (
         <View style={{ gap: theme.space(3) }}>
           <EmptyState

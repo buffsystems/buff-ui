@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   One Ask thread (#629): the person's bubbles on the right, Buff's answers as prose on the
@@ -44,7 +45,7 @@ export function AskThreadScreen({
   status: InstallStatus
   thread?: AskThread
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   notFound?: boolean
   canWrite?: boolean
   draft?: string
@@ -72,7 +73,7 @@ export function AskThreadScreen({
   const body = loading ? (
     <ListSkeleton rows={5} />
   ) : error ? (
-    <LoadError text={t('ask.threadError')} onRetry={onRetry} />
+    <LoadError error={error} text={t('ask.threadError')} onRetry={onRetry} />
   ) : notFound || !thread ? (
     <EmptyState icon="inbox" title={t('ask.notFound')} text={t('ask.notFoundText')} />
   ) : (

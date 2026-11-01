@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   The review of one task (#629): the header with its state, the checks, and the tabs —
@@ -69,7 +70,7 @@ export function ReviewScreen({
   review?: Review
   tab?: ReviewTab
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   findingFilter?: FindingFilter
   /** The discussion with the assistant, as an Ask thread; none = not started. */
   discussion?: AskThread
@@ -155,7 +156,7 @@ export function ReviewScreen({
         <InstallBanner status={status} />
         {loading || !review ? (
           error ? (
-            <LoadError onRetry={onRetry} />
+            <LoadError error={error} onRetry={onRetry} />
           ) : (
             <ListSkeleton rows={5} />
           )

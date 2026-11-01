@@ -8,10 +8,11 @@ import { Badge } from '../../../Badge.tsx'
 import { Button, IconButton } from '../../../Button.tsx'
 import { Callout } from '../../../Feedback.tsx'
 import { Field, Input } from '../../../Field.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Prose } from '../../../Prose.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Sheet } from '../../../Sheet.tsx'
+import { Spinner } from '../../../Spinner.tsx'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
 import { InstallBanner } from '../../status.tsx'
@@ -33,7 +34,7 @@ export function KnowledgeEntryScreen({
   status: InstallStatus
   entry?: KnowledgeEntry
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canEdit?: boolean
   onBack?: () => void
   onEdit?: () => void
@@ -72,7 +73,7 @@ export function KnowledgeEntryScreen({
         {loading ? (
           <ListSkeleton rows={4} />
         ) : error || !entry ? (
-          <LoadError onRetry={onRetry} />
+          <LoadError error={error} onRetry={onRetry} />
         ) : (
           <View
             style={{
@@ -98,7 +99,7 @@ export function KnowledgeEntryScreen({
             {entry.needsReview && entry.reviewNote && (
               <Callout tone="warn">{entry.reviewNote}</Callout>
             )}
-            <Prose markdown={entry.body} />
+            {entry.body === undefined ? <Spinner /> : <Prose markdown={entry.body} />}
             <View
               style={{
                 gap: 2,

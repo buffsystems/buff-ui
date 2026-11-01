@@ -9,7 +9,7 @@ import { Button } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
 import { EmptyState } from '../../../Feedback.tsx'
 import { Icon } from '../../../Icon.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Row, RowGroup } from '../../../Row.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Text } from '../../../Text.tsx'
@@ -110,7 +110,7 @@ export function ReviewQueueScreen({
   status: InstallStatus
   rows: ReviewQueueRow[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onOpen?: (n: number) => void
   onDiscuss?: (n: number) => void
   onTask?: (n: number) => void
@@ -136,7 +136,7 @@ export function ReviewQueueScreen({
       {loading ? (
         <ListSkeleton />
       ) : error ? (
-        <LoadError text={t('review.queueError')} onRetry={onRetry} />
+        <LoadError error={error} text={t('review.queueError')} onRetry={onRetry} />
       ) : rows.length === 0 ? (
         <View style={{ gap: theme.space(3) }}>
           <EmptyState

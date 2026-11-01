@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   One research (#629): its status line with the timer and the pause / stop controls, the
@@ -56,7 +57,7 @@ export function ResearchScreen({
   status: InstallStatus
   research?: Research
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canWrite?: boolean
   draft?: string
   /** Files for the next turn (#27), and how to add and drop one; no `onAttach` — no paperclip. */
@@ -127,7 +128,7 @@ export function ResearchScreen({
         {loading ? (
           <ListSkeleton rows={5} />
         ) : error || !research ? (
-          <LoadError text={t('research.loadError')} onRetry={onRetry} />
+          <LoadError error={error} text={t('research.loadError')} onRetry={onRetry} />
         ) : (
           <View
             style={{

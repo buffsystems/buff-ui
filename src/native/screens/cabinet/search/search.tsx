@@ -8,7 +8,7 @@ import { Chip, ChipRow } from '../../../Chip.tsx'
 import { EmptyState } from '../../../Feedback.tsx'
 import { Input } from '../../../Field.tsx'
 import type { IconName } from '../../../icons.ts'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Row, RowGroup } from '../../../Row.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
@@ -63,7 +63,7 @@ export function SearchScreen({
   kinds?: SearchKind[]
   hits: SearchHitRow[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onQuery?: (text: string) => void
   onToggleKind?: (kind: SearchKind) => void
   onOpen?: (id: string) => void
@@ -101,7 +101,7 @@ export function SearchScreen({
         ) : loading ? (
           <ListSkeleton />
         ) : error ? (
-          <LoadError text={t('search.error')} onRetry={onRetry} />
+          <LoadError error={error} text={t('search.error')} onRetry={onRetry} />
         ) : hits.length === 0 ? (
           <EmptyState icon="search" title={t('search.none')} />
         ) : (

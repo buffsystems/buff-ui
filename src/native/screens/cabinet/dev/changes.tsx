@@ -8,7 +8,7 @@ import { Button } from '../../../Button.tsx'
 import { Chip, ChipRow } from '../../../Chip.tsx'
 import { DiffView } from '../../../Code.tsx'
 import { EmptyState } from '../../../Feedback.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Row, RowGroup } from '../../../Row.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Text } from '../../../Text.tsx'
@@ -58,7 +58,7 @@ export function ChangesScreen({
   taskNumber: number
   files: ChangedFile[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onBack?: () => void
   onOpenFile?: (path: string) => void
   onRetry?: () => void
@@ -84,7 +84,7 @@ export function ChangesScreen({
         {loading ? (
           <ListSkeleton />
         ) : error ? (
-          <LoadError text={t('devt.filesError')} onRetry={onRetry} />
+          <LoadError error={error} text={t('devt.filesError')} onRetry={onRetry} />
         ) : files.length === 0 ? (
           <EmptyState icon="fileText" title={t('devt.noFiles')} />
         ) : (
@@ -131,7 +131,7 @@ export function FileDiffScreen({
   path: string
   lines: string[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   /** The file's whole diff, in lines, when it comes in pages. */
   total?: number
   /** Another page; absent once everything is here. */
@@ -149,7 +149,7 @@ export function FileDiffScreen({
         <View style={{ paddingHorizontal: theme.space(3), gap: theme.space(2) }}>
           {lines.length > 0 && <DiffView lines={lines} />}
           {error ? (
-            <LoadError onRetry={onRetry} />
+            <LoadError error={error} onRetry={onRetry} />
           ) : loading ? (
             <ListSkeleton rows={4} />
           ) : (
@@ -188,7 +188,7 @@ export function TestsTab({
   tests: TestEntry[]
   filter?: TestFilter
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onFilter?: (f: TestFilter) => void
   onRetry?: () => void
   /** What an empty list means where it is shown (a task's branch, a project's main). */
@@ -197,7 +197,7 @@ export function TestsTab({
   const t = useT()
   const theme = useTheme()
   if (loading) return <ListSkeleton />
-  if (error) return <LoadError text={t('devt.testsError')} onRetry={onRetry} />
+  if (error) return <LoadError error={error} text={t('devt.testsError')} onRetry={onRetry} />
   if (tests.length === 0)
     return (
       <EmptyState

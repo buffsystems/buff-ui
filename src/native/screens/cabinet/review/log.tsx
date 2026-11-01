@@ -9,7 +9,7 @@ import { Button } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
 import { Terminal } from '../../../Code.tsx'
 import { Icon } from '../../../Icon.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
@@ -27,7 +27,7 @@ export interface CheckLogStep {
   lines?: string[]
   total?: number
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
 }
 
 const TONE: Record<CheckLogStep['status'], Tone> = { ok: 'ok', failed: 'crit', running: 'neutral' }
@@ -52,7 +52,7 @@ export function CheckLogScreen({
   task: number
   steps: CheckLogStep[]
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onToggle?: (id: string) => void
   onMore?: (id: string) => void
   /** Without a step: the run itself; with one: that step's output. */
@@ -69,7 +69,7 @@ export function CheckLogScreen({
         {loading ? (
           <ListSkeleton rows={4} />
         ) : error ? (
-          <LoadError onRetry={() => onRetry?.()} />
+          <LoadError error={error} onRetry={() => onRetry?.()} />
         ) : (
           <View style={{ paddingHorizontal: theme.space(4), gap: theme.space(2) }}>
             {steps.map((s) => (
@@ -131,7 +131,7 @@ function StepBody({
         )
       )}
       {step.error ? (
-        <LoadError onRetry={() => onRetry?.(step.id)} />
+        <LoadError error={step.error} onRetry={() => onRetry?.(step.id)} />
       ) : step.loading ? (
         <ListSkeleton rows={2} />
       ) : (

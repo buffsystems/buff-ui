@@ -7,7 +7,7 @@
 import { View } from 'react-native'
 import { IconButton } from '../../../Button.tsx'
 import { Callout } from '../../../Feedback.tsx'
-import type { InstallStatus } from '../../../model.ts'
+import type { InstallStatus, LoadFailure } from '../../../model.ts'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
@@ -43,7 +43,7 @@ export function ProjectTestsScreen({
   failure?: string
   filter?: TestFilter
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   onFilter?: (f: TestFilter) => void
   onRefresh?: () => void
   onRetry?: () => void

@@ -82,3 +82,6 @@ export interface PicturePolicy {
   /** The model, to name in the refusal; null — not known. */
   model: string | null
 }
+
+/** Why a screen's read failed: a flag, or the reason the install gave (#739) — shown as is. */
+export type LoadFailure = boolean | string

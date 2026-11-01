@@ -64,7 +64,6 @@ export const S = defineStrings({
   },
   'dev.prepareTools': { ru: 'Подготовить инструменты', en: 'Prepare the tools' },
   'dev.loadError': { ru: 'Не удалось загрузить задачи', en: 'Could not load the tasks' },
-  'dev.showMore': { ru: 'Показать ещё {n}', en: 'Show {n} more' },
   'dev.stagesTitle': { ru: 'Этапы', en: 'Stages' },
   'dev.stagesOf': { ru: '{i} из 7 · сейчас {stage}', en: '{i} of 7 · now {stage}' },
   'dev.stagesPaused': { ru: '{i} из 7 · на паузе', en: '{i} of 7 · paused' },

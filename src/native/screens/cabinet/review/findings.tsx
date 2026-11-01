@@ -1,3 +1,4 @@
+import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
 /*
   The findings of a review (#629): the filter, the cards with their actions, and the sheet
@@ -132,7 +133,7 @@ export function FindingsTab({
   findings: Finding[]
   filter?: FindingFilter
   loading?: boolean
-  error?: boolean
+  error?: LoadFailure
   canAdd?: boolean
   canDecide?: boolean
   disabled?: boolean

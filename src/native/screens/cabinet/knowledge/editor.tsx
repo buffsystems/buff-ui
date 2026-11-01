@@ -97,7 +97,7 @@ export function KnowledgeEditorScreen({
             <Text variant="caption" tone="fg2">
               {conflict.description}
             </Text>
-            <Prose markdown={conflict.body} />
+            <Prose markdown={conflict.body ?? ''} />
             <Button size="sm" onPress={onTakeCurrent}>
               {t('kbe.takeCurrent')}
             </Button>
