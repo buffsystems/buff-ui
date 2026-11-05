@@ -1,16 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SessionScreen, type SessionScreenProps } from '../../src/native/screens/buffcode/index.ts'
+import {
+  SessionScreen,
+  type SessionScreenProps,
+  type ToolStatus,
+} from '../../src/native/screens/buffcode/index.ts'
 import {
   changes,
   commands,
+  filesRefused,
   git,
   machine,
   offline,
   permission,
   permissionEdit,
+  planning,
   projects,
   questions,
   sessions,
+  subagents,
   timeline,
   trust,
 } from './fixtures-buffcode.ts'
@@ -43,7 +50,63 @@ export const base: SessionScreenProps = {
   commands,
 }
 
-export const Running: Story = { render: () => <SessionScreen {...base} /> }
+/** The machine works on the turn: the breathing brain and the timer under the timeline (#742). */
+export const Running: Story = {
+  render: () => <SessionScreen {...base} working={{ elapsed: '0:42' }} />,
+}
+/** The permission mode in the composer (#760): an icon of its own per mode; a tap opens the settings. */
+export const ModeFullAccess: Story = {
+  render: () => <SessionScreen {...base} running={false} mode="full" />,
+}
+export const ModePlan: Story = {
+  render: () => <SessionScreen {...base} running={false} mode="ask" plan />,
+}
+/** A compaction (#761): the summary for the model opens on a tap; while it runs — shown as it is written. */
+export const CompactionRunning: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      items={[
+        ...timeline.slice(0, 3),
+        {
+          kind: 'compaction',
+          id: 'c9',
+          when: '14:40',
+          status: 'running',
+          summary:
+            '## Цель\nЭкспорт отчётов в PDF с кириллицей.\n\n## Сделано\n- генератор на pdfkit',
+        },
+      ]}
+    />
+  ),
+}
+/** Tool calls in a row (#758): one folded line each run, as in the window; the last one at work. */
+export const ToolGroups: Story = {
+  render: () => {
+    const call = (id: string, tool: string, title: string, status: ToolStatus = 'done') =>
+      ({ kind: 'tool', id, tool, title, status }) as const
+    return (
+      <SessionScreen
+        {...base}
+        items={[
+          { kind: 'user', id: 'u1', text: 'Почини экспорт PDF', when: '14:02' },
+          call('t1', 'read', 'src/reports/pdf.ts'),
+          call('t2', 'grep', 'fontkit'),
+          call('t3', 'read', 'package.json'),
+          call('t4', 'shell', 'bun test src/reports', 'error'),
+          call('t5', 'shell', 'bun add fontkit'),
+          {
+            kind: 'assistant',
+            id: 'a1',
+            markdown: 'Не хватало `fontkit`. Поставил, перезапускаю тесты.',
+          },
+          call('t6', 'edit', 'src/reports/pdf.ts'),
+          call('t7', 'shell', 'bun test src/reports', 'running'),
+        ]}
+      />
+    )
+  },
+}
 /** Scrolled up: the floating button brings the latest message back. */
 export const ScrolledUp: Story = {
   render: () => <SessionScreen {...base} initialScroll="top" />,
@@ -60,6 +123,47 @@ export const Idle: Story = {
         { id: 'a2', name: 'spec.pdf', size: 1048576, kind: 'file' },
       ]}
     />
+  ),
+}
+/** The model's to-do list and subagents (#752, #753, #762): cards in the timeline, the working ones behind the composer's icon. */
+export const TodoAndSubagents: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      items={planning}
+      subagents={subagents}
+      onOpenSubagent={() => undefined}
+    />
+  ),
+}
+/** Subagents at work while a dock waits (#762): a line above the dock opens their list. */
+export const SubagentsWithDock: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      items={planning}
+      subagents={subagents}
+      dock={{ kind: 'permission', request: { title: 'bun test', patterns: ['bun test *'] } }}
+      onOpenSubagent={() => undefined}
+    />
+  ),
+}
+/** A subagent's session opened from its card (#753): read-only, the parent answers. */
+export const SubagentReadOnly: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      session={{ ...base.session, title: 'Найти, как в проекте формируются PDF' }}
+      items={planning.slice(0, 1)}
+      readOnly
+      running={false}
+    />
+  ),
+}
+/** The model refused a request with files (#757): analyse them with code, switch the model or go on without them. */
+export const FilesRefused: Story = {
+  render: () => (
+    <SessionScreen {...base} running={false} items={filesRefused} onFileChoice={() => undefined} />
   ),
 }
 export const Empty: Story = {

@@ -78,6 +78,23 @@ export const Details: Story = {
     </>
   ),
 }
+/** The session's settings with the thinking mode (#759): the model's variant, changed from here. */
+export const DetailsThinkingMode: Story = {
+  render: () => (
+    <>
+      <SessionScreen {...base} variant="high" />
+      <SessionDetailsSheet
+        details={details}
+        model="DeepSeek V4"
+        onModel={() => undefined}
+        variant="high"
+        onVariant={() => undefined}
+        mode="Править самому"
+        onMode={() => undefined}
+      />
+    </>
+  ),
+}
 export const ChangesOffline: Story = {
   render: () => <SessionScreen {...base} status={offline} view="changes" />,
 }

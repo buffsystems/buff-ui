@@ -13,6 +13,7 @@ import { useT, useTheme } from '../../theme.tsx'
 import { Gutter } from '../buffcode/shell.tsx'
 import { InstallRow } from '../home.tsx'
 import { InstallBanner } from '../status.tsx'
+import { StarterCards, type StarterLink } from '../starter.tsx'
 
 /** Manage installs: the list, each opening its own settings. */
 export function InstallsSettingsScreen({
@@ -20,14 +21,20 @@ export function InstallsSettingsScreen({
   onOpen,
   onAdd,
   onBack,
+  onOpenLink,
+  onDemo,
 }: {
   installs: Install[]
   onOpen?: (id: string) => void
   onAdd?: () => void
   onBack?: () => void
+  /** The list is empty (#745): where to get Buff Code and Buff Community, and the demo in one tap. */
+  onOpenLink?: (link: StarterLink) => void
+  onDemo?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
+  const starter = !!onOpenLink || !!onDemo
   return (
     <>
       <TopBar
@@ -35,14 +42,17 @@ export function InstallsSettingsScreen({
         onBack={onBack}
         actions={<IconButton icon="plus" label={t('home.addInstall')} onPress={onAdd} />}
       />
-      <Screen scroll={installs.length > 0}>
+      <Screen scroll={installs.length > 0 || starter}>
         {installs.length === 0 ? (
-          <EmptyState
-            icon="smartphone"
-            title={t('settings.noInstalls')}
-            text={t('pair.welcomeText')}
-            action={{ label: t('home.addInstall'), icon: 'plus', onPress: onAdd }}
-          />
+          <>
+            <EmptyState
+              icon="smartphone"
+              title={t('settings.noInstalls')}
+              text={t('pair.welcomeText')}
+              action={{ label: t('home.addInstall'), icon: 'plus', onPress: onAdd }}
+            />
+            {starter && <StarterCards onOpen={onOpenLink} onDemo={onDemo} />}
+          </>
         ) : (
           <View style={{ paddingTop: theme.space(3) }}>
             <Gutter>

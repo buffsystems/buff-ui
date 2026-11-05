@@ -8,6 +8,7 @@ import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { BcAgent, BcModel, BcProject, PermissionMode } from './model.ts'
 import { Gutter, isLive, MachineShell } from './shell.tsx'
+import { variantHint, variantLabel } from './variant.ts'
 
 export const MODE_KEY: Record<PermissionMode, string> = {
   ask: 'buffcode.modeAsk',
@@ -84,6 +85,8 @@ export function NewSessionScreen({
   onPickProject,
   onPickModel,
   onPickAgent,
+  variant,
+  onPickVariant,
   onMode,
   onPlan,
   onPrompt,
@@ -102,6 +105,9 @@ export function NewSessionScreen({
   onPickProject?: () => void
   onPickModel?: () => void
   onPickAgent?: () => void
+  /** The model's thinking mode (#759): its variant id; no handler — the model has none. */
+  variant?: string
+  onPickVariant?: () => void
   onMode?: (mode: PermissionMode) => void
   onPlan?: () => void
   onPrompt?: (text: string) => void
@@ -150,6 +156,17 @@ export function NewSessionScreen({
               disabled={!live}
             />
           </Field>
+          {onPickVariant && (
+            <Field label={t('buffcode.thinkingMode')} hint={variantHint(t, variant ?? 'default')}>
+              <SelectField
+                icon="brain"
+                placeholder={t('buffcode.thinkingMode')}
+                value={variantLabel(t, variant ?? 'default')}
+                onPress={onPickVariant}
+                disabled={!live}
+              />
+            </Field>
+          )}
           <Field label={t('buffcode.agent')}>
             <SelectField
               icon="bot"

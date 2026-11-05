@@ -1,5 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { NewSessionScreen, PickerSheet } from '../../src/native/screens/buffcode/index.ts'
+import {
+  NewSessionScreen,
+  PickerSheet,
+  variantHint,
+  variantLabel,
+} from '../../src/native/screens/buffcode/index.ts'
+import { useT } from '../../src/native/index.ts'
 import { agents, machine, models, offline, projects } from './fixtures-buffcode.ts'
 import { withPhone } from './PhoneFrame.tsx'
 
@@ -43,6 +49,52 @@ export const PlanMode: Story = {
       mode="ask"
       plan
     />
+  ),
+}
+/** The model's thinking mode (#759): picked when the session starts, each choice says what it changes. */
+export const ThinkingMode: Story = {
+  render: () => (
+    <NewSessionScreen
+      install={machine}
+      status={status}
+      project={projects[0]}
+      model={models[0]}
+      variant="high"
+      onPickVariant={() => undefined}
+      mode="edit"
+    />
+  ),
+}
+function VariantPicker() {
+  const t = useT()
+  return (
+    <PickerSheet
+      title={t('buffcode.thinkingMode')}
+      icon="brain"
+      items={['default', 'low', 'high', 'max'].map((id) => ({
+        id,
+        title: variantLabel(t, id),
+        subtitle: variantHint(t, id),
+      }))}
+      selectedId="high"
+      emptyTitle=""
+      emptyText=""
+    />
+  )
+}
+export const PickThinkingMode: Story = {
+  render: () => (
+    <>
+      <NewSessionScreen
+        install={machine}
+        status={status}
+        project={projects[0]}
+        model={models[0]}
+        variant="high"
+        onPickVariant={() => undefined}
+      />
+      <VariantPicker />
+    </>
   ),
 }
 export const PickProject: Story = {

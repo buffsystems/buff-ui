@@ -30,6 +30,11 @@ const detail = {
 
 export const Installs: Story = { render: () => <InstallsSettingsScreen installs={installs} /> }
 export const InstallsEmpty: Story = { render: () => <InstallsSettingsScreen installs={[]} /> }
+export const InstallsEmptyStarter: Story = {
+  render: () => (
+    <InstallsSettingsScreen installs={[]} onOpenLink={() => undefined} onDemo={() => undefined} />
+  ),
+}
 export const Install: Story = { render: () => <InstallSettingsScreen {...detail} /> }
 export const InstallRepair: Story = {
   render: () => <InstallSettingsScreen {...detail} install={installs[7]} name="dev-box" />,

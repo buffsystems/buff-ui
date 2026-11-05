@@ -20,6 +20,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Welcome: Story = { render: () => <WelcomeScreen /> }
+/** Nothing paired (#745): where to get Buff Code and Buff Community, and the demo in one tap. */
+export const WelcomeStarter: Story = {
+  render: () => <WelcomeScreen onOpen={() => undefined} onDemo={() => undefined} />,
+}
+export const WelcomeStarterNoDemo: Story = {
+  render: () => <WelcomeScreen onOpen={() => undefined} />,
+}
 export const Scanner: Story = { render: () => <ScanScreen /> }
 export const ScannerFound: Story = { render: () => <ScanScreen found /> }
 export const EnterCode: Story = {

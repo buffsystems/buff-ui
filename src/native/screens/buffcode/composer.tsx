@@ -6,7 +6,9 @@ import type { Attachment } from '../../model.ts'
 import { Row, RowGroup } from '../../Row.tsx'
 import { Sheet } from '../../Sheet.tsx'
 import { useT, useTheme } from '../../theme.tsx'
-import { AttachmentChip } from './composer-parts.tsx'
+import { AttachmentChip, ModeButton } from './composer-parts.tsx'
+import type { PermissionMode } from './model.ts'
+import { SubagentsButton } from './subagents.tsx'
 
 /**
  * The composer under the timeline: attachments, the text, the chips (model, mode, agent),
@@ -18,6 +20,11 @@ export function Composer({
   disabled = false,
   attachments = [],
   chips,
+  mode,
+  plan = false,
+  onMode,
+  subagents = 0,
+  onSubagents,
   onChange,
   onAttach,
   onRemoveAttachment,
@@ -31,6 +38,14 @@ export function Composer({
   attachments?: Attachment[]
   /** The model / mode / agent chips, built by the screen. */
   chips?: React.ReactNode
+  /** The session's permission mode (#760): its icon next to the paperclip; unknown — no icon. */
+  mode?: PermissionMode
+  plan?: boolean
+  /** The mode's icon was tapped: the session's settings open. */
+  onMode?: () => void
+  /** Subagents at work (#762): an icon with their count; none — no icon. */
+  subagents?: number
+  onSubagents?: () => void
   onChange?: (text: string) => void
   onAttach?: () => void
   onRemoveAttachment?: (id: string) => void
@@ -103,6 +118,10 @@ export function Composer({
             size="sm"
             disabled={disabled}
           />
+          {mode && <ModeButton mode={mode} plan={plan} disabled={disabled} onPress={onMode} />}
+          {subagents > 0 && (
+            <SubagentsButton count={subagents} disabled={disabled} onPress={onSubagents} />
+          )}
           <View
             style={{
               flex: 1,

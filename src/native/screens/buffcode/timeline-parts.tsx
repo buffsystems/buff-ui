@@ -1,15 +1,17 @@
 /** @jsxRuntime automatic */
 import { View } from 'react-native'
 import { StatusDot } from '../../Badge.tsx'
+import { Button } from '../../Button.tsx'
 import { Callout } from '../../Feedback.tsx'
 import { Icon } from '../../Icon.tsx'
 import type { Attachment } from '../../model.ts'
 import { Prose } from '../../Prose.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
-import type { TimelineItem } from './model.ts'
+import type { FileChoice, TimelineItem } from './model.ts'
+import { CompactionNote } from './compaction.tsx'
 import { SentFile } from './sent-file.tsx'
-import { BackgroundWork, ToolCall } from './tool-parts.tsx'
+import { BackgroundWork, SubagentCard, TodoCard, ToolCall } from './tool-parts.tsx'
 
 /** What the person said; attachments as chips under the text. */
 export function UserTurn({
@@ -115,11 +117,20 @@ export function TimelinePart({
   item,
   disabled = false,
   onOpenSent,
+  onOpenSubagent,
+  onFileChoice,
+  onOpenCompaction,
 }: {
   item: TimelineItem
   disabled?: boolean
   /** A file the agent handed over was tapped (#708). */
   onOpenSent?: (file: { path: string; name: string; mime: string }) => void
+  /** A subagent's card was tapped (#753): its session opens read-only. */
+  onOpenSubagent?: (sessionID: string) => void
+  /** A way on after the model refused a request with files (#757); `id` — the error item. */
+  onFileChoice?: (choice: FileChoice, id: string) => void
+  /** A compaction's summary was opened (#761): the screen fetches the whole text. */
+  onOpenCompaction?: (id: string) => void
 }) {
   const t = useT()
   switch (item.kind) {
@@ -141,6 +152,23 @@ export function TimelinePart({
       )
     case 'background':
       return <BackgroundWork tasks={item.tasks} disabled={disabled} />
+    case 'todo':
+      return <TodoCard items={item.items} />
+    case 'subagent':
+      return (
+        <SubagentCard
+          title={item.title}
+          agent={item.agent}
+          status={item.status}
+          output={item.output}
+          background={item.background}
+          onOpen={
+            onOpenSubagent && item.sessionID && !disabled
+              ? () => onOpenSubagent(item.sessionID!)
+              : undefined
+          }
+        />
+      )
     case 'file':
       return (
         <SentFile
@@ -157,7 +185,33 @@ export function TimelinePart({
       )
     case 'error':
       return (
-        <Callout tone="crit" title={t('buffcode.errorTitle')}>
+        <Callout
+          tone="crit"
+          title={t('buffcode.errorTitle')}
+          action={
+            item.files && onFileChoice ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+                {(
+                  [
+                    ['analyze', 'buffcode.filesAnalyze'],
+                    ['switch-model', 'buffcode.filesModel'],
+                    ['without-files', 'buffcode.filesWithout'],
+                  ] as const
+                ).map(([choice, label]) => (
+                  <Button
+                    key={choice}
+                    size="sm"
+                    variant="outline"
+                    disabled={disabled}
+                    onPress={() => onFileChoice(choice, item.id)}
+                  >
+                    {t(label)}
+                  </Button>
+                ))}
+              </View>
+            ) : undefined
+          }
+        >
           {item.text}
         </Callout>
       )
@@ -165,9 +219,12 @@ export function TimelinePart({
       return <ServiceNotice label={item.label} summary={item.summary} />
     case 'compaction':
       return (
-        <Text variant="caption" tone="muted" align="center">
-          — {t('buffcode.compacted')} · {item.when} —
-        </Text>
+        <CompactionNote
+          when={item.when}
+          status={item.status}
+          summary={item.summary}
+          onOpen={onOpenCompaction ? () => onOpenCompaction(item.id) : undefined}
+        />
       )
   }
 }

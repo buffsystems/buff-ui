@@ -1,10 +1,12 @@
 /** @jsxRuntime automatic */
 import { Pressable, View } from 'react-native'
+import { Spinner } from '../../Feedback.tsx'
 import { Icon } from '../../Icon.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { GitState, PermissionMode } from './model.ts'
 import { MODE_KEY } from './new-session.tsx'
+import { variantLabel } from './variant.ts'
 
 /**
  * One quiet line over the composer instead of a row of chips (owner's review): the model,
@@ -12,14 +14,19 @@ import { MODE_KEY } from './new-session.tsx'
  */
 export function SessionContextLine({
   model,
+  variant,
   git,
   mode,
+  plan = false,
   disabled = false,
   onPress,
 }: {
   model?: string
+  /** The model's thinking mode (#759) by its variant id; the default one is not named. */
+  variant?: string
   git?: GitState
   mode?: PermissionMode
+  plan?: boolean
   disabled?: boolean
   onPress?: () => void
 }) {
@@ -27,7 +34,7 @@ export function SessionContextLine({
   const theme = useTheme()
   const c = theme.colors
   const parts = [
-    model,
+    model && variant && variant !== 'default' ? `${model} · ${variantLabel(t, variant)}` : model,
     git?.branch &&
       [
         git.branch,
@@ -36,6 +43,7 @@ export function SessionContextLine({
       ]
         .filter(Boolean)
         .join(' '),
+    plan && t('buffcode.plan'),
     mode && t(MODE_KEY[mode]),
   ].filter(Boolean)
   if (parts.length === 0) return null
@@ -96,6 +104,32 @@ export function JumpToLatest({ onPress }: { onPress?: () => void }) {
   )
 }
 
+/**
+ * Under the latest turn while the machine works on it (#742): the brand's breathing brain,
+ * «Working…» and how long the turn has run — as the window's «Working» and Ask's «thinking» line.
+ * Stays until the turn ends: the phone sees the answer in snapshots, and a pause between them
+ * must not read as a stall.
+ */
+export function WorkingLine({ elapsed }: { elapsed?: string }) {
+  const t = useT()
+  return (
+    <View
+      accessibilityLiveRegion="polite"
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+    >
+      <Spinner />
+      <Text variant="label" tone="muted">
+        {t('buffcode.working')}
+      </Text>
+      {elapsed && (
+        <Text variant="mono" tone="muted">
+          {elapsed}
+        </Text>
+      )}
+    </View>
+  )
+}
+
 /** In place of the composer while a dock waits for the person's answer. */
 export function WaitingAboveNote() {
   const t = useT()
@@ -113,6 +147,28 @@ export function WaitingAboveNote() {
       <Icon name="info" size={16} color={theme.colors.mutedForeground} />
       <Text variant="caption" tone="muted" style={{ flex: 1 }}>
         {t('buffcode.waitingAbove')}
+      </Text>
+    </View>
+  )
+}
+
+/** A subagent's session (#753): the parent session answers, here one only reads. */
+export function ReadOnlyNote() {
+  const t = useT()
+  const theme = useTheme()
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.space(2),
+        padding: theme.space(3),
+        paddingHorizontal: theme.space(4),
+      }}
+    >
+      <Icon name="eye" size={16} color={theme.colors.mutedForeground} />
+      <Text variant="caption" tone="muted" style={{ flex: 1 }}>
+        {t('buffcode.subagentReadOnly')}
       </Text>
     </View>
   )

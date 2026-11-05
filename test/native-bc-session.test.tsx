@@ -218,3 +218,36 @@ test('the goal bar shows the goal and drives pause and reset', () => {
   fireEvent.click(screen.getByRole('button', { name: /Сбросить|Reset/ }))
   expect(acts).toEqual(['pause', 'clear'])
 })
+
+test('the working line shows under the timeline while the machine works, not under a dock', () => {
+  const props = {
+    install,
+    status: install.status,
+    session: {
+      id: 's',
+      projectId: 'p',
+      title: 'S',
+      origin: 'phone' as const,
+      when: '',
+      group: 'today' as const,
+    },
+    project: { id: 'p', name: 'shop', path: '/w', sessions: 1 },
+    items: [],
+    running: true,
+  }
+  const { rerender } = render(wrap(<SessionScreen {...props} working={{ elapsed: '0:42' }} />))
+  expect(screen.getByText('Работает…')).toBeTruthy()
+  expect(screen.getByText('0:42')).toBeTruthy()
+  rerender(
+    wrap(
+      <SessionScreen
+        {...props}
+        working={{ elapsed: '0:43' }}
+        dock={{ kind: 'question', index: 0, questions: [{ text: 'Какая база?', options: [] }] }}
+      />,
+    ),
+  )
+  expect(screen.queryByText('Работает…')).toBeNull()
+  rerender(wrap(<SessionScreen {...props} running={false} />))
+  expect(screen.queryByText('Работает…')).toBeNull()
+})

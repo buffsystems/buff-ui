@@ -2,9 +2,12 @@
 import { Pressable, View } from 'react-native'
 import { IconButton } from '../../Button.tsx'
 import { Icon } from '../../Icon.tsx'
+import type { IconName } from '../../icons.ts'
 import type { Attachment } from '../../model.ts'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
+import type { PermissionMode } from './model.ts'
+import { MODE_KEY } from './new-session.tsx'
 
 export function sizeLabel(bytes: number): string {
   return bytes < 1024 * 1024
@@ -133,6 +136,57 @@ export function ComposerChip({
       <Text variant="caption" style={{ color: fg, fontWeight: '500' }} numberOfLines={1}>
         {label}
       </Text>
+    </Pressable>
+  )
+}
+
+const MODE_ICON: Record<PermissionMode, IconName> = {
+  ask: 'shieldQuestion',
+  edit: 'pencil',
+  full: 'shieldAlert',
+  custom: 'slidersHorizontal',
+}
+
+/** The permission mode's icon (#760): one per mode; in the plan — the plan's own. */
+export function modeIcon(mode: PermissionMode, plan: boolean): IconName {
+  return plan ? 'map' : MODE_ICON[mode]
+}
+
+/** The permission mode in the composer's bottom row (#760): its icon; a tap opens the settings. */
+export function ModeButton({
+  mode,
+  plan = false,
+  disabled = false,
+  onPress,
+}: {
+  mode: PermissionMode
+  plan?: boolean
+  disabled?: boolean
+  onPress?: () => void
+}) {
+  const t = useT()
+  const theme = useTheme()
+  const c = theme.colors
+  const name = plan ? `${t('buffcode.plan')} · ${t(MODE_KEY[mode])}` : t(MODE_KEY[mode])
+  const fg = mode === 'full' && !plan ? c.warning : c.fg2
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${t('buffcode.permissionMode')}: ${name}`}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={4}
+      style={({ pressed }) => ({
+        width: 36,
+        height: 36,
+        borderRadius: theme.radius.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: disabled ? 0.5 : pressed ? 0.7 : 1,
+      })}
+    >
+      <Icon name={modeIcon(mode, plan)} size={16} color={fg} />
     </Pressable>
   )
 }

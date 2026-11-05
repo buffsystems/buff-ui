@@ -6,9 +6,10 @@ import { Button } from '../../Button.tsx'
 import { CodeBlock } from '../../Code.tsx'
 import { Icon } from '../../Icon.tsx'
 import type { IconName } from '../../icons.ts'
+import { Prose } from '../../Prose.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
-import type { ToolStatus } from './model.ts'
+import type { TodoItem, TodoStatus, ToolStatus } from './model.ts'
 
 export function statusTone(status: ToolStatus): Tone {
   return status === 'running' ? 'info' : status === 'done' ? 'ok' : 'crit'
@@ -153,6 +154,176 @@ export function BackgroundWork({
           )}
         </View>
       ))}
+    </View>
+  )
+}
+
+const TODO_ICON: Record<TodoStatus, IconName> = {
+  completed: 'checkCircle',
+  in_progress: 'play',
+  pending: 'clock',
+}
+const TODO_LABEL: Record<TodoStatus, string> = {
+  completed: 'buffcode.todoCompleted',
+  in_progress: 'buffcode.todoInProgress',
+  pending: 'buffcode.todoPending',
+}
+
+/** The model's to-do list (#752): done, in progress or waiting — the whole list as of this call. */
+export function TodoCard({ items }: { items: TodoItem[] }) {
+  const t = useT()
+  const theme = useTheme()
+  const done = items.filter((i) => i.status === 'completed').length
+  const current =
+    items.find((i) => i.status === 'in_progress') ?? items.find((i) => i.status === 'pending')
+  return (
+    <View
+      accessibilityLabel={`${t('buffcode.todos')}: ${t('buffcode.todoProgress', { done: String(done), total: String(items.length) })}`}
+      style={{
+        borderRadius: theme.radius.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.muted,
+        padding: theme.space(3),
+        gap: theme.space(2),
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space(2) }}>
+        <Icon name="listChecks" size={16} color={theme.colors.mutedForeground} />
+        <Text variant="label" tone="fg2" style={{ flex: 1 }} numberOfLines={1}>
+          {t('buffcode.todos')} ·{' '}
+          {t('buffcode.todoProgress', { done: String(done), total: String(items.length) })}
+          {current ? ` · ${current.content}` : ` · ${t('buffcode.todoAllDone')}`}
+        </Text>
+      </View>
+      {items.map((item, i) => (
+        <View
+          key={i}
+          accessibilityLabel={`${t(TODO_LABEL[item.status])}: ${item.content}`}
+          style={{ flexDirection: 'row', alignItems: 'flex-start', gap: theme.space(2) }}
+        >
+          <Icon
+            name={TODO_ICON[item.status]}
+            size={16}
+            color={
+              item.status === 'completed'
+                ? theme.colors.success
+                : item.status === 'in_progress'
+                  ? theme.colors.primary
+                  : theme.colors.mutedForeground
+            }
+          />
+          <Text
+            variant="body"
+            tone={item.status === 'completed' ? 'muted' : 'fg'}
+            style={{
+              flex: 1,
+              ...(item.status === 'completed'
+                ? { textDecorationLine: 'line-through' as const }
+                : {}),
+            }}
+          >
+            {item.content}
+          </Text>
+        </View>
+      ))}
+    </View>
+  )
+}
+
+/** A subagent's result as the tool returns it: one outer wrapper tag, if any, is not for people. */
+export function subagentMarkdown(output: string): string {
+  const m = /^\s*<([A-Za-z_][\w-]*)(?:\s[^>]*)?>\s*([\s\S]*?)\s*<\/\1>\s*$/.exec(output)
+  return (m ? m[2]! : output).trim()
+}
+
+/** A subagent's call (#753): who, what, how it goes; the result as Markdown; a tap opens its session. */
+export function SubagentCard({
+  title,
+  agent,
+  status,
+  output,
+  background = false,
+  onOpen,
+}: {
+  title: string
+  agent?: string
+  status: ToolStatus
+  output?: string
+  background?: boolean
+  onOpen?: () => void
+}) {
+  const t = useT()
+  const theme = useTheme()
+  const [open, setOpen] = useState(false)
+  const markdown = output ? subagentMarkdown(output) : ''
+  const head = (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.space(2),
+        minHeight: 44,
+        paddingHorizontal: theme.space(3),
+      }}
+    >
+      <StatusDot tone={statusTone(status)} pulse={status === 'running'} />
+      <Icon name="bot" size={16} color={theme.colors.mutedForeground} />
+      <View style={{ flex: 1 }}>
+        <Text variant="label" numberOfLines={1}>
+          {agent ?? t('buffcode.subagentDefault')}
+          {background ? ` · ${t('buffcode.subagentInBackground')}` : ''}
+        </Text>
+        <Text variant="caption" tone="muted" numberOfLines={2}>
+          {title}
+        </Text>
+      </View>
+      {onOpen ? (
+        <Icon name="chevronRight" size={16} color={theme.colors.mutedForeground} />
+      ) : markdown ? (
+        <Icon
+          name={open ? 'chevronDown' : 'chevronRight'}
+          size={16}
+          color={theme.colors.mutedForeground}
+        />
+      ) : null}
+    </View>
+  )
+  return (
+    <View
+      style={{
+        borderRadius: theme.radius.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.muted,
+        overflow: 'hidden',
+      }}
+    >
+      {onOpen ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('buffcode.subagentOpen')}
+          onPress={onOpen}
+        >
+          {head}
+        </Pressable>
+      ) : markdown ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={title}
+          accessibilityState={{ expanded: open }}
+          onPress={() => setOpen((v) => !v)}
+        >
+          {head}
+        </Pressable>
+      ) : (
+        head
+      )}
+      {markdown && (onOpen || open) ? (
+        <View style={{ paddingHorizontal: theme.space(3), paddingBottom: theme.space(3) }}>
+          <Prose markdown={markdown} />
+        </View>
+      ) : null}
     </View>
   )
 }

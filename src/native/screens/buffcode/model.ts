@@ -59,6 +59,19 @@ export type TimelineItem =
       output?: string
     }
   | { kind: 'background'; id: string; tasks: { title: string; status: ToolStatus }[] }
+  /** The model's to-do list (#752, `todo_update`): the whole list as of this call. */
+  | { kind: 'todo'; id: string; items: TodoItem[] }
+  /** A subagent's call (#753): its session opens read-only; the result is Markdown. */
+  | {
+      kind: 'subagent'
+      id: string
+      title: string
+      agent?: string
+      status: ToolStatus
+      sessionID?: string
+      output?: string
+      background?: boolean
+    }
   /** A file the agent handed over (#708): the path inside the session's folder. */
   | {
       kind: 'file'
@@ -71,8 +84,43 @@ export type TimelineItem =
     }
   /** A service notice (#711): the goal, a workflow — a label and what happened. */
   | { kind: 'notice'; id: string; label: string; summary?: string }
-  | { kind: 'error'; id: string; text: string }
-  | { kind: 'compaction'; id: string; when: string }
+  /**
+   * A failed turn. `files` (#757): the model refused a request with files — the card offers to
+   * analyse them with code, switch the model or go on without them.
+   */
+  | { kind: 'error'; id: string; text: string; files?: { names: string[] } }
+  /**
+   * A context compaction (#761): its summary for the model, clipped as the timeline comes; the
+   * whole text is fetched when the person opens it. No status — an old service.
+   */
+  | {
+      kind: 'compaction'
+      id: string
+      when: string
+      status?: CompactionStatus
+      summary?: string
+    }
+
+export type CompactionStatus = 'running' | 'completed' | 'failed'
+
+/** The ways on after a refusal with files (#757). */
+export type FileChoice = 'analyze' | 'switch-model' | 'without-files'
+
+export type TodoStatus = 'pending' | 'in_progress' | 'completed'
+export interface TodoItem {
+  content: string
+  status: TodoStatus
+}
+
+/** A subagent of the session (#753): the working ones sit behind the composer's icon (#762). */
+export interface SubagentRef {
+  id: string
+  title: string
+  status: ToolStatus
+  sessionID?: string
+  /** The agent that runs it (#762). */
+  agent?: string
+}
 
 /** The session's goal for the bar above the composer (#711). */
 export interface GoalBarState {

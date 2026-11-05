@@ -1,5 +1,5 @@
 /** @jsxRuntime automatic */
-import type { ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, IconButton } from '../../Button.tsx'
 import { useFollowEnd } from '../../follow-end.ts'
@@ -18,19 +18,29 @@ import type {
   BcSession,
   ChangedFile,
   Dock,
+  FileChoice,
   GoalBarState,
   FileNode,
   GitState,
   PermissionMode,
   SlashCommand,
+  SubagentRef,
   TimelineItem,
   TrustItem,
   Usage,
 } from './model.ts'
 import { QuestionDock } from './question-dock.tsx'
-import { JumpToLatest, SessionContextLine, WaitingAboveNote } from './session-parts.tsx'
+import {
+  JumpToLatest,
+  ReadOnlyNote,
+  SessionContextLine,
+  WaitingAboveNote,
+  WorkingLine,
+} from './session-parts.tsx'
 import { isLive, MachineShell } from './shell.tsx'
+import { SubagentsLine, SubagentsSheet } from './subagents.tsx'
 import { TimelinePart } from './timeline-parts.tsx'
+import { foldTools, ToolGroup } from './tool-group.tsx'
 import { ChangesView, UsageView } from './changes-usage.tsx'
 import { ViewSwitcher, type SessionView } from './views.tsx'
 
@@ -41,10 +51,16 @@ export interface SessionScreenProps {
   project: BcProject
   items: TimelineItem[]
   running?: boolean
+  /** The machine works on the latest turn (#742): the line under the timeline, with the timer. */
+  working?: { elapsed?: string }
   view?: SessionView
   dock?: Dock
   /** The session's goal, shown above the composer (#711). */
   goal?: GoalBarState
+  /** The session's subagents (#753, #762): the working ones behind the composer's icon; a tap opens one read-only. */
+  subagents?: SubagentRef[]
+  /** A subagent's session (#753): no composer and no docks, the parent session answers. */
+  readOnly?: boolean
   trust?: TrustItem[]
   git?: GitState
   changes?: ChangedFile[]
@@ -68,8 +84,12 @@ export interface SessionScreenProps {
   slashQuery?: string
   commands?: SlashCommand[]
   model?: string
+  /** The model's thinking mode (#759) by its variant id, named in the context line. */
+  variant?: string
   agent?: string
   mode?: PermissionMode
+  /** The plan mark (#760): the composer's mode icon shows the plan. */
+  plan?: boolean
   loading?: boolean
   /** Where the timeline opens: at the latest message (default) or at the top (a story). */
   initialScroll?: 'end' | 'top'
@@ -115,6 +135,12 @@ export interface SessionScreenProps {
   onOpenFile?: (path: string) => void
   /** A file the agent handed over (#708): the app shows it or gives it to the system. */
   onOpenSent?: (file: { path: string; name: string; mime: string }) => void
+  /** A subagent's card or its line in the bar was tapped (#753). */
+  onOpenSubagent?: (sessionID: string) => void
+  /** A way on after the model refused a request with files (#757). */
+  onFileChoice?: (choice: FileChoice, id: string) => void
+  /** A compaction's summary was opened (#761): fetch the whole text. */
+  onOpenCompaction?: (id: string) => void
   onCloseFile?: () => void
   onRepair?: () => void
 }
@@ -178,6 +204,19 @@ export function SessionScreen(p: SessionScreenProps) {
   // The timeline opens at the latest message, keeps up with the agent while the reader is at the
   // bottom (#703) and offers a way back to it once scrolled up.
   const follow = useFollowEnd(p.initialScroll === 'top' ? 'top' : 'end')
+  const part = (item: TimelineItem) => (
+    <TimelinePart
+      item={item}
+      disabled={!live}
+      onOpenSent={p.onOpenSent}
+      onOpenSubagent={p.onOpenSubagent}
+      onFileChoice={p.onFileChoice}
+      onOpenCompaction={p.onOpenCompaction}
+    />
+  )
+  // The working subagents (#762): the composer's icon and its list.
+  const working = (p.subagents ?? []).filter((x) => x.status === 'running')
+  const [subagentsOpen, setSubagentsOpen] = useState(false)
   const body = () => {
     if (view === 'changes')
       return (
@@ -236,9 +275,15 @@ export function SessionScreen(p: SessionScreenProps) {
                 {tr('buffcode.older')}
               </Button>
             )}
-            {p.items.map((item) => (
-              <TimelinePart key={item.id} item={item} disabled={!live} onOpenSent={p.onOpenSent} />
-            ))}
+            {foldTools(p.items).map((item) =>
+              item.kind === 'tools' ? (
+                <ToolGroup key={item.id} items={item.items} render={part} />
+              ) : (
+                <Fragment key={item.id}>{part(item)}</Fragment>
+              ),
+            )}
+            {/* A dock waiting for the person takes the place of the working line. */}
+            {p.working && !p.dock && <WorkingLine elapsed={p.working.elapsed} />}
           </ScrollView>
           {!follow.atEnd && <JumpToLatest onPress={follow.toEnd} />}
         </View>
@@ -250,6 +295,9 @@ export function SessionScreen(p: SessionScreenProps) {
             onHide={p.onTrustHide}
           />
         )}
+        {p.dock && !p.readOnly && working.length > 0 && (
+          <SubagentsLine count={working.length} onPress={() => setSubagentsOpen(true)} />
+        )}
         {p.goal && !p.dock && (
           <GoalBar
             goal={p.goal}
@@ -260,7 +308,7 @@ export function SessionScreen(p: SessionScreenProps) {
           />
         )}
         <DockView
-          dock={p.dock}
+          dock={p.readOnly ? undefined : p.dock}
           disabled={!live}
           onDecide={p.onDecide}
           onReply={p.onReply}
@@ -277,7 +325,9 @@ export function SessionScreen(p: SessionScreenProps) {
           />
         )}
         <View style={{ borderTopWidth: 1, borderTopColor: t.colors.border }}>
-          {p.dock ? (
+          {p.readOnly ? (
+            <ReadOnlyNote />
+          ) : p.dock ? (
             // A dock waits for the person: the chat input would compete with it.
             <WaitingAboveNote />
           ) : (
@@ -295,8 +345,10 @@ export function SessionScreen(p: SessionScreenProps) {
               )}
               <SessionContextLine
                 model={p.model}
+                variant={p.variant}
                 git={p.git}
                 mode={p.mode}
+                plan={p.plan ?? false}
                 disabled={!live}
                 onPress={p.onDetails}
               />
@@ -311,6 +363,9 @@ export function SessionScreen(p: SessionScreenProps) {
                 onAttach={p.onAttach}
                 onRemoveAttachment={p.onRemoveAttachment}
                 onCommands={p.onCommands}
+                {...(p.mode ? { mode: p.mode, plan: p.plan ?? false, onMode: p.onDetails } : {})}
+                subagents={working.length}
+                onSubagents={() => setSubagentsOpen(true)}
               />
             </>
           )}
@@ -344,6 +399,14 @@ export function SessionScreen(p: SessionScreenProps) {
         onMore={p.onMore}
       />
       {body()}
+      {subagentsOpen && working.length > 0 && (
+        <SubagentsSheet
+          subagents={working}
+          disabled={!live}
+          onOpen={(id) => (setSubagentsOpen(false), p.onOpenSubagent?.(id))}
+          onClose={() => setSubagentsOpen(false)}
+        />
+      )}
     </MachineShell>
   )
 }

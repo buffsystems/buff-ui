@@ -182,7 +182,14 @@ export const timeline: TimelineItem[] = [
     id: 'e1',
     text: 'Тест упал: fontkit не найден в окружении. Нужна установка зависимости.',
   },
-  { kind: 'compaction', id: 'c1', when: '14:20' },
+  {
+    kind: 'compaction',
+    id: 'c1',
+    when: '14:20',
+    status: 'completed',
+    summary:
+      '## Цель\nЭкспорт отчётов в PDF с кириллицей.\n\n## Сделано\n- `src/reports/pdf.ts` — генератор на pdfkit\n- шрифт подключён из `assets/fonts`\n\n## Дальше\n- починить тест округления\n- поставить `fontkit`',
+  },
   {
     kind: 'background',
     id: 'b1',
@@ -580,5 +587,93 @@ export const notifications: NotificationEntry[] = [
     when: 'вчера',
     read: true,
     source: 'stream',
+  },
+]
+
+/** The model's to-do list and a subagent's call in the timeline (#752, #753). */
+export const planning: TimelineItem[] = [
+  {
+    kind: 'user',
+    id: 'pu1',
+    text: 'Разбей задачу на шаги и сделай по порядку, тесты запускай сам.',
+    when: '15:10',
+  },
+  {
+    kind: 'todo',
+    id: 'todo1',
+    items: [
+      { content: 'Прочитать страницу отчёта и обёртку PDF', status: 'completed' },
+      { content: 'Добавить эндпоинт POST /reports/:id/pdf', status: 'in_progress' },
+      { content: 'Кнопка «Скачать PDF» на странице отчёта', status: 'pending' },
+      { content: 'Тест на формирование файла', status: 'pending' },
+    ],
+  },
+  {
+    kind: 'subagent',
+    id: 'sa1',
+    title: 'Найти, как в проекте уже формируются PDF и какие шрифты подключены',
+    agent: 'explore',
+    status: 'done',
+    sessionID: 'ses_child_1',
+    output:
+      '<task_result>\nВ `src/lib/pdf.ts` есть обёртка над **@react-pdf/renderer**; шрифты подключаются в `src/lib/fonts.ts`:\n\n- Inter (regular, bold)\n- JetBrains Mono\n\nГотового эндпоинта экспорта нет.\n</task_result>',
+  },
+  {
+    kind: 'subagent',
+    id: 'sa2',
+    title: 'Написать тест на формирование PDF и прогнать его',
+    agent: 'build',
+    status: 'running',
+    sessionID: 'ses_child_2',
+    background: true,
+  },
+  {
+    kind: 'assistant',
+    id: 'pa1',
+    model: 'Claude Sonnet 5.5',
+    markdown: 'Эндпоинт добавлен, жду результат теста от субагента.',
+    streaming: true,
+  },
+]
+
+export const subagents = [
+  {
+    id: 'sa1',
+    title: 'Найти, как в проекте формируются PDF',
+    status: 'done' as const,
+    sessionID: 'ses_child_1',
+  },
+  {
+    id: 'sa2',
+    title: 'Написать тест на формирование PDF',
+    status: 'running' as const,
+    sessionID: 'ses_child_2',
+  },
+  {
+    id: 'sa3',
+    title: 'Проверить вёрстку отчёта',
+    status: 'running' as const,
+    sessionID: 'ses_child_3',
+    agent: 'review',
+  },
+]
+
+/** The model refused a request with a picture and a PDF (#757): the card offers three ways on. */
+export const filesRefused: TimelineItem[] = [
+  {
+    kind: 'user',
+    id: 'fr-u',
+    text: 'Собери дизайн-систему по брендбуку',
+    when: '10:42',
+    attachments: [
+      { id: 'fr-a1', name: 'brand.png', size: 70655, kind: 'image' },
+      { id: 'fr-a2', name: 'brand.pdf', size: 860688, kind: 'file' },
+    ],
+  },
+  {
+    kind: 'error',
+    id: 'fr-e',
+    text: 'Модель не приняла запрос с файлами brand.png, brand.pdf (ответ 400: image input is not supported). Возможно, она не читает такие файлы — выберите, как продолжить.',
+    files: { names: ['brand.png', 'brand.pdf'] },
   },
 ]

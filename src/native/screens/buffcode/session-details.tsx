@@ -8,6 +8,7 @@ import { Sheet } from '../../Sheet.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { SessionDetails } from './model.ts'
+import { variantHint, variantLabel } from './variant.ts'
 import { Eyebrow, originLabel } from './shell.tsx'
 
 /** «Session details»: where it runs, its branch, the MCP servers and the LSPs, a way to review. */
@@ -18,8 +19,10 @@ export function SessionDetailsSheet({
   onReview,
   model,
   mode,
+  variant,
   onModel,
   onMode,
+  onVariant,
   onClose,
 }: {
   details: SessionDetails
@@ -30,6 +33,9 @@ export function SessionDetailsSheet({
   mode?: string
   onModel?: () => void
   onMode?: () => void
+  /** The model's thinking mode (#759) by its variant id; no handler — the model has none. */
+  variant?: string
+  onVariant?: () => void
   onClose?: () => void
 }) {
   const t = useT()
@@ -57,7 +63,7 @@ export function SessionDetailsSheet({
         <KeyValue label={t('buffcode.detailsOrigin')} value={originLabel(t, details.origin)} />
         <KeyValue label={t('buffcode.detailsCreated')} value={details.created} />
       </Card>
-      {(onModel || onMode) && (
+      {(onModel || onMode || onVariant) && (
         <Card style={{ gap: theme.space(2) }}>
           {onModel && (
             <Field label={t('buffcode.model')}>
@@ -66,6 +72,17 @@ export function SessionDetailsSheet({
                 placeholder={t('buffcode.chooseModel')}
                 icon="sparkles"
                 onPress={onModel}
+                disabled={disabled}
+              />
+            </Field>
+          )}
+          {onVariant && (
+            <Field label={t('buffcode.thinkingMode')} hint={variantHint(t, variant ?? 'default')}>
+              <SelectField
+                value={variantLabel(t, variant ?? 'default')}
+                icon="brain"
+                placeholder={t('buffcode.thinkingMode')}
+                onPress={onVariant}
                 disabled={disabled}
               />
             </Field>

@@ -15,6 +15,7 @@ export type {
   BcSession,
   // The cabinet exports its own ChangedFile / Question / QuestionOption: these carry a prefix.
   ChangedFile as BcChangedFile,
+  CompactionStatus,
   Dock,
   FileNode,
   GitState,
@@ -43,6 +44,7 @@ export { ProjectRow, ProjectsScreen } from './projects.tsx'
 export { DeleteSessionSheet, SessionActionsSheet, SessionRow, SessionsScreen } from './sessions.tsx'
 export { MODE_KEY, NewSessionScreen, PermissionModeControl } from './new-session.tsx'
 export { PickerSheet } from './picker.tsx'
+export { variantHint, variantLabel } from './variant.ts'
 export { AssistantTurn, TimelinePart, UserTurn } from './timeline-parts.tsx'
 export { BackgroundWork, statusTone, ToolCall } from './tool-parts.tsx'
 export { AttachSheet, Composer } from './composer.tsx'

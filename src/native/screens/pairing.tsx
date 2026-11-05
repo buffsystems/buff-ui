@@ -10,22 +10,29 @@ import { CodeInput, SasCode, ScannerFrame } from '../Pairing.tsx'
 import { Screen, TopBar } from '../Screen.tsx'
 import { Text } from '../Text.tsx'
 import { useT, useTheme } from '../theme.tsx'
+import { StarterCards, type StarterLink } from './starter.tsx'
 
 /** First launch: nothing paired yet. */
 export function WelcomeScreen({
   onScan,
   onEnterCode,
   onBack,
+  onOpen,
+  onDemo,
 }: {
   onScan?: () => void
   onEnterCode?: () => void
   /** Adding one more install (#696): the same two ways as the first time, with a way back. */
   onBack?: () => void
+  /** Nothing paired yet (#745): where to get Buff Code and Buff Community, and the demo in one tap. */
+  onOpen?: (link: StarterLink) => void
+  onDemo?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
+  const starter = !!onOpen || !!onDemo
   return (
-    <Screen scroll={false}>
+    <Screen scroll={starter}>
       {onBack && <TopBar title={t('home.addInstall')} onBack={onBack} />}
       <EmptyState
         icon="smartphone"
@@ -33,11 +40,12 @@ export function WelcomeScreen({
         text={t('pair.welcomeText')}
         action={{ label: t('pair.scan'), icon: 'qrCode', onPress: onScan }}
       />
-      <View style={{ alignItems: 'center', paddingBottom: theme.space(8) }}>
+      <View style={{ alignItems: 'center', paddingBottom: theme.space(starter ? 4 : 8) }}>
         <Button variant="ghost" leadingIcon="link" onPress={onEnterCode}>
           {t('pair.enterCode')}
         </Button>
       </View>
+      {starter && <StarterCards onOpen={onOpen} onDemo={onDemo} />}
     </Screen>
   )
 }
