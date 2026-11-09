@@ -5,10 +5,11 @@ import { Chip } from '../../Chip.tsx'
 import { Field, Input, Segmented, SelectField } from '../../Field.tsx'
 import type { Install, InstallStatus } from '../../model.ts'
 import { Text } from '../../Text.tsx'
-import { useT, useTheme } from '../../theme.tsx'
+import { useLocale, useT, useTheme } from '../../theme.tsx'
 import type { BcAgent, BcModel, BcProject, PermissionMode } from './model.ts'
 import { Gutter, isLive, MachineShell } from './shell.tsx'
 import { variantHint, variantLabel } from './variant.ts'
+import { contextLabel } from './context.ts'
 
 export const MODE_KEY: Record<PermissionMode, string> = {
   ask: 'buffcode.modeAsk',
@@ -87,6 +88,9 @@ export function NewSessionScreen({
   onPickAgent,
   variant,
   onPickVariant,
+  context,
+  modelWindow,
+  onPickContext,
   onMode,
   onPlan,
   onPrompt,
@@ -108,6 +112,10 @@ export function NewSessionScreen({
   /** The model's thinking mode (#759): its variant id; no handler — the model has none. */
   variant?: string
   onPickVariant?: () => void
+  /** The session's context window (#839): the cap in tokens, 0 — the model's window; no handler — not picked here. */
+  context?: number
+  modelWindow?: number
+  onPickContext?: () => void
   onMode?: (mode: PermissionMode) => void
   onPlan?: () => void
   onPrompt?: (text: string) => void
@@ -115,6 +123,7 @@ export function NewSessionScreen({
   onRepair?: () => void
 }) {
   const t = useT()
+  const locale = useLocale()
   const theme = useTheme()
   const live = isLive(status)
   const ready = live && !!project && !!model
@@ -163,6 +172,17 @@ export function NewSessionScreen({
                 placeholder={t('buffcode.thinkingMode')}
                 value={variantLabel(t, variant ?? 'default')}
                 onPress={onPickVariant}
+                disabled={!live}
+              />
+            </Field>
+          )}
+          {onPickContext && (
+            <Field label={t('buffcode.contextWindow')} hint={t('buffcode.contextHint')}>
+              <SelectField
+                icon="layers"
+                placeholder={t('buffcode.contextWindow')}
+                value={contextLabel(locale, context ?? 0, modelWindow)}
+                onPress={onPickContext}
                 disabled={!live}
               />
             </Field>

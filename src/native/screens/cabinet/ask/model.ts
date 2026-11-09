@@ -18,13 +18,16 @@ export interface AskThreadRow {
 
 export interface AskMessage {
   id: string
-  role: 'user' | 'assistant'
+  /** `note` (#840): a service row — the AI mode changed; not a turn. */
+  role: 'user' | 'assistant' | 'note'
   /** Markdown. */
   content: string
   reasoning?: string
   questions?: Question[]
   attachments?: Attachment[]
   when?: string
+  /** Sent while Buff answered (#813): it waits for the next turn. */
+  queued?: boolean
 }
 
 export interface AskThread extends AskThreadRow {

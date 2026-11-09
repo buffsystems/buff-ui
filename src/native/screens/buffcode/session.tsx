@@ -3,9 +3,12 @@ import { Fragment, useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, IconButton } from '../../Button.tsx'
 import { useFollowEnd } from '../../follow-end.ts'
+import { useNearTop } from '../../near-top.ts'
 import type { Attachment, Install, InstallStatus } from '../../model.ts'
+import type { Download } from '../../download.ts'
 import { useT, useTheme } from '../../theme.tsx'
 import { Composer } from './composer.tsx'
+import { QueuedMessages, type QueuedMessage } from './queue.tsx'
 import { GoalBar } from './goal-bar.tsx'
 import { SlashSuggestions } from './commands.tsx'
 import { PermissionDock } from './docks.tsx'
@@ -61,6 +64,10 @@ export interface SessionScreenProps {
   subagents?: SubagentRef[]
   /** A subagent's session (#753): no composer and no docks, the parent session answers. */
   readOnly?: boolean
+  /** Messages sent while the agent worked (#812): they wait for the end of its turn. */
+  queued?: QueuedMessage[]
+  onQueuedCancel?: (id: string) => void
+  onQueuedSend?: (id: string) => void
   trust?: TrustItem[]
   git?: GitState
   changes?: ChangedFile[]
@@ -71,10 +78,14 @@ export interface SessionScreenProps {
     content: string
     language?: string
     image?: string
+    /** A page (#808): the host's rendering of it, with «Code» one tap away. */
+    page?: ReactNode
     /** The host's viewer of the whole file (#710). */
     preview?: ReactNode
     binary?: { mime: string; bytes: number }
     loading?: boolean
+    /** How much of it came (#809). */
+    progress?: Download
   }
   terminal?: string[]
   usage?: Usage
@@ -104,8 +115,11 @@ export interface SessionScreenProps {
   onStop?: () => void
   onAttach?: () => void
   onRemoveAttachment?: (id: string) => void
-  /** Older messages above the loaded ones; absent when the timeline starts here. */
+  /** Older messages above the loaded ones; absent when the timeline starts here. Also asked by
+   *  itself as the reader scrolls up near the top (#766). */
   onEarlier?: () => void
+  /** The earlier page is on its way. */
+  loadingEarlier?: boolean
   /** The terminal's command line and whether its command still runs. */
   terminalCommand?: string
   terminalRunning?: boolean
@@ -130,6 +144,8 @@ export interface SessionScreenProps {
   onReply?: (answers: string[]) => void
   onMcpSend?: (values: McpValues) => void
   onMcpDecline?: () => void
+  /** A link in a form (#765): the app opens it outside. */
+  onMcpOpen?: (url: string) => void
   onWebSearch?: (providerId: string) => void
   onWebSearchOff?: () => void
   onOpenFile?: (path: string) => void
@@ -152,11 +168,19 @@ function DockView({
   onReply,
   onMcpSend,
   onMcpDecline,
+  onMcpOpen,
   onWebSearch,
   onWebSearchOff,
 }: Pick<
   SessionScreenProps,
-  'dock' | 'onDecide' | 'onReply' | 'onMcpSend' | 'onMcpDecline' | 'onWebSearch' | 'onWebSearchOff'
+  | 'dock'
+  | 'onDecide'
+  | 'onReply'
+  | 'onMcpSend'
+  | 'onMcpDecline'
+  | 'onMcpOpen'
+  | 'onWebSearch'
+  | 'onWebSearchOff'
 > & { disabled: boolean }) {
   if (!dock) return null
   switch (dock.kind) {
@@ -181,6 +205,7 @@ function DockView({
           disabled={disabled}
           onSend={onMcpSend}
           onDecline={onMcpDecline}
+          onOpen={onMcpOpen}
         />
       )
     case 'websearch':
@@ -204,6 +229,7 @@ export function SessionScreen(p: SessionScreenProps) {
   // The timeline opens at the latest message, keeps up with the agent while the reader is at the
   // bottom (#703) and offers a way back to it once scrolled up.
   const follow = useFollowEnd(p.initialScroll === 'top' ? 'top' : 'end')
+  const top = useNearTop(p.loadingEarlier ? undefined : p.onEarlier)
   const part = (item: TimelineItem) => (
     <TimelinePart
       item={item}
@@ -233,9 +259,11 @@ export function SessionScreen(p: SessionScreenProps) {
           path={p.openFile.path}
           content={p.openFile.content}
           image={p.openFile.image}
+          page={p.openFile.page}
           preview={p.openFile.preview}
           binary={p.openFile.binary}
           loading={p.openFile.loading}
+          progress={p.openFile.progress}
           language={p.openFile.language}
           disabled={!live}
           onBack={p.onCloseFile}
@@ -267,11 +295,23 @@ export function SessionScreen(p: SessionScreenProps) {
             style={{ flex: 1 }}
             contentContainerStyle={{ padding: t.space(4), gap: t.space(4) }}
             scrollEventThrottle={100}
-            onScroll={follow.onScroll}
+            onScroll={(e) => {
+              follow.onScroll(e)
+              top.onScroll(e)
+            }}
+            onScrollBeginDrag={top.onScrollBeginDrag}
             onContentSizeChange={follow.onContentSizeChange}
+            // An earlier page lands above: the message being read stays where it was (#766).
+            maintainVisibleContentPosition={{ minIndexForVisible: 1 }}
           >
             {p.onEarlier && (
-              <Button size="sm" variant="ghost" leadingIcon="history" onPress={p.onEarlier}>
+              <Button
+                size="sm"
+                variant="ghost"
+                leadingIcon="history"
+                loading={p.loadingEarlier ?? false}
+                onPress={p.onEarlier}
+              >
                 {tr('buffcode.older')}
               </Button>
             )}
@@ -313,6 +353,7 @@ export function SessionScreen(p: SessionScreenProps) {
           onDecide={p.onDecide}
           onReply={p.onReply}
           onMcpSend={p.onMcpSend}
+          onMcpOpen={p.onMcpOpen}
           onMcpDecline={p.onMcpDecline}
           onWebSearch={p.onWebSearch}
           onWebSearchOff={p.onWebSearchOff}
@@ -351,6 +392,12 @@ export function SessionScreen(p: SessionScreenProps) {
                 plan={p.plan ?? false}
                 disabled={!live}
                 onPress={p.onDetails}
+              />
+              <QueuedMessages
+                items={p.queued ?? []}
+                disabled={!live}
+                onCancel={p.onQueuedCancel}
+                onSendNow={p.onQueuedSend}
               />
               <Composer
                 value={p.prompt}

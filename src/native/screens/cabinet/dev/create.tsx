@@ -3,6 +3,7 @@
   Starting work (#629): a new task — a project, a statement, attachments — and the sheet
   that makes a development project out of repositories and branches.
 */
+import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import { Button } from '../../../Button.tsx'
 import { Callout, Spinner } from '../../../Feedback.tsx'
@@ -33,6 +34,7 @@ export function CreateTaskScreen({
   onRemoveStaged,
   onCreate,
   onStatement,
+  params,
 }: {
   status: InstallStatus
   project?: ProjectRef
@@ -47,6 +49,8 @@ export function CreateTaskScreen({
   onCreate?: () => void
   /** The statement as typed. */
   onStatement?: (text: string) => void
+  /** «Параметры ИИ» (#840), when the install has them. */
+  params?: ReactNode
 }) {
   const t = useT()
   const theme = useTheme()
@@ -90,6 +94,7 @@ export function CreateTaskScreen({
             onChangeText={onStatement}
           />
         </Field>
+        {params}
         {staged.length > 0 && (
           <RowGroup title={t('cabinet.attachments')}>
             {staged.map((a) => (

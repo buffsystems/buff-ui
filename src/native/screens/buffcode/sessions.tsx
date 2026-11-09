@@ -21,8 +21,9 @@ import {
   skeletonRows,
 } from './shell.tsx'
 
-const GROUPS: BcSession['group'][] = ['today', 'yesterday', 'older']
+const GROUPS: BcSession['group'][] = ['setup', 'today', 'yesterday', 'older']
 const GROUP_KEY: Record<BcSession['group'], string> = {
+  setup: 'buffcode.setupGroup',
   today: 'common.today',
   yesterday: 'common.yesterday',
   older: 'buffcode.older',
@@ -74,6 +75,7 @@ export function SessionsScreen({
   onOpen,
   onMore,
   onNew,
+  onNewSetup,
   onQuery,
   onRepair,
 }: {
@@ -87,6 +89,8 @@ export function SessionsScreen({
   onOpen?: (id: string) => void
   onMore?: (id: string) => void
   onNew?: () => void
+  /** Setup mode (#765): a new session where the agent connects itself to what the user needs. */
+  onNewSetup?: () => void
   onQuery?: (text: string) => void
   onRepair?: () => void
 }) {
@@ -135,10 +139,32 @@ export function SessionsScreen({
           ) : (
             GROUPS.map((group) => {
               const items = sessions.filter((s) => s.group === group)
-              if (items.length === 0) return null
+              // Setup (#765): its group is shown even empty — it is the way into the mode.
+              if (items.length === 0 && !(group === 'setup' && onNewSetup)) return null
               return (
                 <Gutter key={group} gap={theme.space(2)}>
-                  <Eyebrow>{t(GROUP_KEY[group])}</Eyebrow>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Eyebrow>{t(GROUP_KEY[group])}</Eyebrow>
+                    {group === 'setup' && onNewSetup && (
+                      <IconButton
+                        icon="plus"
+                        label={t('buffcode.newSetup')}
+                        onPress={onNewSetup}
+                        size="sm"
+                      />
+                    )}
+                  </View>
+                  {items.length === 0 && (
+                    <Text tone="muted" variant="label">
+                      {t('buffcode.setupEmpty')}
+                    </Text>
+                  )}
                   <RowGroup>
                     {items.map((session) => (
                       <SessionRow

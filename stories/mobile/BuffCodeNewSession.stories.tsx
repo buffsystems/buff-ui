@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
+  contextOptions,
   NewSessionScreen,
   PickerSheet,
   variantHint,
   variantLabel,
 } from '../../src/native/screens/buffcode/index.ts'
-import { useT } from '../../src/native/index.ts'
+import { useLocale, useT } from '../../src/native/index.ts'
 import { agents, machine, models, offline, projects } from './fixtures-buffcode.ts'
 import { withPhone } from './PhoneFrame.tsx'
 
@@ -61,6 +62,9 @@ export const ThinkingMode: Story = {
       model={models[0]}
       variant="high"
       onPickVariant={() => undefined}
+      context={200_000}
+      modelWindow={400_000}
+      onPickContext={() => undefined}
       mode="edit"
     />
   ),
@@ -151,5 +155,39 @@ export const PickModelEmpty: Story = {
 export const Offline: Story = {
   render: () => (
     <NewSessionScreen install={machine} status={offline} project={projects[0]} model={models[0]} />
+  ),
+}
+
+// Окно контекста (#839): выбор потолка рядом с режимом размышлений — пресеты по окну модели и свой размер.
+function ContextPicker() {
+  const t = useT()
+  const locale = useLocale()
+  return (
+    <PickerSheet
+      title={t('buffcode.contextWindow')}
+      icon="layers"
+      items={contextOptions(locale, 400_000, 200_000)}
+      selectedId="200000"
+      emptyTitle=""
+      emptyText=""
+    />
+  )
+}
+export const PickContextWindow: Story = {
+  render: () => (
+    <>
+      <NewSessionScreen
+        install={machine}
+        status={status}
+        project={projects[0]}
+        model={models[0]}
+        variant="high"
+        onPickVariant={() => undefined}
+        context={200_000}
+        modelWindow={400_000}
+        onPickContext={() => undefined}
+      />
+      <ContextPicker />
+    </>
   ),
 }

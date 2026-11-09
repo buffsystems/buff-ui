@@ -21,11 +21,14 @@ export function AppSettingsScreen({
   onTheme,
   onLocale,
   onInstalls,
+  onLinks,
   onDemo,
   onLicences,
   onPrivacy,
   onDiagnostics,
   onVersionLongPress,
+  update,
+  onUpdate,
   onBack,
 }: {
   theme?: ThemeChoice
@@ -37,12 +40,18 @@ export function AppSettingsScreen({
   onTheme?: (choice: ThemeChoice) => void
   onLocale?: (locale: Locale) => void
   onInstalls?: () => void
+  /** Settings → Public links (#821). */
+  onLinks?: () => void
   onDemo?: () => void
   onLicences?: () => void
   onPrivacy?: () => void
   onDiagnostics?: () => void
   /** A long press on the version: where the app hides what reviewers need (the demo install). */
   onVersionLongPress?: () => void
+  /** A newer app version that is out (#768); absent — this one is the latest. */
+  update?: string
+  /** Where to get it: the store or the site's download block. */
+  onUpdate?: () => void
   onBack?: () => void
 }) {
   const t = useT()
@@ -63,6 +72,15 @@ export function AppSettingsScreen({
                 chevron
                 onPress={onInstalls}
               />
+              {onLinks ? (
+                <Row
+                  icon="link"
+                  title={t('share.links')}
+                  subtitle={t('share.linksHint')}
+                  chevron
+                  onPress={onLinks}
+                />
+              ) : null}
               {onDemo ? (
                 <Row
                   icon="eye"
@@ -108,6 +126,18 @@ export function AppSettingsScreen({
                     value={build ? `${version} (${build})` : version}
                   />
                 </Pressable>,
+                ...(update
+                  ? [
+                      <Row
+                        key="update"
+                        icon="refreshCw"
+                        title={t('settings.updateAvailable', { version: update })}
+                        subtitle={t('settings.updateHint')}
+                        chevron
+                        onPress={onUpdate}
+                      />,
+                    ]
+                  : []),
                 <Row
                   key="licences"
                   icon="scale"

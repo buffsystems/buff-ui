@@ -65,6 +65,17 @@ export const S = defineStrings({
   'buffcode.promptPlaceholder': { ru: 'Напишите агенту…', en: 'Write to the agent…' },
   'buffcode.permissionMode': { ru: 'Режим разрешений', en: 'Permission mode' },
   'buffcode.thinkingMode': { ru: 'Режим размышлений', en: 'Thinking mode' },
+  'buffcode.contextWindow': { ru: 'Окно контекста', en: 'Context window' },
+  'buffcode.contextHint': {
+    ru: 'Сколько диалога модель держит в памяти до уплотнения',
+    en: 'How much of the dialogue the model keeps in mind before compaction',
+  },
+  'buffcode.contextCustomTitle': { ru: 'Свой размер окна', en: 'Your own window size' },
+  'buffcode.contextCustomHint': {
+    ru: 'Число токенов: 150000, 150k или 1.5M — от 1k до окна модели',
+    en: 'Tokens: 150000, 150k or 1.5M — from 1k up to the model window',
+  },
+  'buffcode.contextLimitRow': { ru: 'Лимит контекста: {limit}', en: 'Context limit: {limit}' },
   'buffcode.variantDefault': { ru: 'По умолчанию', en: 'Default' },
   'buffcode.variantNone': { ru: 'Выключены', en: 'Off' },
   'buffcode.variantMinimal': { ru: 'Минимальные', en: 'Minimal' },
@@ -200,6 +211,8 @@ export const S = defineStrings({
   'buffcode.sentFile': { ru: 'Файл для вас', en: 'File for you' },
   'buffcode.openIn': { ru: 'Открыть в…', en: 'Open in…' },
   'buffcode.preview': { ru: 'Просмотр', en: 'Preview' },
+  // #808: a page shown rendered or as its source.
+  'buffcode.viewCode': { ru: 'Код', en: 'Code' },
   'buffcode.goalPause': { ru: 'Пауза', en: 'Pause' },
   'buffcode.goalResume': { ru: 'Продолжить', en: 'Resume' },
   'buffcode.goalReset': { ru: 'Сбросить', en: 'Reset' },
@@ -207,6 +220,11 @@ export const S = defineStrings({
   'buffcode.removeAttachment': { ru: 'Убрать вложение', en: 'Remove attachment' },
   'buffcode.stop': { ru: 'Остановить', en: 'Stop' },
   'buffcode.queue': { ru: 'В очередь', en: 'Queue' },
+  // Очередь сообщений (#812): отправленное во время работы агента ждёт конца хода.
+  'buffcode.queued': { ru: 'В очереди: {n}', en: 'Queued: {n}' },
+  'buffcode.queuedFiles': { ru: 'Файлов: {n}', en: 'Files: {n}' },
+  'buffcode.queuedCancel': { ru: 'Убрать из очереди: {text}', en: 'Remove from the queue: {text}' },
+  'buffcode.queuedSendNow': { ru: 'Отправить сейчас: {text}', en: 'Send now: {text}' },
   'buffcode.permissionTitle': { ru: 'Запрос разрешения', en: 'Permission request' },
   'buffcode.allowOnce': { ru: 'Разрешить', en: 'Allow once' },
   'buffcode.allowAlways': { ru: 'Всегда', en: 'Always' },
@@ -250,4 +268,20 @@ export const S = defineStrings({
   'buffcode.usageCache': { ru: 'Кэш', en: 'Cache' },
   'buffcode.usageReasoning': { ru: 'Рассуждения', en: 'Reasoning' },
   'buffcode.usageByTurn': { ru: 'По ходам', en: 'By turn' },
+  // #765: режим «Настройка» на телефоне.
+  'buffcode.setupGroup': { ru: 'Настройка', en: 'Setup' },
+  'buffcode.newSetup': { ru: 'Новая настройка', en: 'New setup' },
+  'buffcode.setupEmpty': {
+    ru: 'Пока ничего не подключено — нажмите + и попросите что-нибудь подключить.',
+    en: 'Nothing connected yet — press + and ask to connect something.',
+  },
+  'buffcode.setupHint': {
+    ru: 'Агент сам подключает себя к сервисам, аккаунтам и папкам',
+    en: 'The agent connects itself to services, accounts and folders',
+  },
+  'buffcode.setupOn': { ru: 'Режим настройки включён', en: 'Setup mode is on' },
+  'buffcode.setupOff': { ru: 'Включить режим настройки', en: 'Turn on Setup mode' },
+  'buffcode.addOwn': { ru: 'Добавить', en: 'Add' },
+  'buffcode.openLink': { ru: 'Открыть', en: 'Open' },
+  'buffcode.openLinkAgain': { ru: 'Открыть ещё раз', en: 'Open again' },
 })

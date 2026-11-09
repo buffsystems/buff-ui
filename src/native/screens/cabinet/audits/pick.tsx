@@ -2,6 +2,7 @@
 /*
   Picking the audit sections to (re)run (#629), with the confirm step before the launch.
 */
+import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import { Button } from '../../../Button.tsx'
 import { Callout } from '../../../Feedback.tsx'
@@ -26,6 +27,7 @@ export function AuditPickSheet({
   onBack,
   onLaunch,
   onClose,
+  params,
 }: {
   mode: 'launch' | 'restart'
   sections: AuditSection[]
@@ -39,6 +41,8 @@ export function AuditPickSheet({
   onBack?: () => void
   onLaunch?: () => void
   onClose?: () => void
+  /** «Параметры ИИ» on the confirm step (#840), when the install has them. */
+  params?: ReactNode
 }) {
   const t = useT()
   const theme = useTheme()
@@ -71,6 +75,7 @@ export function AuditPickSheet({
               {`• ${s.title}`}
             </Text>
           ))}
+        {params}
         {error && <Callout tone="crit">{error}</Callout>}
       </Sheet>
     )

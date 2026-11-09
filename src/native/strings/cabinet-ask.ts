@@ -20,6 +20,7 @@ export const S = defineStrings({
     en: 'It may have been deleted, or the link is wrong.',
   },
   'ask.thinking': { ru: 'Buff думает…', en: 'Buff is thinking…' },
+  'ask.queued': { ru: 'В очереди', en: 'Queued' },
   'ask.reasoning': { ru: 'размышления', en: 'reasoning' },
   'ask.reasoningTrail': { ru: 'Ход рассуждений', en: 'Reasoning' },
   'ask.collapse': { ru: 'свернуть', en: 'collapse' },

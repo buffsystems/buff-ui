@@ -19,6 +19,12 @@ export const S = defineStrings({
   'settings.langEn': { ru: 'English', en: 'English' },
   'settings.about': { ru: 'О приложении', en: 'About' },
   'settings.version': { ru: 'Версия', en: 'Version' },
+  'settings.updateAvailable': { ru: 'Доступна версия {version}', en: 'Version {version} is out' },
+  'settings.updateHint': { ru: 'Обновите приложение', en: 'Update the app' },
+  'settings.updateToast': {
+    ru: 'Вышла новая версия приложения {version} — обновите в «Настройках»',
+    en: 'App version {version} is out — update it from Settings',
+  },
   'settings.licences': { ru: 'Лицензии сторонних компонентов', en: 'Third-party licences' },
   'settings.privacy': { ru: 'Политика конфиденциальности', en: 'Privacy policy' },
   'settings.diagnostics': { ru: 'Экспорт диагностики', en: 'Export diagnostics' },

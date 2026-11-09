@@ -154,10 +154,13 @@ export function AskListScreen({
 /** The «⋯» of a thread: rename, delete. */
 export function ThreadActionsSheet({
   onRename,
+  onShare,
   onDelete,
   onClose,
 }: {
   onRename?: () => void
+  /** A public link to the thread (#821). */
+  onShare?: () => void
   onDelete?: () => void
   onClose?: () => void
 }) {
@@ -166,6 +169,7 @@ export function ThreadActionsSheet({
     <Sheet title={t('devd.actions')} onClose={onClose}>
       <RowGroup>
         <Row icon="pencil" title={t('common.rename')} onPress={onRename} />
+        {onShare && <Row icon="share" title={t('share.action')} onPress={onShare} />}
         <Row icon="trash" title={t('common.delete')} destructive onPress={onDelete} />
       </RowGroup>
     </Sheet>

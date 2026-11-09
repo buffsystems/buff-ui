@@ -84,6 +84,7 @@ import {
   Wrench,
   X,
   Zap,
+  Layers,
 } from 'lucide-react'
 import type { IconSet } from '../../src/native/index.ts'
 
@@ -129,6 +130,7 @@ export const storyIcons: IconSet = {
   info: Info,
   keyRound: KeyRound,
   languages: Languages,
+  layers: Layers,
   link: Link,
   listChecks: ListChecks,
   lock: Lock,

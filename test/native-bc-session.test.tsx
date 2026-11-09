@@ -74,7 +74,15 @@ test('an MCP form hands on what was filled in', () => {
             fields: [
               { key: 'user', kind: 'text', label: 'Логин' },
               { key: 'remember', kind: 'switch', label: 'Запомнить' },
-              { key: 'site', kind: 'select', label: 'Сайт', options: ['a', 'b'] },
+              {
+                key: 'site',
+                kind: 'select',
+                label: 'Сайт',
+                options: [
+                  { value: 'a', label: 'a' },
+                  { value: 'b', label: 'b' },
+                ],
+              },
             ],
           },
         }}

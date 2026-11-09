@@ -188,3 +188,20 @@ export const researchPaused: Research = {
   ...researchRunning,
   paused: { by: 'anna', reason: 'balance', when: '10 мин назад' },
 }
+
+/** A run that gave up on a provider outage (#767): the reason, the stage, the raw tail. */
+export const researchFailed: Research = {
+  ...researchDone,
+  status: 'error',
+  timer: '1 ч 45 мин',
+  failure: {
+    kind: 'provider',
+    step: 'analyst_first',
+    attempts: 5,
+    detail:
+      'analyst: Buff Code вышел с кодом 1 — обрыв связи с провайдером.\n{"code":504,"message":"error code: 524","error_type":"timeout"}',
+  },
+}
+
+/** A run that failed before reasons were kept (#767). */
+export const researchFailedOld: Research = { ...researchFailed, failure: null }

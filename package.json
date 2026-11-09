@@ -1,7 +1,7 @@
 {
   "name": "@buff/ui",
   "private": true,
-  "version": "0.2.5",
+  "version": "0.3.0",
   "license": "MIT",
   "type": "module",
   "description": "Buff design system: platform-neutral tokens, composite CSS classes, React components (#561). Shipped as source: the consumer's bundler compiles it.",
@@ -10,6 +10,7 @@
     "./native": "./src/native/index.ts",
     "./tokens": "./src/tokens/index.ts",
     "./locale": "./src/shared/locale.ts",
+    "./ai-modes": "./src/shared/ai-modes.ts",
     "./ui.css": "./styles/ui.css",
     "./tailwind.css": "./styles/tailwind.css",
     "./tokens.css": "./styles/tokens.css"

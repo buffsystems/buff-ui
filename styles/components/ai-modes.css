@@ -1,0 +1,215 @@
+/*
+  Режимы ИИ (#832, эпик #783): уровень мышления и окно контекста по шагам и ролям.
+    Matrix:  .ui-ai-matrix > .ui-ai-matrix__card (a bordered Collapsible)
+               > button.ui-ai-matrix__head (> .ui-ai-matrix__title + .ui-ai-matrix__summary)
+               + content > section.ui-ai-matrix__body > table.ui-ai-matrix__table
+                 tr.ui-ai-matrix__bulk — the scenario's first row writes every cell;
+                 tr.ui-ai-matrix__row(--own) — a phase × role; td.ui-ai-matrix__cell--inherited is dimmed
+    Context: .ui-ai-context > .ui-ai-context__row (select + label.ui-ai-context__custom > input + __unit)
+               + .ui-ai-context__note — what will really apply above the model window
+    Chip:    button.ui-ai-chip (> svg.ui-ai-chip__icon + .ui-ai-chip__text); .ui-ai-panel in its popover
+    Params:  .ui-ai-params (a bordered Collapsible) > .ui-ai-params__trigger (> __icon, __title, __summary)
+    Note:    .ui-ai-note (> svg.ui-ai-note__icon + .ui-ai-note__text + .ui-ai-note__when)
+*/
+@layer components {
+  .ui-ai-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .ui-ai-matrix__head {
+    padding: 0.625rem 0.875rem;
+    gap: 0.5rem;
+  }
+  .ui-ai-matrix__title {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .ui-ai-matrix__summary {
+    margin-left: auto;
+    font-weight: 400;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ui-ai-matrix__body {
+    padding: 0 0.5rem 0.5rem;
+    overflow-x: auto;
+  }
+  .ui-ai-matrix__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .ui-ai-matrix__table th,
+  .ui-ai-matrix__table td {
+    padding: 0.375rem 0.375rem;
+    text-align: left;
+    vertical-align: middle;
+    border-top: 1px solid var(--border);
+  }
+  .ui-ai-matrix__table thead th {
+    border-top: 0;
+    color: var(--muted-foreground);
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+  .ui-ai-matrix__table tbody th {
+    font-weight: 500;
+    min-width: 11rem;
+  }
+  .ui-ai-matrix__bulk th,
+  .ui-ai-matrix__bulk td {
+    background-color: var(--muted);
+  }
+  .ui-ai-matrix__phase {
+    display: block;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .ui-ai-matrix__role {
+    display: block;
+  }
+  .ui-ai-matrix__row--own th {
+    border-left: 2px solid var(--primary);
+  }
+  .ui-ai-matrix__cell--inherited {
+    opacity: 0.72;
+  }
+  .ui-ai-matrix__cell--inherited .ui-badge {
+    margin-top: 0.25rem;
+  }
+
+  .ui-ai-context {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+  .ui-ai-context__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ui-ai-context__row > .ui-select-menu {
+    flex: 1 1 auto;
+  }
+  .ui-ai-context__custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 0 0 auto;
+  }
+  .ui-ai-context__custom .ui-input {
+    width: 5rem;
+  }
+  .ui-ai-context__unit {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+  .ui-ai-context__note {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .ui-ai-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--muted-foreground);
+    padding: 0 0.625rem 0 0.5rem;
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    cursor: pointer;
+    outline: none;
+    transition:
+      color 150ms,
+      background-color 150ms,
+      box-shadow 150ms;
+  }
+  .ui-ai-chip:hover {
+    color: var(--foreground);
+    background-color: var(--muted);
+  }
+  .ui-ai-chip:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent);
+  }
+  .ui-ai-chip__icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .ui-ai-chip__text {
+    white-space: nowrap;
+  }
+  .ui-ai-panel-popover {
+    width: 20rem;
+  }
+  .ui-ai-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .ui-ai-panel__note {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .ui-ai-params__trigger {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+  .ui-ai-params__icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--muted-foreground);
+  }
+  .ui-ai-params--changed .ui-ai-params__icon {
+    color: var(--primary);
+  }
+  .ui-ai-params__title {
+    font-weight: 600;
+  }
+  .ui-ai-params__summary {
+    margin-left: auto;
+    color: var(--muted-foreground);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ui-ai-params .ui-collapsible__body,
+  .ui-ai-params .ui-ai-panel {
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .ui-ai-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    text-align: center;
+  }
+  .ui-ai-note__icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex: 0 0 auto;
+  }
+  .ui-ai-note__when::before {
+    content: '·';
+    margin: 0 0.25rem;
+  }
+}

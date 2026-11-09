@@ -4,6 +4,7 @@ import {
   ExportSheet,
   NewResearchScreen,
   ResearchConfirmSheet,
+  ResearchFailureSheet,
   ResearchListScreen,
   ResearchScreen,
 } from '../../src/native/screens/cabinet/index.ts'
@@ -12,6 +13,8 @@ import {
   online,
   researchDone,
   researches,
+  researchFailed,
+  researchFailedOld,
   researchPaused,
   researchRunning,
   researchWaiting,
@@ -78,6 +81,23 @@ export const Paused: Story = {
 }
 export const NoWrite: Story = {
   render: () => <ResearchScreen status={online} research={researchDone} canWrite={false} />,
+}
+/** A failed run (#767): why, the stage, the raw text folded, «Продолжить». */
+export const Failed: Story = {
+  render: () => <ResearchScreen status={online} research={researchFailed} onContinue={() => {}} />,
+}
+export const FailedNoReason: Story = {
+  render: () => (
+    <ResearchScreen status={online} research={researchFailedOld} onContinue={() => {}} />
+  ),
+}
+export const FailedSheet: Story = {
+  render: () => (
+    <>
+      <ResearchScreen status={online} research={researchFailed} onContinue={() => {}} />
+      <ResearchFailureSheet failure={researchFailed.failure} onContinue={() => {}} />
+    </>
+  ),
 }
 export const Loading: Story = { render: () => <ResearchScreen status={online} loading /> }
 export const Error: Story = { render: () => <ResearchScreen status={online} error /> }

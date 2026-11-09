@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native'
 import { Icon } from '../../Icon.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
-import { sizeLabel } from './composer-parts.tsx'
+import { sizeLabel } from '../../download.ts'
 
 /**
  * A file the agent handed over (#708): its kind, name, size and the agent's note; a tap opens it —

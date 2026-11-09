@@ -129,3 +129,35 @@ export type {
   TabStripTriggerProps,
 } from './TabStrip.tsx'
 export * from './pairing/index.ts'
+// Режимы ИИ (#832, эпик #783): уровень мышления и окно контекста по шагам и ролям.
+export { AiThinkingSelect } from './ai-modes/AiThinkingSelect.tsx'
+export type { AiThinkingSelectProps } from './ai-modes/AiThinkingSelect.tsx'
+export { AiContextSelect } from './ai-modes/AiContextSelect.tsx'
+export type { AiContextSelectProps } from './ai-modes/AiContextSelect.tsx'
+export { AiModeMatrix } from './ai-modes/AiModeMatrix.tsx'
+export type { AiModeMatrixProps } from './ai-modes/AiModeMatrix.tsx'
+export { AiModeChip, AiModePanel } from './ai-modes/AiModeChip.tsx'
+export type { AiModeChipProps, AiModePanelProps } from './ai-modes/AiModeChip.tsx'
+export { AiModeParams } from './ai-modes/AiModeParams.tsx'
+export type { AiModeParamsProps } from './ai-modes/AiModeParams.tsx'
+export { AiModeNote } from './ai-modes/AiModeNote.tsx'
+export { aiModeGroups, cellValue, groupSummary, phaseLabel } from './ai-modes/model.ts'
+export type {
+  AiModeCell,
+  AiModeGroup,
+  AiModeStepDef,
+  AiModeRoleDef,
+  AiModeCellView,
+} from './ai-modes/model.ts'
+export {
+  AI_CONTEXT_PRESETS,
+  AI_THINKING_LEVELS,
+  aiContextOptions,
+  aiContextPreset,
+  aiContextWords,
+  aiModeSummary,
+  aiThinkingWords,
+  formatTokens,
+  isAiThinkingLevel,
+} from '../shared/ai-modes.ts'
+export type { AiContextOption, AiContextPreset, AiThinkingLevel } from '../shared/ai-modes.ts'

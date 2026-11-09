@@ -18,6 +18,11 @@ export const S = defineStrings({
   'common.search': { ru: 'Поиск', en: 'Search' },
   'common.filter': { ru: 'Фильтр', en: 'Filter' },
   'common.loading': { ru: 'Загрузка…', en: 'Loading…' },
+  // #809: a file on its way — how much of how much, how long is left.
+  'common.downloadOf': { ru: '{done} из {total}', en: '{done} of {total}' },
+  'common.etaSeconds': { ru: 'ещё ~{n} с', en: '~{n} s left' },
+  'common.etaMinutes': { ru: 'ещё ~{n} мин', en: '~{n} min left' },
+  'common.etaAlmost': { ru: 'почти готово', en: 'almost done' },
   'common.empty': { ru: 'Пока пусто', en: 'Nothing here yet' },
   'common.error': { ru: 'Что-то пошло не так', en: 'Something went wrong' },
   'common.all': { ru: 'Все', en: 'All' },

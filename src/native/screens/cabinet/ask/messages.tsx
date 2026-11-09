@@ -3,8 +3,10 @@
   The turns of an Ask thread (#629): the person's bubbles, Buff's prose with its reasoning,
   attachments under either, and the «thinking» line with its timer.
 */
+import { AiModeNoteRow } from '../ai-mode.tsx'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { Badge } from '../../../Badge.tsx'
 import { Spinner } from '../../../Feedback.tsx'
 import { Icon } from '../../../Icon.tsx'
 import type { Attachment } from '../../../model.ts'
@@ -65,6 +67,7 @@ export function MessageList({
   messages: AskMessage[]
   onOpenAttachment?: (id: string) => void
 }) {
+  const t = useT()
   const theme = useTheme()
   const c = theme.colors
   return (
@@ -72,7 +75,9 @@ export function MessageList({
       style={{ gap: theme.space(3), paddingHorizontal: theme.space(4), paddingTop: theme.space(2) }}
     >
       {messages.map((m) =>
-        m.role === 'user' ? (
+        m.role === 'note' ? (
+          <AiModeNoteRow key={m.id} text={m.content} when={m.when} />
+        ) : m.role === 'user' ? (
           <View key={m.id} style={{ alignItems: 'flex-end', gap: 6 }}>
             <View
               style={{
@@ -92,6 +97,7 @@ export function MessageList({
                 <Attachments items={m.attachments} onOpen={onOpenAttachment} />
               </View>
             )}
+            {m.queued && <Badge icon="clock">{t('ask.queued')}</Badge>}
           </View>
         ) : (
           <View key={m.id} style={{ gap: 8 }}>

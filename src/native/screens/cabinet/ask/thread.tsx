@@ -6,6 +6,7 @@ import type { LoadFailure } from '../../../model.ts'
   question when it waits, and the composer. The message list is reused by a review's
   discussion tab.
 */
+import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { IconButton } from '../../../Button.tsx'
 import { Callout, EmptyState } from '../../../Feedback.tsx'
@@ -41,6 +42,7 @@ export function AskThreadScreen({
   onDraft,
   onFree,
   cost,
+  chip,
 }: {
   status: InstallStatus
   thread?: AskThread
@@ -66,6 +68,8 @@ export function AskThreadScreen({
   onFree?: (questionId: string, text: string) => void
   /** What the thread cost so far: «12 ₽ · 41 тыс. токенов». */
   cost?: string
+  /** The session's AI mode chip (#840), when the install has the feature. */
+  chip?: ReactNode
 }) {
   const t = useT()
   const live = status.kind === 'online'
@@ -88,7 +92,6 @@ export function AskThreadScreen({
       onOpenAttachment={onOpenAttachment}
     />
   )
-  const thinking = thread?.status === 'running' || thread?.status === 'answering'
   const pending = thread?.status === 'waiting'
   return (
     <>
@@ -121,7 +124,7 @@ export function AskThreadScreen({
                     : t('ask.followUp')
               }
               staged={staged}
-              busy={thinking}
+              // #813: the follow-up stays open while Buff answers — it waits for the next turn.
               disabled={!live || pending}
               canAttach={staged.length < 3}
               onAttach={onAttach}
@@ -135,6 +138,7 @@ export function AskThreadScreen({
         }
       >
         <InstallBanner status={status} />
+        {chip ? <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>{chip}</View> : null}
         {body}
       </Screen>
     </>

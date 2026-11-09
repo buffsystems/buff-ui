@@ -1,5 +1,6 @@
 import type { LoadFailure } from '../../../model.ts'
 /** @jsxRuntime automatic */
+import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { Button } from '../../../Button.tsx'
 import { Callout, EmptyState } from '../../../Feedback.tsx'
@@ -125,6 +126,7 @@ export function NewResearchScreen({
   onText,
   onAttach,
   onRemoveStaged,
+  params,
 }: {
   status: InstallStatus
   place: string
@@ -143,6 +145,8 @@ export function NewResearchScreen({
   onStart?: () => void
   /** The question as typed. */
   onText?: (text: string) => void
+  /** «Параметры ИИ» (#840), when the install has them. */
+  params?: ReactNode
 }) {
   const t = useT()
   const theme = useTheme()
@@ -189,6 +193,7 @@ export function NewResearchScreen({
             {error}
           </Text>
         )}
+        {params}
         {staged.length > 0 && (
           <RowGroup title={t('cabinet.attachments')}>
             {staged.map((a) => (

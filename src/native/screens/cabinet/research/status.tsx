@@ -2,7 +2,7 @@
 /*
   The status line of a research (#629): the label, the timer, the commit, the pause.
 */
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { Badge } from '../../../Badge.tsx'
 import { Spinner } from '../../../Feedback.tsx'
 import { Text } from '../../../Text.tsx'
@@ -10,7 +10,16 @@ import { useT, useTheme } from '../../../theme.tsx'
 import { pauseLine } from '../dev/controls.tsx'
 import type { Research } from './model.ts'
 
-export function StatusLine({ research, canWrite }: { research: Research; canWrite: boolean }) {
+export function StatusLine({
+  research,
+  canWrite,
+  onFailure,
+}: {
+  research: Research
+  canWrite: boolean
+  /** A failed research's «Ошибка» opens why it failed (#767). */
+  onFailure?: () => void
+}) {
   const t = useT()
   const theme = useTheme()
   const busy = research.status === 'researching'
@@ -27,14 +36,27 @@ export function StatusLine({ research, canWrite }: { research: Research; canWrit
     <View style={{ gap: 6 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         {busy && !research.paused && <Spinner />}
-        {!research.paused && (
-          <Text
-            variant="label"
-            tone={research.status === 'error' ? 'destructive' : 'fg2'}
-            style={{ flexShrink: 1 }}
+        {!research.paused && research.status === 'error' && onFailure ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            onPress={onFailure}
+            hitSlop={8}
           >
-            {label}
-          </Text>
+            <Text variant="label" tone="destructive" style={{ textDecorationLine: 'underline' }}>
+              {label}
+            </Text>
+          </Pressable>
+        ) : (
+          !research.paused && (
+            <Text
+              variant="label"
+              tone={research.status === 'error' ? 'destructive' : 'fg2'}
+              style={{ flexShrink: 1 }}
+            >
+              {label}
+            </Text>
+          )
         )}
         {research.timer && (
           <Text variant="mono" tone="muted">

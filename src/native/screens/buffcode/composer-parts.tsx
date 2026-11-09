@@ -1,6 +1,7 @@
 /** @jsxRuntime automatic */
 import { Pressable, View } from 'react-native'
 import { IconButton } from '../../Button.tsx'
+import { sizeLabel } from '../../download.ts'
 import { Icon } from '../../Icon.tsx'
 import type { IconName } from '../../icons.ts'
 import type { Attachment } from '../../model.ts'
@@ -8,12 +9,6 @@ import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { PermissionMode } from './model.ts'
 import { MODE_KEY } from './new-session.tsx'
-
-export function sizeLabel(bytes: number): string {
-  return bytes < 1024 * 1024
-    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
-    : `${(bytes / 1024 / 1024).toFixed(1)} MB`
-}
 
 /** An attachment in the composer: a thumbnail or a file mark, the name, the upload progress. */
 

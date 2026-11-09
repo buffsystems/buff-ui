@@ -3,6 +3,7 @@
   A new question (#629): the intro for the kind of place asked (project / space / task
   review), the text and attachments. The cabinet never picks a model — only Buff Code does.
 */
+import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { Button } from '../../../Button.tsx'
 import { Callout } from '../../../Feedback.tsx'
@@ -36,6 +37,7 @@ export function NewQuestionScreen({
   onRemoveStaged,
   onSend,
   onText,
+  params,
 }: {
   status: InstallStatus
   kind?: AskKind
@@ -52,6 +54,8 @@ export function NewQuestionScreen({
   onSend?: () => void
   /** The question as typed. */
   onText?: (text: string) => void
+  /** «Параметры ИИ» (#840), when the install has them. */
+  params?: ReactNode
 }) {
   const t = useT()
   const theme = useTheme()
@@ -90,6 +94,7 @@ export function NewQuestionScreen({
           editable={!disabled}
           onChangeText={onText}
         />
+        {params}
         {staged.length > 0 && (
           <RowGroup title={t('cabinet.attachments')}>
             {staged.map((a) => (

@@ -4,6 +4,7 @@ import type { LoadFailure } from '../../../model.ts'
   One research (#629): its status line with the timer and the pause / stop controls, the
   analyst's pending question, the document, the dialog, and the composer.
 */
+import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { Button, IconButton } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
@@ -20,6 +21,7 @@ import { ThreadComposer } from '../attachments.tsx'
 import { AskedQuestions, QuestionForm, type Picks } from '../questions.tsx'
 import { documentBody, type Research, type ResearchRole } from './model.ts'
 import { StatusLine } from './status.tsx'
+import { FailureCard } from './failure.tsx'
 
 const ROLE_KEY: Record<ResearchRole, string> = {
   user: 'research.roleUser',
@@ -42,6 +44,7 @@ export function ResearchScreen({
   picks,
   onBack,
   onExport,
+  onShare,
   onPause,
   onResume,
   onStop,
@@ -51,8 +54,11 @@ export function ResearchScreen({
   onDraft,
   onSend,
   onRetry,
+  onContinue,
+  onFailure,
   cost,
   notice,
+  chip,
 }: {
   status: InstallStatus
   research?: Research
@@ -67,6 +73,8 @@ export function ResearchScreen({
   picks?: Picks
   onBack?: () => void
   onExport?: () => void
+  /** A public link to the research (#821). */
+  onShare?: () => void
   onPause?: () => void
   onResume?: () => void
   onStop?: () => void
@@ -76,10 +84,16 @@ export function ResearchScreen({
   onDraft?: (text: string) => void
   onSend?: () => void
   onRetry?: () => void
+  /** «Продолжить» on a failed research (#767): its run again, from where it stopped. */
+  onContinue?: () => void
+  /** The «Ошибка» status pressed: show why the run failed (#767). */
+  onFailure?: () => void
   /** What the research cost so far: «12 ₽ · 41 тыс. токенов». */
   cost?: string
   /** Why the run may not go on — the org's spending ceiling. */
   notice?: string
+  /** The session's AI mode chip (#840), when the install has the feature. */
+  chip?: ReactNode
 }) {
   const t = useT()
   const theme = useTheme()
@@ -97,8 +111,13 @@ export function ResearchScreen({
         subtitle={[t('cabinet.researchFull'), cost].filter(Boolean).join(' · ')}
         onBack={onBack}
         actions={
-          hasDoc ? (
-            <IconButton icon="download" label={t('research.exportTitle')} onPress={onExport} />
+          hasDoc || onShare ? (
+            <>
+              {hasDoc && (
+                <IconButton icon="download" label={t('research.exportTitle')} onPress={onExport} />
+              )}
+              {onShare && <IconButton icon="share" label={t('share.action')} onPress={onShare} />}
+            </>
           ) : undefined
         }
       />
@@ -125,6 +144,7 @@ export function ResearchScreen({
         }
       >
         <InstallBanner status={status} />
+        {chip ? <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>{chip}</View> : null}
         {loading ? (
           <ListSkeleton rows={5} />
         ) : error || !research ? (
@@ -137,7 +157,14 @@ export function ResearchScreen({
               gap: theme.space(3),
             }}
           >
-            <StatusLine research={research} canWrite={canWrite} />
+            <StatusLine research={research} canWrite={canWrite} onFailure={onFailure} />
+            {research.status === 'error' && !research.paused && (
+              <FailureCard
+                failure={research.failure}
+                onContinue={canWrite ? onContinue : undefined}
+                disabled={!live}
+              />
+            )}
             {notice && (
               <Callout tone="warn" icon="zap">
                 {notice}

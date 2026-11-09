@@ -1,14 +1,16 @@
 /** @jsxRuntime automatic */
 import { View } from 'react-native'
 import { Badge } from '../../Badge.tsx'
+import { Chip } from '../../Chip.tsx'
 import { Button } from '../../Button.tsx'
 import { Card, KeyValue } from '../../Card.tsx'
 import { Field, SelectField } from '../../Field.tsx'
 import { Sheet } from '../../Sheet.tsx'
 import { Text } from '../../Text.tsx'
-import { useT, useTheme } from '../../theme.tsx'
+import { useLocale, useT, useTheme } from '../../theme.tsx'
 import type { SessionDetails } from './model.ts'
 import { variantHint, variantLabel } from './variant.ts'
+import { contextLabel } from './context.ts'
 import { Eyebrow, originLabel } from './shell.tsx'
 
 /** «Session details»: where it runs, its branch, the MCP servers and the LSPs, a way to review. */
@@ -23,6 +25,11 @@ export function SessionDetailsSheet({
   onModel,
   onMode,
   onVariant,
+  context,
+  modelWindow,
+  onContext,
+  setup,
+  onSetup,
   onClose,
 }: {
   details: SessionDetails
@@ -36,9 +43,17 @@ export function SessionDetailsSheet({
   /** The model's thinking mode (#759) by its variant id; no handler — the model has none. */
   variant?: string
   onVariant?: () => void
+  /** The session's context window (#839): the cap in tokens, 0 — the model's window. */
+  context?: number
+  modelWindow?: number
+  onContext?: () => void
+  /** Setup mode (#765): the agent connects itself to services; switched here. */
+  setup?: boolean
+  onSetup?: () => void
   onClose?: () => void
 }) {
   const t = useT()
+  const locale = useLocale()
   const theme = useTheme()
   return (
     <Sheet
@@ -63,7 +78,7 @@ export function SessionDetailsSheet({
         <KeyValue label={t('buffcode.detailsOrigin')} value={originLabel(t, details.origin)} />
         <KeyValue label={t('buffcode.detailsCreated')} value={details.created} />
       </Card>
-      {(onModel || onMode || onVariant) && (
+      {(onModel || onMode || onVariant || onContext) && (
         <Card style={{ gap: theme.space(2) }}>
           {onModel && (
             <Field label={t('buffcode.model')}>
@@ -87,6 +102,17 @@ export function SessionDetailsSheet({
               />
             </Field>
           )}
+          {onContext && (
+            <Field label={t('buffcode.contextWindow')} hint={t('buffcode.contextHint')}>
+              <SelectField
+                value={contextLabel(locale, context ?? 0, modelWindow)}
+                icon="layers"
+                placeholder={t('buffcode.contextWindow')}
+                onPress={onContext}
+                disabled={disabled}
+              />
+            </Field>
+          )}
           {onMode && (
             <Field label={t('buffcode.permissionMode')}>
               <SelectField
@@ -96,6 +122,13 @@ export function SessionDetailsSheet({
                 onPress={onMode}
                 disabled={disabled}
               />
+            </Field>
+          )}
+          {onSetup && (
+            <Field label={t('buffcode.setupGroup')} hint={t('buffcode.setupHint')}>
+              <Chip selected={!!setup} icon={setup ? 'check' : undefined} onPress={onSetup}>
+                {t(setup ? 'buffcode.setupOn' : 'buffcode.setupOff')}
+              </Chip>
             </Field>
           )}
         </Card>

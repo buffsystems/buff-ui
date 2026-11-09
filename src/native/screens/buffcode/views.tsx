@@ -93,6 +93,7 @@ export function ViewMenu({
   onUndo,
   onRedo,
   onRename,
+  onShare,
   onClose,
 }: {
   onUsage?: () => void
@@ -102,6 +103,8 @@ export function ViewMenu({
   onUndo?: () => void
   onRedo?: () => void
   onRename?: () => void
+  /** A public link to the session (#821). */
+  onShare?: () => void
   onClose?: () => void
 }) {
   const t = useT()
@@ -145,6 +148,9 @@ export function ViewMenu({
             : []),
           ...(onRename
             ? [{ label: t('buffcode.rename'), icon: 'pencil' as const, onPress: onRename }]
+            : []),
+          ...(onShare
+            ? [{ label: t('share.action'), icon: 'share' as const, onPress: onShare }]
             : []),
         ].map((item) => (
           <Pressable

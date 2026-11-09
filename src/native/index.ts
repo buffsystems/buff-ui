@@ -20,6 +20,12 @@ export { defineStrings, makeTranslate, rubles, registeredStrings } from './i18n.
 export type { Dictionary, Locale, Translate } from './i18n.ts'
 export { DEFAULT_LOCALE, isLanguageChoice, pickLocale, resolveLocale } from '../shared/locale.ts'
 export type { LanguageChoice } from '../shared/locale.ts'
+export {
+  aiContextEffective,
+  aiContextParse,
+  aiContextWords,
+  formatTokens,
+} from '../shared/ai-modes.ts'
 export { S as commonStrings } from './strings/common.ts'
 export { auditSectionAbout, auditSectionTitle } from './strings/audit-sections.ts'
 
@@ -36,6 +42,8 @@ export { Card, KeyValue, SectionHeader } from './Card.tsx'
 export { Disclosure } from './Disclosure.tsx'
 export { Row, RowGroup, SectionTitle } from './Row.tsx'
 export { Callout, EmptyState, Separator, Skeleton, Spinner, Toast } from './Feedback.tsx'
+export { DownloadProgress, ProgressBar } from './Download.tsx'
+export { downloadLabel, downloadShare, sizeLabel, type Download } from './download.ts'
 export { Avatar, avatarColorFor } from './Avatar.tsx'
 export { Screen, TabBar, TopBar } from './Screen.tsx'
 export type { TabItem } from './Screen.tsx'
@@ -97,4 +105,5 @@ export * from './screens/cabinet/index.ts'
 export * from './screens/buffcode/index.ts'
 export * from './screens/notifications/index.ts'
 export * from './screens/settings/index.ts'
+export * from './screens/share/index.ts'
 export type { FileChoice, SubagentRef, TodoItem, TodoStatus } from './screens/buffcode/model.ts'

@@ -4,6 +4,7 @@
   subtasks, tests, history, metrics. The sheets (actions, export, rework, reject) are drawn
   by the host over this screen.
 */
+import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { Badge } from '../../../Badge.tsx'
 import { Button, IconButton } from '../../../Button.tsx'
@@ -55,6 +56,7 @@ export function TaskDetailScreen({
   staged,
   onRemoveStaged,
   notice,
+  chip,
   onAttach,
   onSendAnswers,
   onApprove,
@@ -94,6 +96,8 @@ export function TaskDetailScreen({
   onRemoveStaged?: (id: string) => void
   /** A warning over the run: the org's model spending ceiling reached (the cabinet's CeilingNotice). */
   notice?: string
+  /** The task's AI mode chip (#840), when the install has the feature. */
+  chip?: ReactNode
   onAttach?: () => void
   onSendAnswers?: () => void
   onApprove?: () => void
@@ -198,6 +202,7 @@ export function TaskDetailScreen({
             gap: theme.space(3),
           }}
         >
+          {chip}
           <Text variant="title">{task.title}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <Badge tone={st.tone}>{st.label}</Badge>

@@ -25,7 +25,7 @@ export interface BcSession {
   title: string
   origin: SessionOrigin
   when: string
-  group: 'today' | 'yesterday' | 'older'
+  group: 'setup' | 'today' | 'yesterday' | 'older'
   running?: boolean
   /** Waits for the person: a permission, a question. */
   attention?: number
@@ -151,10 +151,19 @@ export interface Question {
   multiple?: boolean
 }
 
+export interface McpOption {
+  value: string
+  label: string
+}
+
+/** A field of a server's or the setup agent's form (#765): secrets are typed unseen, options may take own answers. */
 export type McpField =
   | { key: string; kind: 'text'; label: string; hint?: string }
+  | { key: string; kind: 'secret'; label: string; hint?: string }
   | { key: string; kind: 'switch'; label: string }
-  | { key: string; kind: 'select'; label: string; options: string[] }
+  | { key: string; kind: 'select'; label: string; options: McpOption[]; custom?: boolean }
+  | { key: string; kind: 'multi'; label: string; options: McpOption[]; custom?: boolean }
+  | { key: string; kind: 'link'; label: string; url: string }
 
 export interface McpRequest {
   server: string

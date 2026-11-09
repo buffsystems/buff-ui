@@ -25,6 +25,39 @@ export const S = defineStrings({
   'research.pause': { ru: 'Пауза', en: 'Pause' },
   'research.resume': { ru: 'Продолжить', en: 'Continue' },
   'research.stop': { ru: 'Остановить', en: 'Stop' },
+  'research.continue': { ru: 'Продолжить', en: 'Continue' },
+  'research.failTitle': {
+    ru: 'Исследование остановилось с ошибкой',
+    en: 'The research stopped with an error',
+  },
+  'research.failProvider': {
+    ru: 'Провайдер модели не отвечал или обрывал связь.',
+    en: 'The model provider did not respond or kept dropping the connection.',
+  },
+  'research.failLimit': {
+    ru: 'Провайдер модели отказал: превышен лимит запросов или закончился баланс.',
+    en: 'The model provider refused: the rate limit was hit or the balance ran out.',
+  },
+  'research.failInterrupted': {
+    ru: 'Прогон прервался: его отменили или пропала машина, на которой он шёл.',
+    en: 'The run was interrupted: it was cancelled or the machine running it went away.',
+  },
+  'research.failLaunch': {
+    ru: 'Исследование не удалось запустить.',
+    en: 'The research could not be started.',
+  },
+  'research.failInternal': {
+    ru: 'Внутренняя ошибка при выполнении исследования.',
+    en: 'An internal error stopped the research.',
+  },
+  'research.failUnknown': { ru: 'Причина не сохранена.', en: 'The reason was not saved.' },
+  'research.failAttempts': { ru: 'Попыток: {n}.', en: 'Attempts: {n}.' },
+  'research.failStep': { ru: 'Этап: {stage}', en: 'Stage: {stage}' },
+  'research.stepPrepare': { ru: 'подготовка', en: 'preparation' },
+  'research.stepAnalyst': { ru: 'аналитик', en: 'analyst' },
+  'research.stepReview': { ru: 'ревью', en: 'review' },
+  'research.stepPublish': { ru: 'публикация', en: 'publishing' },
+  'research.failDetails': { ru: 'Технические детали', en: 'Technical details' },
   'research.pauseTitle': { ru: 'Приостановить работу?', en: 'Pause the work?' },
   'research.pauseText': {
     ru: 'Работа остановится сразу. «Продолжить» поднимет её с того же места; незакоммиченные правки текущего шага могут потеряться.',

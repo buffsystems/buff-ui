@@ -2,7 +2,7 @@
 // Settings on the phone (#656): the demo install shows only where the app offers it (a long press
 // on the version reveals it in the app); an install without notices wired shows no row for them.
 import { afterEach, expect, test } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import {
   AppSettingsScreen,
@@ -55,4 +55,23 @@ test('an install shows its notices row only when they are wired', () => {
   expect(screen.queryByText('Уведомления')).toBeNull()
   rerender(wrap(<InstallSettingsScreen {...props} onNotifications={() => undefined} />))
   expect(screen.getByText('Уведомления')).toBeTruthy()
+})
+
+// #768: a newer app is out — «About» says so and leads to where to get it.
+test('«About» names a newer app version and leads to it; none — no row', () => {
+  const opened: string[] = []
+  const { rerender } = render(wrap(<AppSettingsScreen version="0.23.5" installs={1} />))
+  expect(screen.queryByText(/Доступна/)).toBeNull()
+  rerender(
+    wrap(
+      <AppSettingsScreen
+        version="0.23.5"
+        installs={1}
+        update="0.24.1"
+        onUpdate={() => opened.push('update')}
+      />,
+    ),
+  )
+  fireEvent.click(screen.getByRole('button', { name: /Доступна версия 0\.24\.1/ }))
+  expect(opened).toEqual(['update'])
 })

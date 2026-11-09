@@ -12,7 +12,8 @@ import { SubagentsButton } from './subagents.tsx'
 
 /**
  * The composer under the timeline: attachments, the text, the chips (model, mode, agent),
- * attach / commands / send — or stop while the agent runs. Every control is disabled offline.
+ * attach / commands / send. While the agent runs — stop, and send queues the message for the end
+ * of its turn (#812). Every control is disabled offline.
  */
 export function Composer({
   value = '',
@@ -133,7 +134,7 @@ export function Composer({
           >
             {chips}
           </View>
-          {running ? (
+          {running && (
             <IconButton
               icon="square"
               label={t('buffcode.stop')}
@@ -142,16 +143,16 @@ export function Composer({
               size="sm"
               disabled={disabled}
             />
-          ) : (
-            <IconButton
-              icon="send"
-              label={t('common.send')}
-              onPress={onSend}
-              variant="primary"
-              size="sm"
-              disabled={!canSend}
-            />
           )}
+          {/* While the agent works the message waits for the end of its turn (#812). */}
+          <IconButton
+            icon="send"
+            label={running ? t('buffcode.queue') : t('common.send')}
+            onPress={onSend}
+            variant="primary"
+            size="sm"
+            disabled={!canSend}
+          />
         </View>
       </View>
     </View>

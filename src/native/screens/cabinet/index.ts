@@ -90,10 +90,19 @@ export {
 } from './ask/list.tsx'
 export { AskThreadScreen } from './ask/thread.tsx'
 export { MessageList, ThinkingLine } from './ask/messages.tsx'
+export {
+  AiModeChip,
+  AiModeFields,
+  AiModeNoteRow,
+  AiModeParamsCard,
+  AiModeSlot,
+} from './ai-mode.tsx'
+export type { AiModeDefaults } from './ai-mode.tsx'
 export { NewQuestionScreen } from './ask/new.tsx'
 
 export type {
   Research,
+  ResearchFailure,
   ResearchRole,
   ResearchRow,
   ResearchStatus,
@@ -101,6 +110,7 @@ export type {
 } from './research/model.ts'
 export { DeleteResearchSheet, NewResearchScreen, ResearchListScreen } from './research/list.tsx'
 export { ResearchConfirmSheet, ResearchScreen } from './research/detail.tsx'
+export { ResearchFailureSheet } from './research/failure.tsx'
 
 export type {
   ApproveRepo,

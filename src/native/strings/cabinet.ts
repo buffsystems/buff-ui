@@ -10,6 +10,20 @@ export const S = defineStrings({
   'cabinet.knowledge': { ru: 'Знания', en: 'Knowledge' },
   'cabinet.knowledgeFull': { ru: 'База знаний', en: 'Knowledge base' },
   'cabinet.audits': { ru: 'Аудиты', en: 'Audits' },
+  // Режимы ИИ (#840): карточка на формах, чип в сессии, лист выбора.
+  'cabinet.aiParams': { ru: 'Параметры ИИ', en: 'AI parameters' },
+  'cabinet.aiThinking': { ru: 'Размышления', en: 'Thinking' },
+  'cabinet.aiContext': { ru: 'Контекст', en: 'Context' },
+  'cabinet.aiDefault': { ru: 'По умолчанию ({value})', en: 'Default ({value})' },
+  'cabinet.aiNoteForm': {
+    ru: 'Для этой сессии; не задано — как в настройках.',
+    en: 'For this session; unset — as in the settings.',
+  },
+  'cabinet.aiNoteSession': {
+    ru: 'Применится со следующего запуска; запись останется в сессии.',
+    en: 'Applies from the next run; the record stays in the session.',
+  },
+  'cabinet.aiModeTitle': { ru: 'Режим ИИ сессии', en: 'The session’s AI mode' },
   'cabinet.repos': { ru: 'Репо', en: 'Repos' },
   'cabinet.reposFull': { ru: 'Репозитории', en: 'Repositories' },
   'cabinet.moreSections': { ru: 'Другие разделы', en: 'Other sections' },

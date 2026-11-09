@@ -57,6 +57,7 @@ export const ICON_NAMES = [
   'info',
   'keyRound',
   'languages',
+  'layers',
   'link',
   'listChecks',
   'lock',

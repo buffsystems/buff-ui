@@ -55,6 +55,21 @@ export const Running: Story = {
   render: () => <SessionScreen {...base} working={{ elapsed: '0:42' }} />,
 }
 /** The permission mode in the composer (#760): an icon of its own per mode; a tap opens the settings. */
+// #812: while the agent works the message waits for the end of the turn; what waits is above the composer.
+export const RunningWithQueue: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      prompt="и проверь мобильную вёрстку"
+      queued={[
+        { id: 'q1', text: 'После тестов обнови README', files: 0 },
+        { id: 'q2', text: '', files: 2 },
+      ]}
+      onQueuedCancel={() => undefined}
+      onQueuedSend={() => undefined}
+    />
+  ),
+}
 export const ModeFullAccess: Story = {
   render: () => <SessionScreen {...base} running={false} mode="full" />,
 }
@@ -197,6 +212,48 @@ export const McpDock: Story = {
           fields: [
             { key: 'title', kind: 'text', label: 'Заголовок', hint: 'Коротко, как правило' },
             { key: 'shared', kind: 'switch', label: 'Для всей организации' },
+          ],
+        },
+      }}
+    />
+  ),
+}
+/** Форма режима «Настройка» (#765): секрет скрыт, свои варианты — списком, ссылка открывается. */
+export const SetupFormDock: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      dock={{
+        kind: 'mcp',
+        request: {
+          server: 'Подключение почты',
+          message: 'Нужно, чтобы читать письма.',
+          fields: [
+            { key: 'host', kind: 'text', label: 'Адрес сервера', hint: 'Из настроек почты' },
+            { key: 'password', kind: 'secret', label: 'Пароль' },
+            {
+              key: 'folders',
+              kind: 'multi',
+              label: 'Какие папки',
+              options: [
+                { value: 'inbox', label: 'Входящие' },
+                { value: 'sent', label: 'Отправленные' },
+              ],
+              custom: true,
+            },
+            {
+              key: 'proto',
+              kind: 'select',
+              label: 'Протокол',
+              options: [{ value: 'a', label: 'Обычный' }],
+              custom: true,
+            },
+            {
+              key: 'open',
+              kind: 'link',
+              label: 'Разрешить доступ',
+              url: 'https://example.com/allow',
+            },
           ],
         },
       }}

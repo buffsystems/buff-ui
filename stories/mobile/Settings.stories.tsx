@@ -64,6 +64,18 @@ export const AppEnglishDark: Story = {
   globals: { locale: 'en', theme: 'dark' },
   render: () => <AppSettingsScreen version="1.2.0" installs={0} theme="dark" locale="en" />,
 }
+/** A newer app is out (#768): «About» says so and leads to it. */
+export const AppUpdate: Story = {
+  render: () => (
+    <AppSettingsScreen
+      version="0.23.5"
+      build="57"
+      installs={2}
+      update="0.24.1"
+      onUpdate={() => {}}
+    />
+  ),
+}
 export const Demo: Story = { render: () => <DemoInstallScreen /> }
 export const DemoConnecting: Story = { render: () => <DemoInstallScreen state="connecting" /> }
 export const DemoFailed: Story = { render: () => <DemoInstallScreen state="failed" /> }

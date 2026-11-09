@@ -60,6 +60,45 @@ export const FileOpen: Story = {
     />
   ),
 }
+/** Страница (#808): по умолчанию отрисованной, «Код» — исходник. В приложении страницу рисует WebView. */
+const PAGE =
+  '<!doctype html>\n<html>\n  <body>\n    <h1>Отчёт за неделю</h1>\n    <p>Сборок: 42</p>\n  </body>\n</html>'
+export const HtmlPage: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      view="files"
+      openFile={{
+        path: 'out/report.html',
+        language: 'html',
+        content: PAGE,
+        page: (
+          <iframe
+            title="report.html"
+            srcDoc={PAGE}
+            sandbox=""
+            style={{ border: 0, width: '100%', height: '100%', background: '#fff' }}
+          />
+        ),
+      }}
+    />
+  ),
+}
+/** Файл в пути (#809): сколько пришло из скольких и сколько ещё ждать. */
+export const FileDownloading: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      view="files"
+      openFile={{
+        path: 'docs/presentation.pdf',
+        content: '',
+        loading: true,
+        progress: { done: 3.6 * 1024 * 1024, total: 9.4 * 1024 * 1024, eta: 14 },
+      }}
+    />
+  ),
+}
 export const Terminal: Story = { render: () => <SessionScreen {...base} view="terminal" /> }
 export const Usage: Story = { render: () => <SessionScreen {...base} view="usage" /> }
 export const Menu: Story = {
@@ -89,6 +128,26 @@ export const DetailsThinkingMode: Story = {
         onModel={() => undefined}
         variant="high"
         onVariant={() => undefined}
+        mode="Править самому"
+        onMode={() => undefined}
+      />
+    </>
+  ),
+}
+/** The session's settings with the context window (#839): the cap beside the thinking mode. */
+export const DetailsContextWindow: Story = {
+  render: () => (
+    <>
+      <SessionScreen {...base} variant="high" />
+      <SessionDetailsSheet
+        details={details}
+        model="DeepSeek V4"
+        onModel={() => undefined}
+        variant="high"
+        onVariant={() => undefined}
+        context={200_000}
+        modelWindow={400_000}
+        onContext={() => undefined}
         mode="Править самому"
         onMode={() => undefined}
       />

@@ -38,6 +38,18 @@ export interface Research extends ResearchRow {
   /** What the analyst is doing now, replaces the status label. */
   progressNote?: string
   paused?: Pause
+  /** Why the last run failed (#767), on an 'error' research; null — no reason was saved. */
+  failure?: ResearchFailure | null
+}
+
+/** Why a research run failed (#767): kind = provider | limit | interrupted | launch | internal. */
+export interface ResearchFailure {
+  kind: string
+  /** The flow step it failed in: analyst_first, review_phase, … */
+  step?: string
+  attempts?: number
+  /** The tail of the original error text, keys masked. */
+  detail?: string
 }
 
 /**

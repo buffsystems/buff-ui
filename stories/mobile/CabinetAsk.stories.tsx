@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
+  AiModeChip,
+  AiModeParamsCard,
   AskListScreen,
   AskThreadScreen,
   AttachSourceSheet,
@@ -93,6 +95,22 @@ export const Thread: Story = {
 export const ThreadThinking: Story = {
   render: () => <AskThreadScreen status={online} thread={threadThinking} />,
 }
+// #813: the follow-up stays open while Buff answers; the question sent meanwhile waits.
+export const ThreadThinkingWithQueued: Story = {
+  render: () => (
+    <AskThreadScreen
+      status={online}
+      draft="И что с инвалидацией?"
+      thread={{
+        ...threadThinking,
+        messages: [
+          ...threadThinking.messages,
+          { id: 'q1', role: 'user', content: 'И ещё: какой TTL ставить?', queued: true },
+        ],
+      }}
+    />
+  ),
+}
 export const ThreadWaiting: Story = {
   render: () => (
     <AskThreadScreen
@@ -145,4 +163,74 @@ export const NewQuestionNoRight: Story = {
 }
 export const NewQuestionOffline: Story = {
   render: () => <NewQuestionScreen status={offline} place="Acme · billing-service" />,
+}
+
+// Режимы ИИ (#840): «Параметры ИИ» на форме вопроса — свёрнуто к тому, что применится; чип и
+// служебная строка в открытой сессии.
+const aiDefaults = { thinking: 'high', contextTokens: 200_000 }
+export const NewWithAiParams: Story = {
+  render: () => (
+    <NewQuestionScreen
+      status={online}
+      place="acme · shop"
+      params={
+        <AiModeParamsCard
+          thinking={null}
+          contextTokens={null}
+          defaults={aiDefaults}
+          modelWindow={400_000}
+          onPickThinking={() => undefined}
+          onPickContext={() => undefined}
+        />
+      }
+    />
+  ),
+}
+export const NewWithAiParamsOpen: Story = {
+  render: () => (
+    <NewQuestionScreen
+      status={online}
+      place="acme · shop"
+      params={
+        <AiModeParamsCard
+          thinking="low"
+          contextTokens={null}
+          defaults={aiDefaults}
+          modelWindow={400_000}
+          defaultOpen
+          onPickThinking={() => undefined}
+          onPickContext={() => undefined}
+        />
+      }
+    />
+  ),
+}
+export const ThreadWithAiMode: Story = {
+  render: () => (
+    <AskThreadScreen
+      status={online}
+      thread={{
+        ...thread,
+        messages: [
+          thread.messages[0]!,
+          {
+            id: 'note-1',
+            role: 'note',
+            content: 'Иван: размышления — низкие',
+            when: 'сегодня, 14:05',
+          },
+          ...thread.messages.slice(1),
+        ],
+      }}
+      chip={
+        <AiModeChip
+          thinking="low"
+          contextTokens={200_000}
+          modelWindow={400_000}
+          onPress={() => undefined}
+        />
+      }
+      onActions={() => {}}
+    />
+  ),
 }
