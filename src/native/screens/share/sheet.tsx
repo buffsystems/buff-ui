@@ -131,9 +131,14 @@ export function ShareSheet({
       title={t('share.title')}
       onClose={onClose}
       footer={
-        <Button block loading={busy} onPress={create}>
-          {t('share.create')}
-        </Button>
+        // The reason a link was not made stays beside the button (#857): below the options it sat
+        // out of sight, and the button seemed to do nothing.
+        <View style={{ gap: theme.space(2) }}>
+          {shown && <Callout tone="crit">{shown}</Callout>}
+          <Button block loading={busy} onPress={create}>
+            {t('share.create')}
+          </Button>
+        </View>
       }
     >
       <View style={{ gap: theme.space(4) }}>
@@ -194,7 +199,6 @@ export function ShareSheet({
           onPress={() => setTools((v) => !v)}
         />
         <Choice multiple picked={live} label={t('share.live')} onPress={() => setLive((v) => !v)} />
-        {shown && <Callout tone="crit">{shown}</Callout>}
       </View>
     </Sheet>
   )

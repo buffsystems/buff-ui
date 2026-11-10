@@ -16,7 +16,7 @@ export const S = defineStrings({
     ru: 'Проекты появляются здесь, когда вы открываете их в Buff Code на компьютере.',
     en: 'Projects appear here once you open them in Buff Code on the computer.',
   },
-  'buffcode.sessionsCount': { ru: 'сессий: {n}', en: '{n} sessions' },
+  'buffcode.sessionsCount': { ru: 'сессий: {n}', en: 'sessions: {n}' },
   'buffcode.sessions': { ru: 'Сессии', en: 'Sessions' },
   'buffcode.newSession': { ru: 'Новая сессия', en: 'New session' },
   'buffcode.noSessions': { ru: 'Сессий пока нет', en: 'No sessions yet' },
