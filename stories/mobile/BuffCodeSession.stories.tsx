@@ -107,6 +107,12 @@ export const ToolGroups: Story = {
           { kind: 'user', id: 'u1', text: 'Почини экспорт PDF', when: '14:02' },
           call('t1', 'read', 'src/reports/pdf.ts'),
           call('t2', 'grep', 'fontkit'),
+          {
+            kind: 'reasoning',
+            id: 'r1',
+            markdown:
+              'Похоже, `fontkit` **не установлен**:\n\n- проверю `package.json`\n- запущу тесты отчётов',
+          },
           call('t3', 'read', 'package.json'),
           call('t4', 'shell', 'bun test src/reports', 'error'),
           call('t5', 'shell', 'bun add fontkit'),
@@ -284,4 +290,41 @@ export const SlashAutocomplete: Story = {
 }
 export const Offline: Story = {
   render: () => <SessionScreen {...base} status={offline} running={false} />,
+}
+
+/** What a call was given, while it runs and after (#903); what the timeline cut offers «Show all». */
+export const CallsWhole: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      onShowAll={() => {}}
+      items={[
+        { kind: 'user', id: 'u', text: 'Проверь зазоры', when: '09:40' },
+        {
+          kind: 'reasoning',
+          id: 'r',
+          markdown: 'Сначала измерю зазор между ControlCrossbar и ShiftCarriage, потом…',
+          clipped: true,
+        },
+        {
+          kind: 'tool',
+          id: 't1',
+          tool: 'execute',
+          title: 'execute',
+          status: 'done',
+          input:
+            "code:\nconst q = await tools.solidcraft.execute({ command: 'inspect.interference' })\nreturn q",
+          output: '{\n  "count": 1\n}',
+        },
+        {
+          kind: 'tool',
+          id: 't2',
+          tool: 'execute',
+          title: 'execute',
+          status: 'running',
+          input: 'code:\nreturn await tools.solidcraft.inspect_design({ measure: true })',
+        },
+      ]}
+    />
+  ),
 }

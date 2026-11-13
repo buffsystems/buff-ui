@@ -10,6 +10,7 @@ import type { BcAgent, BcModel, BcProject, PermissionMode } from './model.ts'
 import { Gutter, isLive, MachineShell } from './shell.tsx'
 import { variantHint, variantLabel } from './variant.ts'
 import { contextLabel } from './context.ts'
+import { WorkModeControl, type WorkMode } from './work-mode.tsx'
 
 export const MODE_KEY: Record<PermissionMode, string> = {
   ask: 'buffcode.modeAsk',
@@ -71,7 +72,8 @@ export function PermissionModeControl({
 
 /**
  * A new session: a project and a model from the service's lists, both mandatory; the agent too,
- * except under «Plan», which is the plan agent.
+ * except under «Plan», which is the plan agent. A new setup (#891) is the same page without the
+ * project, the agent and «Plan»: the agent is Setup, the project is the machine's last one.
  */
 export function NewSessionScreen({
   install,
@@ -82,6 +84,9 @@ export function NewSessionScreen({
   mode = 'ask',
   plan = false,
   prompt = '',
+  setup: setupOnly = false,
+  work,
+  onWork,
   onBack,
   onPickProject,
   onPickModel,
@@ -105,6 +110,14 @@ export function NewSessionScreen({
   mode?: PermissionMode
   plan?: boolean
   prompt?: string
+  /** Setup mode (#765, #891): a session where the agent connects itself to what the user needs. */
+  setup?: boolean
+  /**
+   * The work mode (#894): Work, Plan, Setup as one switch in place of the «Plan» chip; Setup turns
+   * the page into a new setup.
+   */
+  work?: WorkMode
+  onWork?: (next: WorkMode) => void
   onBack?: () => void
   onPickProject?: () => void
   onPickModel?: () => void
@@ -127,11 +140,13 @@ export function NewSessionScreen({
   const theme = useTheme()
   const live = isLive(status)
   const ready = live && !!project && !!model
+  const setup = setupOnly || work === 'setup'
+  const planned = work ? work === 'plan' : plan
   return (
     <MachineShell
       install={install}
       status={status}
-      title={t('buffcode.newSession')}
+      title={t(setup ? 'buffcode.newSetup' : 'buffcode.newSession')}
       onBack={onBack}
       onRepair={onRepair}
       footer={
@@ -140,22 +155,33 @@ export function NewSessionScreen({
             {t('buffcode.start')}
           </Button>
           <Text variant="caption" tone="muted" align="center">
-            {t('buffcode.startHint')}
+            {t(setup && !project ? 'buffcode.setupNoProject' : 'buffcode.startHint')}
           </Text>
         </View>
       }
     >
       <View style={{ paddingTop: theme.space(4) }}>
         <Gutter gap={theme.space(4)}>
-          <Field label={t('buffcode.project')} required>
-            <SelectField
-              icon="folderGit"
-              value={project?.name}
-              placeholder={t('buffcode.chooseProject')}
-              onPress={onPickProject}
-              disabled={!live}
-            />
-          </Field>
+          {onWork && work && (
+            <Field label={t('buffcode.workMode')}>
+              <WorkModeControl work={work} disabled={!live} onWork={onWork} />
+            </Field>
+          )}
+          {setup ? (
+            onWork ? null : (
+              <Text tone="muted">{t('buffcode.setupHint')}</Text>
+            )
+          ) : (
+            <Field label={t('buffcode.project')} required>
+              <SelectField
+                icon="folderGit"
+                value={project?.name}
+                placeholder={t('buffcode.chooseProject')}
+                onPress={onPickProject}
+                disabled={!live}
+              />
+            </Field>
+          )}
           <Field label={t('buffcode.model')} required>
             <SelectField
               icon="cpu"
@@ -187,19 +213,22 @@ export function NewSessionScreen({
               />
             </Field>
           )}
-          <Field label={t('buffcode.agent')}>
-            <SelectField
-              icon="bot"
-              value={plan ? 'plan' : agent?.name}
-              placeholder="build"
-              onPress={onPickAgent}
-              disabled={!live || plan}
-            />
-          </Field>
+          {!setup && (
+            <Field label={t('buffcode.agent')}>
+              <SelectField
+                icon="bot"
+                value={planned ? 'plan' : agent?.name}
+                placeholder="build"
+                onPress={onPickAgent}
+                disabled={!live || planned}
+              />
+            </Field>
+          )}
           <Field label={t('buffcode.permissionMode')}>
             <PermissionModeControl
               mode={mode}
-              plan={plan}
+              plan={!setup && planned}
+              hasPlan={!setup && !onWork}
               disabled={!live}
               onMode={onMode}
               onPlan={onPlan}
@@ -207,7 +236,7 @@ export function NewSessionScreen({
           </Field>
           <Input
             rows={4}
-            placeholder={t('buffcode.promptPlaceholder')}
+            placeholder={t(setup ? 'buffcode.setupPrompt' : 'buffcode.promptPlaceholder')}
             value={prompt}
             onChangeText={onPrompt}
             editable={live}

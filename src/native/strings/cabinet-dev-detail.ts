@@ -50,6 +50,10 @@ export const S = defineStrings({
     ru: 'Разработка завершена — все подзадачи выполнены.',
     en: 'Development finished — every subtask is done.',
   },
+  'devd.stStopped': {
+    ru: 'Прогон остановлен на шаге «{step}». «Запустить заново» продолжит его с этого шага.',
+    en: 'The run stopped at the “{step}” step. “Run again” continues it from that step.',
+  },
   'devd.stIdle': {
     ru: 'Задача декомпозирована — разработка ещё не запущена.',
     en: 'The task is decomposed — development has not started.',

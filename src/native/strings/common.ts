@@ -14,6 +14,8 @@ export const S = defineStrings({
   'common.share': { ru: 'Поделиться', en: 'Share' },
   'common.open': { ru: 'Открыть', en: 'Open' },
   'common.more': { ru: 'Ещё', en: 'More' },
+  // #903: the timeline holds the start of a long text; this fetches the whole.
+  'common.showAll': { ru: 'Показать полностью', en: 'Show all' },
   'common.showMore': { ru: 'Показать ещё', en: 'Show more' },
   'common.search': { ru: 'Поиск', en: 'Search' },
   'common.filter': { ru: 'Фильтр', en: 'Filter' },
@@ -37,6 +39,38 @@ export const S = defineStrings({
     ru: 'Нет связи со шлюзом с {time}',
     en: 'No connection to the gateway since {time}',
   },
+  // #902: an action refused at once because the install is not online (read-only, no queue).
+  'common.offlineAction': {
+    ru: 'Установка не в сети — действие недоступно',
+    en: 'The install is offline — the action is unavailable',
+  },
+  // #901: the gateway was reached and refused the phone — its reason, not «check the internet».
+  'common.gatewayRefusedSince': {
+    ru: 'Шлюз отказал с {time}',
+    en: 'The gateway refused since {time}',
+  },
+  'common.readOnlyGateway': {
+    ru: 'Шлюз отказал в подключении: {detail}. Показано последнее известное состояние, действия недоступны. Подключимся сами, когда шлюз пустит.',
+    en: 'The gateway refused the connection: {detail}. Showing the last known state; actions are disabled. We reconnect by ourselves once it lets us in.',
+  },
+  // #916: a pair's daily traffic against the gateway's limit.
+  'usage.line': {
+    ru: 'Трафик за сутки: {used} из {limit}, сброс в {time}',
+    en: 'Traffic today: {used} of {limit}, resets at {time}',
+  },
+  'usage.exhausted': {
+    ru: 'Суточный лимит трафика исчерпан до {time}',
+    en: 'Daily traffic limit used up until {time}',
+  },
+  'usage.exhaustedText': {
+    ru: 'Телефон и установка израсходовали суточный трафик через buff.systems. Показано последнее известное состояние, действия недоступны. Связь вернётся в {time}.',
+    en: 'The phone and the install used up their daily traffic through buff.systems. Showing the last known state; actions are disabled. The link comes back at {time}.',
+  },
+  'size.b': { ru: '{n} Б', en: '{n} B' },
+  'size.kb': { ru: '{n} КБ', en: '{n} KB' },
+  'size.mb': { ru: '{n} МБ', en: '{n} MB' },
+  'size.gb': { ru: '{n} ГБ', en: '{n} GB' },
+  'size.tb': { ru: '{n} ТБ', en: '{n} TB' },
   'common.notRespondingSince': { ru: 'Не отвечает с {time}', en: 'Not responding since {time}' },
   'common.readOnlyNetwork': {
     ru: 'Телефон не достучался до шлюза. Показано последнее известное состояние, действия недоступны. Проверьте интернет на телефоне — подключимся сами.',

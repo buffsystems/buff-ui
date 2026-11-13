@@ -7,6 +7,7 @@ import { useT, useTheme } from '../../theme.tsx'
 import type { GitState, PermissionMode } from './model.ts'
 import { MODE_KEY } from './new-session.tsx'
 import { variantLabel } from './variant.ts'
+import { workModeLabel, type WorkMode } from './work-mode.tsx'
 
 /**
  * One quiet line over the composer instead of a row of chips (owner's review): the model,
@@ -18,6 +19,7 @@ export function SessionContextLine({
   git,
   mode,
   plan = false,
+  work,
   disabled = false,
   onPress,
 }: {
@@ -27,13 +29,17 @@ export function SessionContextLine({
   git?: GitState
   mode?: PermissionMode
   plan?: boolean
+  /** The work mode (#894): Plan and Setup are named first — it is what the agent is doing. */
+  work?: WorkMode
   disabled?: boolean
   onPress?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
   const c = theme.colors
+  const named = workModeLabel(work ?? (plan ? 'plan' : 'work'))
   const parts = [
+    named && t(named),
     model && variant && variant !== 'default' ? `${model} · ${variantLabel(t, variant)}` : model,
     git?.branch &&
       [
@@ -43,7 +49,6 @@ export function SessionContextLine({
       ]
         .filter(Boolean)
         .join(' '),
-    plan && t('buffcode.plan'),
     mode && t(MODE_KEY[mode]),
   ].filter(Boolean)
   if (parts.length === 0) return null

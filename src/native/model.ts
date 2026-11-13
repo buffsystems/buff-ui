@@ -21,7 +21,16 @@ export type InstallKind = 'saas' | 'ce' | 'ee' | 'machine'
 export type InstallStatus =
   | { kind: 'online' }
   | { kind: 'connecting' }
-  | { kind: 'offline'; since: string; reason?: 'network' | 'install' }
+  | {
+      kind: 'offline'
+      since: string
+      /**
+       * `gateway` — the gateway was reached but refused the phone (#901); `detail` says why.
+       * `quota` — the pair used up its daily traffic (#916); `since` is when it comes back.
+       */
+      reason?: 'network' | 'install' | 'gateway' | 'quota'
+      detail?: string
+    }
   | { kind: 'repair' }
   | { kind: 'blockedOrg' }
   | { kind: 'blockedEe' }
@@ -40,6 +49,17 @@ export interface Install {
   attention: number
   /** A Buff Code machine signed into an install: that install's name (its policy applies). */
   homeInstall?: string
+  /** The pair's traffic today (#909), once the gateway told it. */
+  usage?: PairUsageView
+}
+
+/** A pair's daily traffic (#909): bytes of the limit; `resets` — the local time it starts over. */
+export interface PairUsageView {
+  bytes: number
+  limit: number
+  resets: string
+  /** Ran out: the pair is cut off until `resets`. */
+  exhausted: boolean
 }
 
 /** One line of the attention feed: something that waits for the person, from any install. */

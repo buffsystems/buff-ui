@@ -1,7 +1,6 @@
 /** @jsxRuntime automatic */
 import { View } from 'react-native'
 import { Badge } from '../../Badge.tsx'
-import { Chip } from '../../Chip.tsx'
 import { Button } from '../../Button.tsx'
 import { Card, KeyValue } from '../../Card.tsx'
 import { Field, SelectField } from '../../Field.tsx'
@@ -12,6 +11,7 @@ import type { SessionDetails } from './model.ts'
 import { variantHint, variantLabel } from './variant.ts'
 import { contextLabel } from './context.ts'
 import { Eyebrow, originLabel } from './shell.tsx'
+import { WorkModeControl, type WorkMode } from './work-mode.tsx'
 
 /** «Session details»: where it runs, its branch, the MCP servers and the LSPs, a way to review. */
 
@@ -28,8 +28,10 @@ export function SessionDetailsSheet({
   context,
   modelWindow,
   onContext,
-  setup,
-  onSetup,
+  work,
+  hasPlan,
+  hasSetup,
+  onWork,
   onClose,
 }: {
   details: SessionDetails
@@ -47,9 +49,14 @@ export function SessionDetailsSheet({
   context?: number
   modelWindow?: number
   onContext?: () => void
-  /** Setup mode (#765): the agent connects itself to services; switched here. */
-  setup?: boolean
-  onSetup?: () => void
+  /**
+   * The work mode (#894): Work, Plan, Setup as one switch, on top of the session's settings. Setup
+   * (#765) used to be a lone toggle below them.
+   */
+  work?: WorkMode
+  hasPlan?: boolean
+  hasSetup?: boolean
+  onWork?: (next: WorkMode) => void
   onClose?: () => void
 }) {
   const t = useT()
@@ -78,8 +85,19 @@ export function SessionDetailsSheet({
         <KeyValue label={t('buffcode.detailsOrigin')} value={originLabel(t, details.origin)} />
         <KeyValue label={t('buffcode.detailsCreated')} value={details.created} />
       </Card>
-      {(onModel || onMode || onVariant || onContext) && (
+      {(onModel || onMode || onVariant || onContext || onWork) && (
         <Card style={{ gap: theme.space(2) }}>
+          {onWork && work && (
+            <Field label={t('buffcode.workMode')}>
+              <WorkModeControl
+                work={work}
+                {...(hasPlan === undefined ? {} : { plan: hasPlan })}
+                {...(hasSetup === undefined ? {} : { setup: hasSetup })}
+                disabled={disabled}
+                onWork={onWork}
+              />
+            </Field>
+          )}
           {onModel && (
             <Field label={t('buffcode.model')}>
               <SelectField
@@ -122,13 +140,6 @@ export function SessionDetailsSheet({
                 onPress={onMode}
                 disabled={disabled}
               />
-            </Field>
-          )}
-          {onSetup && (
-            <Field label={t('buffcode.setupGroup')} hint={t('buffcode.setupHint')}>
-              <Chip selected={!!setup} icon={setup ? 'check' : undefined} onPress={onSetup}>
-                {t(setup ? 'buffcode.setupOn' : 'buffcode.setupOff')}
-              </Chip>
             </Field>
           )}
         </Card>

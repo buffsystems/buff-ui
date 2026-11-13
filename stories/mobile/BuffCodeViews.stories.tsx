@@ -117,6 +117,23 @@ export const Details: Story = {
     </>
   ),
 }
+/** The work mode (#894): Work, Plan, Setup as one switch on top of the session's settings. */
+export const DetailsWorkMode: Story = {
+  render: () => (
+    <>
+      <SessionScreen {...base} work="setup" />
+      <SessionDetailsSheet
+        details={details}
+        model="Buff Large"
+        onModel={() => {}}
+        mode="Спрашивать"
+        onMode={() => {}}
+        work="setup"
+        onWork={() => {}}
+      />
+    </>
+  ),
+}
 /** The session's settings with the thinking mode (#759): the model's variant, changed from here. */
 export const DetailsThinkingMode: Story = {
   render: () => (

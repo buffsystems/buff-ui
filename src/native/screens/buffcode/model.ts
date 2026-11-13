@@ -25,7 +25,9 @@ export interface BcSession {
   title: string
   origin: SessionOrigin
   when: string
-  group: 'setup' | 'today' | 'yesterday' | 'older'
+  group: 'today' | 'yesterday' | 'older'
+  /** The project's name, where the list spans projects (#891: the machine's Setup place). */
+  project?: string
   running?: boolean
   /** Waits for the person: a permission, a question. */
   attention?: number
@@ -47,8 +49,23 @@ export type PermissionMode = 'ask' | 'edit' | 'full' | 'custom'
 export type ToolStatus = 'running' | 'done' | 'error'
 
 export type TimelineItem =
-  | { kind: 'user'; id: string; text: string; when: string; attachments?: Attachment[] }
-  | { kind: 'assistant'; id: string; markdown: string; model?: string; streaming?: boolean }
+  | {
+      kind: 'user'
+      id: string
+      text: string
+      when: string
+      attachments?: Attachment[]
+      /** The timeline holds only the start (#903): «Show all» fetches the whole. */
+      clipped?: boolean
+    }
+  | {
+      kind: 'assistant'
+      id: string
+      markdown: string
+      model?: string
+      streaming?: boolean
+      clipped?: boolean
+    }
   | {
       kind: 'tool'
       id: string
@@ -56,8 +73,13 @@ export type TimelineItem =
       title: string
       status: ToolStatus
       detail?: string
+      /** What the call was given (#903), as text — shown while it runs too. */
+      input?: string
       output?: string
+      clipped?: boolean
     }
+  /** The model's thoughts between its steps (#888), Markdown — folded, as in the window. */
+  | { kind: 'reasoning'; id: string; markdown: string; clipped?: boolean }
   | { kind: 'background'; id: string; tasks: { title: string; status: ToolStatus }[] }
   /** The model's to-do list (#752, `todo_update`): the whole list as of this call. */
   | { kind: 'todo'; id: string; items: TodoItem[] }

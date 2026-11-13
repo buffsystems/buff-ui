@@ -124,6 +124,24 @@ describe('native screens render through react-native-web', () => {
     expect(screen.getByText(/выключена или осталась без интернета/)).toBeTruthy()
   })
 
+  test('a gateway that refuses the phone says so with its reason, not «check the internet» (#901)', () => {
+    render(
+      wrap(
+        <InstallBanner
+          status={{
+            kind: 'offline',
+            since: '14:20',
+            reason: 'gateway',
+            detail: 'relay limit exceeded, retry later',
+          }}
+        />,
+      ),
+    )
+    expect(screen.getByText('Шлюз отказал с 14:20')).toBeTruthy()
+    expect(screen.getByText(/relay limit exceeded, retry later/)).toBeTruthy()
+    expect(screen.queryByText(/Проверьте интернет/)).toBeNull()
+  })
+
   test('a pairing error names the real gateway, and a silent install is told apart', () => {
     render(wrap(<PairErrorScreen error="gateway" gateway="dev.buff.systems" />))
     expect(screen.getByText(/dev\.buff\.systems недоступен/)).toBeTruthy()

@@ -61,6 +61,22 @@ const machineContent: SidebarContent = {
   })),
 }
 
+/** Recents (#922): the machine's sessions in one list, the running and the waiting first, each dated. */
+const recentsContent: SidebarContent = {
+  kind: 'machine',
+  selectedSession: sessions[1].id,
+  totalSessions: 12,
+  projects: projects.slice(0, 2).map((p) => ({ id: p.id, name: p.name, sessions: [] })),
+  recents: sessions.slice(0, 5).map((s, i) => ({
+    id: s.id,
+    projectId: projects[i % 2].id,
+    title: s.title,
+    when: ['17:32', '16:05', '12 нояб.', '3 нояб.', '12 окт. 2025 г.'][i],
+    running: i === 0,
+    attention: i === 1,
+  })),
+}
+
 /** The drawer's footer rows (home, notifications, settings, add an install). */
 const footer = { onHome() {}, onNotifications() {}, onSettings() {}, onAddInstall() {} }
 
@@ -100,7 +116,39 @@ export const OverBuffCode: Story = {
   ),
 }
 
+/** Recents (#922): under the projects, the machine's sessions newest first — no projects, a date each. */
+export const Recents: Story = {
+  render: () => (
+    <>
+      <SessionScreen {...base} />
+      <SidebarDrawer
+        installs={installs}
+        currentId={machine.id}
+        content={recentsContent}
+        user="Анна Громова"
+        {...footer}
+      />
+    </>
+  ),
+}
+
 /** The current install is unavailable: the drawer says so under its content. */
+/** The machine's Setup place is open (#891): one entry into the mode for the whole machine. */
+export const OverSetup: Story = {
+  render: () => (
+    <>
+      <SessionScreen {...base} />
+      <SidebarDrawer
+        installs={installs}
+        currentId={machine.id}
+        content={{ ...machineContent, selectedSession: undefined, place: 'setup' }}
+        user="Анна Громова"
+        notifications={1}
+        {...footer}
+      />
+    </>
+  ),
+}
 export const CurrentOffline: Story = {
   render: () => (
     <>

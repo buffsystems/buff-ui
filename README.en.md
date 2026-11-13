@@ -34,7 +34,7 @@
   `ui-*` classes (BEM: `ui-btn ui-btn--ghost ui-btn--sm`, `ui-card__title`). Plain CSS in
   `@layer components`, so any page can use them and a utility class still wins for layout.
 - **React components** — `src/react/*`: thin wrappers that put those classes on the right
-- **Native layer** — `src/native/*` (`@buff/ui/native`, #629): the same tokens for React Native — the theme, primitives and presentational screens of the Buff mobile app (pairing, Home, cabinet sections, Buff Code, notifications, settings). The app injects the icons (`<NativeProvider icons=…>`: `lucide-react-native`), so the package carries no native dependency. Storybook renders the screens through `react-native-web` in a phone frame (the `Mobile` section, device and language toolbar switches).
+- **Native layer** — `src/native/*` (`@buff/ui/native`, #629): the same tokens for React Native — the theme, primitives and presentational screens of the [Buff mobile app](https://github.com/buffsystems/buff-mobile) (pairing, Home, cabinet sections, Buff Code, notifications, settings). The app injects the icons (`<NativeProvider icons=…>`: `lucide-react-native`), so the package carries no native dependency. Storybook renders the screens through `react-native-web` in a phone frame (the `Mobile` section, device and language toolbar switches).
   elements; behaviour (focus, keyboard, portals) comes from Radix.
 
 ## Using it

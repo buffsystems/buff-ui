@@ -21,9 +21,8 @@ import {
   skeletonRows,
 } from './shell.tsx'
 
-const GROUPS: BcSession['group'][] = ['setup', 'today', 'yesterday', 'older']
+const GROUPS: BcSession['group'][] = ['today', 'yesterday', 'older']
 const GROUP_KEY: Record<BcSession['group'], string> = {
-  setup: 'buffcode.setupGroup',
   today: 'common.today',
   yesterday: 'common.yesterday',
   older: 'buffcode.older',
@@ -47,7 +46,7 @@ export function SessionRow({
         <Icon name={ORIGIN_ICON[session.origin]} size={20} color={theme.colors.mutedForeground} />
       }
       title={session.title}
-      subtitle={`${originLabel(t, session.origin)} · ${session.when}${session.running ? ` · ${t('buffcode.running')}` : ''}`}
+      subtitle={`${session.project ? `${session.project} · ` : ''}${originLabel(t, session.origin)} · ${session.when}${session.running ? ` · ${t('buffcode.running')}` : ''}`}
       trailing={
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           {session.attention ? <Badge tone="crit">{session.attention}</Badge> : null}
@@ -72,25 +71,32 @@ export function SessionsScreen({
   loading = false,
   query = '',
   onBack,
+  onMenu,
   onOpen,
   onMore,
   onNew,
-  onNewSetup,
+  setup = false,
   onQuery,
   onRepair,
 }: {
   install: Install
   status: InstallStatus
-  project: BcProject
+  /** The project whose sessions these are; none in the Setup place. */
+  project?: BcProject
   sessions: BcSession[]
   loading?: boolean
   query?: string
   onBack?: () => void
+  /** The drawer — where there is no way back: the Setup place is a place of the machine. */
+  onMenu?: () => void
   onOpen?: (id: string) => void
   onMore?: (id: string) => void
   onNew?: () => void
-  /** Setup mode (#765): a new session where the agent connects itself to what the user needs. */
-  onNewSetup?: () => void
+  /**
+   * The machine's Setup place (#765, #891): the setup sessions of all its projects — there the agent
+   * connects itself to what the user needs; «+» starts a new one.
+   */
+  setup?: boolean
   onQuery?: (text: string) => void
   onRepair?: () => void
 }) {
@@ -98,27 +104,25 @@ export function SessionsScreen({
   const theme = useTheme()
   const live = isLive(status)
   const empty = !loading && sessions.length === 0
+  const newLabel = t(setup ? 'buffcode.newSetup' : 'buffcode.newSession')
   return (
     <MachineShell
       install={install}
       status={status}
-      title={project.name}
-      subtitle={project.branch ? `⎇ ${project.branch} · ${install.name}` : install.name}
+      title={setup ? t('buffcode.setupGroup') : (project?.name ?? '')}
+      subtitle={!setup && project?.branch ? `⎇ ${project.branch} · ${install.name}` : install.name}
       onBack={onBack}
+      onMenu={onMenu}
       onRepair={onRepair}
       scroll={!empty}
-      actions={
-        <IconButton icon="plus" label={t('buffcode.newSession')} onPress={onNew} disabled={!live} />
-      }
+      actions={<IconButton icon="plus" label={newLabel} onPress={onNew} disabled={!live} />}
     >
       {empty && !query ? (
         <EmptyState
-          icon="messageSquare"
-          title={t('buffcode.noSessions')}
-          text={t('buffcode.noSessionsText')}
-          action={
-            live ? { label: t('buffcode.newSession'), icon: 'plus', onPress: onNew } : undefined
-          }
+          icon={setup ? 'plug' : 'messageSquare'}
+          title={t(setup ? 'buffcode.setupHint' : 'buffcode.noSessions')}
+          text={t(setup ? 'buffcode.setupEmpty' : 'buffcode.noSessionsText')}
+          action={live ? { label: newLabel, icon: 'plus', onPress: onNew } : undefined}
         />
       ) : (
         <View style={{ paddingTop: theme.space(3), gap: theme.space(3) }}>
@@ -139,32 +143,10 @@ export function SessionsScreen({
           ) : (
             GROUPS.map((group) => {
               const items = sessions.filter((s) => s.group === group)
-              // Setup (#765): its group is shown even empty — it is the way into the mode.
-              if (items.length === 0 && !(group === 'setup' && onNewSetup)) return null
+              if (items.length === 0) return null
               return (
                 <Gutter key={group} gap={theme.space(2)}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Eyebrow>{t(GROUP_KEY[group])}</Eyebrow>
-                    {group === 'setup' && onNewSetup && (
-                      <IconButton
-                        icon="plus"
-                        label={t('buffcode.newSetup')}
-                        onPress={onNewSetup}
-                        size="sm"
-                      />
-                    )}
-                  </View>
-                  {items.length === 0 && (
-                    <Text tone="muted" variant="label">
-                      {t('buffcode.setupEmpty')}
-                    </Text>
-                  )}
+                  <Eyebrow>{t(GROUP_KEY[group])}</Eyebrow>
                   <RowGroup>
                     {items.map((session) => (
                       <SessionRow

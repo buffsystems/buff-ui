@@ -46,6 +46,7 @@ import { TimelinePart } from './timeline-parts.tsx'
 import { foldTools, ToolGroup } from './tool-group.tsx'
 import { ChangesView, UsageView } from './changes-usage.tsx'
 import { ViewSwitcher, type SessionView } from './views.tsx'
+import type { WorkMode } from './work-mode.tsx'
 
 export interface SessionScreenProps {
   install: Install
@@ -107,6 +108,8 @@ export interface SessionScreenProps {
   onBack?: () => void
   onMenu?: () => void
   onDetails?: () => void
+  /** The work mode (#894): Work, Plan, Setup — named in the context line, switched in the details. */
+  work?: WorkMode
   onView?: (view: SessionView) => void
   onMore?: () => void
   onSide?: () => void
@@ -157,6 +160,8 @@ export interface SessionScreenProps {
   onFileChoice?: (choice: FileChoice, id: string) => void
   /** A compaction's summary was opened (#761): fetch the whole text. */
   onOpenCompaction?: (id: string) => void
+  /** «Show all» under an item the timeline holds only the start of (#903). */
+  onShowAll?: (item: TimelineItem) => void
   onCloseFile?: () => void
   onRepair?: () => void
 }
@@ -238,6 +243,7 @@ export function SessionScreen(p: SessionScreenProps) {
       onOpenSubagent={p.onOpenSubagent}
       onFileChoice={p.onFileChoice}
       onOpenCompaction={p.onOpenCompaction}
+      onShowAll={p.onShowAll}
     />
   )
   // The working subagents (#762): the composer's icon and its list.
@@ -390,6 +396,7 @@ export function SessionScreen(p: SessionScreenProps) {
                 git={p.git}
                 mode={p.mode}
                 plan={p.plan ?? false}
+                {...(p.work ? { work: p.work } : {})}
                 disabled={!live}
                 onPress={p.onDetails}
               />

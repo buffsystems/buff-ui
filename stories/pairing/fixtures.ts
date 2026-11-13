@@ -24,6 +24,8 @@ export const myDevices: PairedDevice[] = [
     pairedAt: '12 окт',
     lastSeen: 'сейчас',
     status: 'online',
+    // #916: the pair's traffic today.
+    usage: { bytes: 340 * 1024 ** 2, limit: 2 * 1024 ** 3, resets: '03:00', exhausted: false },
   },
   {
     id: 'd2',
@@ -32,6 +34,7 @@ export const myDevices: PairedDevice[] = [
     pairedAt: '3 окт',
     lastSeen: 'вчера, 22:10',
     status: 'offline',
+    usage: { bytes: 2 * 1024 ** 3, limit: 2 * 1024 ** 3, resets: '03:00', exhausted: true },
   },
   {
     id: 'd3',

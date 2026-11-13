@@ -24,8 +24,9 @@ export const installs: Install[] = [
     kind: 'ce',
     name: 'Buff Community · офис',
     detail: 'buff.office.local',
-    status: { kind: 'offline', since: '14:20' },
+    status: { kind: 'offline', since: '03:00', reason: 'quota' },
     attention: 1,
+    usage: { bytes: 2 * 1024 ** 3, limit: 2 * 1024 ** 3, resets: '03:00', exhausted: true },
   },
   {
     id: 'ce-home',
@@ -43,7 +44,15 @@ export const installs: Install[] = [
     status: { kind: 'blockedEe' },
     attention: 0,
   },
-  { id: 'mac', kind: 'machine', name: 'MacBook Pro', status: { kind: 'online' }, attention: 2 },
+  {
+    id: 'mac',
+    kind: 'machine',
+    name: 'MacBook Pro',
+    status: { kind: 'online' },
+    attention: 2,
+    // #916: the pair's traffic today.
+    usage: { bytes: 340 * 1024 ** 2, limit: 2 * 1024 ** 3, resets: '03:00', exhausted: false },
+  },
   {
     id: 'ws',
     kind: 'machine',

@@ -212,6 +212,7 @@ export function Segmented({
             key={option.id}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
+            aria-selected={active}
             onPress={() => onChange?.(option.id)}
             style={{
               flex: 1,

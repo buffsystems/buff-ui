@@ -10,6 +10,7 @@ import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { FileChoice, TimelineItem } from './model.ts'
 import { CompactionNote } from './compaction.tsx'
+import { Reasoning } from './reasoning.tsx'
 import { SentFile } from './sent-file.tsx'
 import { BackgroundWork, SubagentCard, TodoCard, ToolCall } from './tool-parts.tsx'
 
@@ -112,15 +113,7 @@ function ServiceNotice({ label, summary }: { label: string; summary?: string }) 
   )
 }
 
-/** One item of the timeline by its kind. */
-export function TimelinePart({
-  item,
-  disabled = false,
-  onOpenSent,
-  onOpenSubagent,
-  onFileChoice,
-  onOpenCompaction,
-}: {
+type PartProps = {
   item: TimelineItem
   disabled?: boolean
   /** A file the agent handed over was tapped (#708). */
@@ -131,7 +124,41 @@ export function TimelinePart({
   onFileChoice?: (choice: FileChoice, id: string) => void
   /** A compaction's summary was opened (#761): the screen fetches the whole text. */
   onOpenCompaction?: (id: string) => void
-}) {
+}
+
+/**
+ * One item of the timeline by its kind. What the timeline holds only the start of (#903) offers
+ * «Show all»: the screen fetches the whole and the item comes back uncut.
+ */
+export function TimelinePart({
+  onShowAll,
+  ...props
+}: PartProps & { onShowAll?: (item: TimelineItem) => void }) {
+  const t = useT()
+  const theme = useTheme()
+  const item = props.item
+  const body = <PartBody {...props} />
+  if (!onShowAll || !('clipped' in item) || !item.clipped) return body
+  return (
+    <View style={{ gap: theme.space(1) }}>
+      {body}
+      <View style={{ alignItems: 'flex-start' }}>
+        <Button size="sm" variant="ghost" onPress={() => onShowAll(item)}>
+          {t('common.showAll')}
+        </Button>
+      </View>
+    </View>
+  )
+}
+
+function PartBody({
+  item,
+  disabled = false,
+  onOpenSent,
+  onOpenSubagent,
+  onFileChoice,
+  onOpenCompaction,
+}: PartProps) {
   const t = useT()
   switch (item.kind) {
     case 'user':
@@ -147,9 +174,12 @@ export function TimelinePart({
           title={item.title}
           status={item.status}
           detail={item.detail}
+          input={item.input}
           output={item.output}
         />
       )
+    case 'reasoning':
+      return <Reasoning markdown={item.markdown} />
     case 'background':
       return <BackgroundWork tasks={item.tasks} disabled={disabled} />
     case 'todo':

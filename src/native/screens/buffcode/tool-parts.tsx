@@ -33,6 +33,7 @@ export function ToolCall({
   title,
   status,
   detail,
+  input,
   output,
   expanded: initial = false,
 }: {
@@ -40,6 +41,7 @@ export function ToolCall({
   title: string
   status: ToolStatus
   detail?: string
+  input?: string
   output?: string
   expanded?: boolean
 }) {
@@ -87,7 +89,7 @@ export function ToolCall({
           color={theme.colors.mutedForeground}
         />
       </Pressable>
-      {open && (detail || output) && (
+      {open && (detail || input || output) && (
         <View
           style={{
             paddingHorizontal: theme.space(3),
@@ -100,7 +102,22 @@ export function ToolCall({
               {detail}
             </Text>
           )}
-          {output && <CodeBlock code={output} />}
+          {input && (
+            <>
+              <Text variant="caption" tone="muted">
+                {t('buffcode.toolInput')}
+              </Text>
+              <CodeBlock code={input} />
+            </>
+          )}
+          {output && (
+            <>
+              <Text variant="caption" tone="muted">
+                {t('buffcode.toolOutput')}
+              </Text>
+              <CodeBlock code={output} />
+            </>
+          )}
         </View>
       )}
     </View>

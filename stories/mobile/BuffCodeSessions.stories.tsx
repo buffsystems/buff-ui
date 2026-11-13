@@ -31,32 +31,30 @@ export const List: Story = {
     />
   ),
 }
-/** Режим «Настройка» (#765): его сессии — своей группой первыми, «+» начинает новую. */
-export const WithSetup: Story = {
+/** Раздел «Настройка» машины (#765, #891): сессии настройки всех её проектов, «+» начинает новую. */
+export const SetupPlace: Story = {
   render: () => (
     <SessionsScreen
       install={machine}
       status={status}
-      project={project}
+      setup
       sessions={[
-        { ...sessions[0]!, id: 'setup-1', title: 'Рабочая почта', group: 'setup' },
-        ...sessions,
+        {
+          ...sessions[0]!,
+          id: 'setup-1',
+          title: 'Рабочая почта',
+          project: 'billing-service',
+          running: false,
+          attention: 0,
+        },
+        { ...sessions[3]!, id: 'setup-2', title: 'Папка с договорами', project: 'storefront' },
       ]}
       onMore={() => {}}
-      onNewSetup={() => {}}
     />
   ),
 }
-export const SetupEmpty: Story = {
-  render: () => (
-    <SessionsScreen
-      install={machine}
-      status={status}
-      project={project}
-      sessions={sessions}
-      onNewSetup={() => {}}
-    />
-  ),
+export const SetupPlaceEmpty: Story = {
+  render: () => <SessionsScreen install={machine} status={status} setup sessions={[]} />,
 }
 export const Empty: Story = {
   render: () => (

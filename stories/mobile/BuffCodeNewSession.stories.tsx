@@ -40,6 +40,43 @@ export const Ready: Story = {
     />
   ),
 }
+/** Новая настройка (#891): модель, её размышления, окно контекста и разрешения — без проекта, агента и «Плана». */
+export const Setup: Story = {
+  render: () => (
+    <NewSessionScreen
+      install={machine}
+      status={status}
+      setup
+      project={projects[0]}
+      model={models[0]}
+      variant="high"
+      onPickVariant={() => {}}
+      context={0}
+      modelWindow={200_000}
+      onPickContext={() => {}}
+      mode="ask"
+      prompt="Подключи рабочую почту"
+    />
+  ),
+}
+export const SetupNoProject: Story = {
+  render: () => <NewSessionScreen install={machine} status={status} setup model={models[0]} />,
+}
+/** The work mode on the new-session page (#894): one switch in place of the «Plan» chip. */
+export const WorkMode: Story = {
+  render: () => (
+    <NewSessionScreen
+      install={machine}
+      status={status}
+      project={projects[0]}
+      model={models[0]}
+      agent={agents[0]}
+      mode="edit"
+      work="plan"
+      onWork={() => {}}
+    />
+  ),
+}
 export const PlanMode: Story = {
   render: () => (
     <NewSessionScreen

@@ -25,6 +25,8 @@ export function Row({
   destructive = false,
   lines = 1,
   label,
+  footnote,
+  footnoteTone = 'muted',
 }: {
   leading?: ReactNode
   icon?: IconName
@@ -41,6 +43,9 @@ export function Row({
   lines?: number
   /** What a screen reader says, when the title alone does not say what the row does. */
   label?: string
+  /** One more line under the subtitle (#916): a fact of its own, not cut by the subtitle's two lines. */
+  footnote?: string
+  footnoteTone?: 'muted' | 'destructive'
 }) {
   const theme = useTheme()
   const titleTone = destructive ? 'destructive' : 'fg'
@@ -64,6 +69,11 @@ export function Row({
         {subtitle && (
           <Text variant="caption" tone="muted" numberOfLines={2}>
             {subtitle}
+          </Text>
+        )}
+        {footnote && (
+          <Text variant="caption" tone={footnoteTone} numberOfLines={2}>
+            {footnote}
           </Text>
         )}
       </View>

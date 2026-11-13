@@ -40,6 +40,12 @@ export interface SidebarSession {
   attention?: boolean
 }
 
+/** A session of the machine's recents (#922): its project to open it in, and when its last message came. */
+export interface SidebarRecent extends SidebarSession {
+  projectId: string
+  when: string
+}
+
 export interface SidebarProject {
   id: string
   name: string
@@ -60,8 +66,10 @@ export type SidebarContent =
       projects: SidebarProject[]
       selectedSession?: string
       totalSessions: number
-      /** The machine's places (#654): projects, automations, workflows; `place` is the open one. */
-      place?: 'projects' | 'automations' | 'workflows'
+      /** Recents (#922): the machine's sessions in the order the app gives — the running and the waiting first. */
+      recents?: SidebarRecent[]
+      /** The machine's places (#654): projects, automations, workflows, Setup mode (#891); `place` is the open one. */
+      place?: 'projects' | 'automations' | 'workflows' | 'setup'
     }
 
 /** One row of the drawer: an icon or avatar, a label, a badge or mark; `active` is the current place. */
@@ -69,6 +77,7 @@ function DrawerRow({
   leading,
   icon,
   label,
+  caption,
   trailing,
   active = false,
   indent = false,
@@ -77,6 +86,8 @@ function DrawerRow({
   leading?: React.ReactNode
   icon?: IconName
   label: string
+  /** A second line under the label, muted. */
+  caption?: string
   trailing?: React.ReactNode
   active?: boolean
   indent?: boolean
@@ -101,13 +112,20 @@ function DrawerRow({
         (icon && (
           <Icon name={icon} size={20} color={active ? c.accentForeground : c.mutedForeground} />
         ))}
-      <Text
-        variant="label"
-        numberOfLines={1}
-        style={{ flex: 1, color: active ? c.accentForeground : c.foreground }}
-      >
-        {label}
-      </Text>
+      <View style={{ flex: 1 }}>
+        <Text
+          variant="label"
+          numberOfLines={1}
+          style={{ color: active ? c.accentForeground : c.foreground }}
+        >
+          {label}
+        </Text>
+        {caption && (
+          <Text variant="caption" tone="muted" numberOfLines={1}>
+            {caption}
+          </Text>
+        )}
+      </View>
       {trailing}
     </>
   )
@@ -124,6 +142,13 @@ function DrawerRow({
       {body}
     </Pressable>
   )
+}
+
+/** A running session pulses; one waiting for the person is marked. */
+function SessionMark({ session }: { session: SidebarSession }) {
+  if (session.running) return <StatusDot tone="info" pulse />
+  if (session.attention) return <StatusDot tone="crit" />
+  return null
 }
 
 function Heading({ children }: { children: string }) {
@@ -279,6 +304,7 @@ export function SidebarDrawer({
                   ['projects', 'folderGit', 'buffcode.projects'],
                   ['automations', 'calendar', 'buffcode.automations'],
                   ['workflows', 'workflow', 'buffcode.workflows'],
+                  ['setup', 'plug', 'buffcode.setupGroup'],
                 ] as const
               ).map(([id, icon, key]) => (
                 <DrawerRow
@@ -310,17 +336,22 @@ export function SidebarDrawer({
                       indent
                       label={s.title}
                       active={s.id === content.selectedSession}
-                      trailing={
-                        s.running ? (
-                          <StatusDot tone="info" pulse />
-                        ) : s.attention ? (
-                          <StatusDot tone="crit" />
-                        ) : undefined
-                      }
+                      trailing={<SessionMark session={s} />}
                       onPress={() => onSelectSession?.(project.id, s.id)}
                     />
                   ))}
                 </View>
+              ))}
+              {!!content.recents?.length && <Heading>{t('sidebar.recents')}</Heading>}
+              {content.recents?.map((s) => (
+                <DrawerRow
+                  key={s.id}
+                  label={s.title}
+                  caption={s.when}
+                  active={s.id === content.selectedSession}
+                  trailing={<SessionMark session={s} />}
+                  onPress={() => onSelectSession?.(s.projectId, s.id)}
+                />
               ))}
               <View style={{ paddingHorizontal: theme.space(2), paddingTop: theme.space(2) }}>
                 <Button variant="ghost" size="sm" leadingIcon="history" onPress={onAllSessions}>

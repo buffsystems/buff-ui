@@ -134,6 +134,13 @@ export const S = defineStrings({
     en: 'Edits and commands in the project — no questions',
   },
   'buffcode.modeCustom': { ru: 'Свои правила', en: 'Custom rules' },
+  // #894: один переключатель режима работы — Работа, План, Настройка.
+  'buffcode.workMode': { ru: 'Режим работы', en: 'Work mode' },
+  'buffcode.work': { ru: 'Работа', en: 'Work' },
+  'buffcode.workHint': {
+    ru: 'Агент выполняет задачу: читает, правит и запускает',
+    en: 'The agent does the task: reads, edits and runs',
+  },
   'buffcode.plan': { ru: 'План', en: 'Plan' },
   'buffcode.planHint': {
     ru: 'Агент только читает и пишет план',
@@ -148,8 +155,12 @@ export const S = defineStrings({
   'buffcode.toolRunning': { ru: 'выполняется', en: 'running' },
   'buffcode.toolDone': { ru: 'готово', en: 'done' },
   'buffcode.toolError': { ru: 'ошибка', en: 'error' },
+  // #903: what a call was given and what came back, each named.
+  'buffcode.toolInput': { ru: 'Параметры', en: 'Parameters' },
+  'buffcode.toolOutput': { ru: 'Результат', en: 'Result' },
   'buffcode.toolsUsed': { ru: 'Использовано {n}: {tools}', en: 'Used {n}: {tools}' },
   'buffcode.toolsUsedCount': { ru: 'Использовано {n}', en: 'Used {n}' },
+  'buffcode.thoughts': { ru: 'Мысли', en: 'Thoughts' },
   'buffcode.toolsFailed': { ru: '{n} с ошибкой', en: '{n} failed' },
   'buffcode.background': { ru: 'Фоновая работа', en: 'Background work' },
   'buffcode.todos': { ru: 'Дела', en: 'To-dos' },
@@ -278,6 +289,14 @@ export const S = defineStrings({
   'buffcode.setupHint': {
     ru: 'Агент сам подключает себя к сервисам, аккаунтам и папкам',
     en: 'The agent connects itself to services, accounts and folders',
+  },
+  'buffcode.setupPrompt': {
+    ru: 'Что подключить или улучшить? Можно написать и в самой сессии',
+    en: 'What to connect or improve? You can also write it in the session',
+  },
+  'buffcode.setupNoProject': {
+    ru: 'Сначала откройте в Buff Code хотя бы один проект — настройка начинается в нём',
+    en: 'Open at least one project in Buff Code first — setup starts in it',
   },
   'buffcode.setupOn': { ru: 'Режим настройки включён', en: 'Setup mode is on' },
   'buffcode.setupOff': { ru: 'Включить режим настройки', en: 'Turn on Setup mode' },

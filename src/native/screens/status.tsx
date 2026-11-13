@@ -11,11 +11,15 @@ import { useT, useTheme } from '../theme.tsx'
 const OFFLINE_LABEL = {
   network: 'common.noGatewaySince',
   install: 'common.notRespondingSince',
+  gateway: 'common.gatewayRefusedSince',
+  quota: 'usage.exhausted',
   unknown: 'common.offlineSince',
 }
 const OFFLINE_TEXT = {
   network: 'common.readOnlyNetwork',
   install: 'common.readOnlyInstall',
+  gateway: 'common.readOnlyGateway',
+  quota: 'usage.exhaustedText',
   unknown: 'common.readOnly',
 }
 
@@ -77,7 +81,10 @@ export function InstallBanner({
   if (status.kind === 'online' || status.kind === 'connecting') return null
   const text =
     status.kind === 'offline'
-      ? t(OFFLINE_TEXT[status.reason ?? 'unknown'], { time: status.since })
+      ? t(OFFLINE_TEXT[status.reason ?? 'unknown'], {
+          time: status.since,
+          detail: status.detail ?? '',
+        })
       : status.kind === 'incompatible'
         ? t('pair.errIncompatibleText', { version: status.version })
         : status.kind === 'blockedOrg'
@@ -110,7 +117,7 @@ export function InstallBanner({
 function bannerIcon(status: InstallStatus): IconName {
   switch (status.kind) {
     case 'offline':
-      return 'wifiOff'
+      return status.reason === 'quota' ? 'clock' : 'wifiOff'
     case 'repair':
       return 'unplug'
     case 'serviceDown':

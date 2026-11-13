@@ -9,6 +9,7 @@ import { Table } from '../Table.tsx'
 import type { DeviceStatus, Locale, PairedDevice } from './model.ts'
 import { tr } from './strings.ts'
 import { useLocale } from '../locale.tsx'
+import { byteParts } from '../../shared/bytes.ts'
 
 const TONE: Record<DeviceStatus, 'ok' | 'neutral' | 'crit'> = {
   online: 'ok',
@@ -40,6 +41,13 @@ export function PairedDevices({
   const t = tr(locale)
   const [confirm, setConfirm] = useState<PairedDevice | null>(null)
   const withUser = scope !== 'mine'
+  // #916: the column shows once the gateway told the use of any pair.
+  const withUsage = devices.some((d) => d.usage)
+  const size = (bytes: number): string => {
+    const { n, unit } = byteParts(bytes)
+    const key = { b: 'sizeB', kb: 'sizeKb', mb: 'sizeMb', gb: 'sizeGb', tb: 'sizeTb' }[unit]
+    return t(key as 'sizeB', { n: n.toLocaleString(locale === 'en' ? 'en-US' : 'ru-RU') })
+  }
   if (devices.length === 0) return <p className="ui-note">{t('devicesEmpty')}</p>
   return (
     <>
@@ -56,6 +64,7 @@ export function PairedDevices({
             <th>{t('colPaired')}</th>
             <th>{t('colSeen')}</th>
             <th>{t('colStatus')}</th>
+            {withUsage && <th>{t('colUsage')}</th>}
             {!readOnly && <th />}
           </tr>
         </thead>
@@ -77,6 +86,20 @@ export function PairedDevices({
               <td>
                 <Badge tone={TONE[d.status]}>{t(d.status)}</Badge>
               </td>
+              {withUsage && (
+                <td>
+                  {d.usage?.exhausted ? (
+                    <Badge tone="crit">{t('usageOut', { time: d.usage.resets })}</Badge>
+                  ) : d.usage ? (
+                    <>
+                      <div>
+                        {t('usageOf', { used: size(d.usage.bytes), limit: size(d.usage.limit) })}
+                      </div>
+                      <div className="ui-hint">{t('usageResets', { time: d.usage.resets })}</div>
+                    </>
+                  ) : null}
+                </td>
+              )}
               {!readOnly && (
                 <td className="ui-table__num">
                   <span className="ui-pairing__row-actions">

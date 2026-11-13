@@ -18,6 +18,7 @@ import { AttachmentRow } from '../attachments.tsx'
 import type { Picks } from '../questions.tsx'
 import type { Attachment } from '../../../model.ts'
 import { BaselinePanel, ClarifyPanel, GatePanel } from './gate.tsx'
+import { stageLabel } from './stage.tsx'
 import type { TaskDetail } from './model.ts'
 
 const STEP_KEY = {
@@ -48,6 +49,9 @@ export function statusText(t: Translate, task: TaskDetail): string {
     case 'review':
       return t('devd.stReview')
     default:
+      // A stopped run (#906): its atoms may be filed with the plan unfinished — say where it stopped.
+      if (task.stage.stopped && !task.stage.rejected)
+        return t('devd.stStopped', { step: stageLabel(t, task.stage.id) })
       return task.subtasksTotal > 0 && task.subtasksDone === task.subtasksTotal
         ? t('devd.stDone')
         : t('devd.stIdle')

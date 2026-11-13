@@ -65,6 +65,7 @@ export type {
   Install,
   InstallKind,
   InstallStatus,
+  PairUsageView,
   Person,
   PicturePolicy,
 } from './model.ts'
@@ -78,6 +79,7 @@ export { SidebarDrawer } from './screens/sidebar.tsx'
 export type {
   SidebarContent,
   SidebarProject,
+  SidebarRecent,
   SidebarSection,
   SidebarSession,
 } from './screens/sidebar.tsx'

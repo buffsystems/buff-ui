@@ -7,6 +7,7 @@ export const S = defineStrings({
   'sidebar.sections': { ru: 'Разделы', en: 'Sections' },
   'sidebar.projects': { ru: 'Проекты и сессии', en: 'Projects and sessions' },
   'sidebar.newSession': { ru: 'Новая сессия', en: 'New session' },
+  'sidebar.recents': { ru: 'Недавние', en: 'Recent' },
   'sidebar.moreSessions': { ru: 'Все сессии ({n})', en: 'All sessions ({n})' },
   'sidebar.home': { ru: 'Домой', en: 'Home' },
   'sidebar.notifications': { ru: 'Уведомления', en: 'Notifications' },

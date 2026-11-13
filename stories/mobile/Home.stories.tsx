@@ -59,3 +59,22 @@ export const StatusBanners: Story = {
     </>
   ),
 }
+
+/** Why an install is unavailable (#901): no network, a silent install, a gateway that refused. */
+export const OfflineReasons: Story = {
+  render: () => (
+    <Screen>
+      <InstallBanner status={{ kind: 'offline', since: '14:20', reason: 'network' }} />
+      <InstallBanner status={{ kind: 'offline', since: '14:20', reason: 'install' }} />
+      <InstallBanner
+        status={{
+          kind: 'offline',
+          since: '14:20',
+          reason: 'gateway',
+          detail: 'relay limit exceeded, retry later',
+        }}
+      />
+      <InstallBanner status={{ kind: 'offline', since: '03:00', reason: 'quota' }} />
+    </Screen>
+  ),
+}

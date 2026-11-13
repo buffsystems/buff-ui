@@ -45,6 +45,8 @@ export interface PairedDevice {
   pairedAt: string
   lastSeen: string
   status: DeviceStatus
+  /** The pair's traffic today (#916), once the gateway told it: bytes of the limit; `resets` — local time. */
+  usage?: { bytes: number; limit: number; resets: string; exhausted: boolean }
 }
 
 /** A phone asking to pair, when the policy wants a person to confirm first. */

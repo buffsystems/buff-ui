@@ -12,7 +12,8 @@ import { Row, RowGroup } from '../Row.tsx'
 import { Screen, TopBar } from '../Screen.tsx'
 import { Sheet } from '../Sheet.tsx'
 import { Text } from '../Text.tsx'
-import { useT, useTheme } from '../theme.tsx'
+import { useLocale, useT, useTheme } from '../theme.tsx'
+import { usageLine, usagePercent } from '../usage.ts'
 import { statusLabel, statusTone } from './status.tsx'
 import { ListSkeleton } from './cabinet/parts.tsx'
 
@@ -54,12 +55,16 @@ export function installDetail(
 /** One install in the Home list. */
 export function InstallRow({ install, onPress }: { install: Install; onPress?: () => void }) {
   const t = useT()
+  const locale = useLocale()
   const live = install.status.kind === 'online'
   return (
     <Row
       leading={<Avatar name={install.name} icon={KIND_ICON[install.kind]} />}
       title={install.name}
       subtitle={`${installDetail(t, install)} · ${statusLabel(t, install.status)}`}
+      // #916: the pair's traffic today, once the gateway told it.
+      footnote={install.usage && usageLine(t, locale, install.usage)}
+      footnoteTone={install.usage?.exhausted ? 'destructive' : 'muted'}
       trailing={
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           {install.attention > 0 && (
@@ -209,6 +214,12 @@ export function InstallSwitchButton({
       })}
     >
       <Avatar name={install.name} icon={KIND_ICON[install.kind]} size={28} />
+      {/* #916: how much of the pair's daily traffic is gone; the list of installs says the rest. */}
+      {install.usage && (
+        <Text variant="caption" tone={install.usage.exhausted ? 'destructive' : 'muted'}>
+          {`${usagePercent(install.usage)}%`}
+        </Text>
+      )}
       <Icon name="chevronDown" size={16} color={theme.colors.mutedForeground} />
     </Pressable>
   )
