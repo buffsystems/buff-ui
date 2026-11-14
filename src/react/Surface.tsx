@@ -1,5 +1,5 @@
 /** @jsxRuntime automatic */
-import type { HTMLAttributes, InputHTMLAttributes, ReactNode } from 'react'
+import type { ComponentProps, HTMLAttributes, ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cx } from './cx.ts'
 
@@ -70,7 +70,7 @@ export function Checkbox({
   hint,
   className,
   ...props
-}: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & { label?: ReactNode; hint?: ReactNode }) {
+}: Omit<ComponentProps<'input'>, 'type'> & { label?: ReactNode; hint?: ReactNode }) {
   const bare = !label && !hint
   const box = <input type="checkbox" className={cx('ui-checkbox', bare && className)} {...props} />
   if (bare) return box

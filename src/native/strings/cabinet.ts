@@ -24,6 +24,18 @@ export const S = defineStrings({
     en: 'Applies from the next run; the record stays in the session.',
   },
   'cabinet.aiModeTitle': { ru: 'Режим ИИ сессии', en: 'The session’s AI mode' },
+  'cabinet.aiSubagents': {
+    ru: 'Рекомендовать модели субагентов',
+    en: 'Advise the model to use subagents',
+  },
+  'cabinet.aiSubagentsHintOff': {
+    ru: 'Может значительно увеличить расход токенов. По умолчанию — нет.',
+    en: 'May considerably increase token spend. Default — no.',
+  },
+  'cabinet.aiSubagentsHintOn': {
+    ru: 'Может значительно увеличить расход токенов. По умолчанию — да.',
+    en: 'May considerably increase token spend. Default — yes.',
+  },
   'cabinet.repos': { ru: 'Репо', en: 'Repos' },
   'cabinet.reposFull': { ru: 'Репозитории', en: 'Repositories' },
   'cabinet.moreSections': { ru: 'Другие разделы', en: 'Other sections' },

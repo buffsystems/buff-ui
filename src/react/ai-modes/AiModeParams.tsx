@@ -13,7 +13,7 @@ export interface AiModeParamsProps extends AiModePanelProps {
 
 /**
  * «Параметры ИИ» on a form that starts a question, a research, a task or an audit (#833):
- * folded to one line with what will apply; open — the two choices. An untouched form sends
+ * folded to one line with what will apply; open — the choices. An untouched form sends
  * nothing and the layers decide.
  */
 export function AiModeParams({
@@ -27,7 +27,8 @@ export function AiModeParams({
     thinking: panel.thinking ?? panel.defaults.thinking,
     contextTokens: panel.contextTokens ?? panel.defaults.contextTokens,
   }
-  const changed = panel.thinking != null || panel.contextTokens != null
+  const subagents = panel.subagents ?? panel.defaults.subagents
+  const changed = panel.thinking != null || panel.contextTokens != null || panel.subagents != null
   return (
     <Collapsible
       bordered
@@ -40,7 +41,7 @@ export function AiModeParams({
           {locale === 'ru' ? 'Параметры ИИ' : 'AI parameters'}
         </span>
         <span className="ui-ai-params__summary">
-          {aiModeSummary(effective, locale, panel.modelWindow)}
+          {aiModeSummary({ ...effective, subagents }, locale, panel.modelWindow)}
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent>

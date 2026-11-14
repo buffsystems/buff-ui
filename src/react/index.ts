@@ -141,7 +141,14 @@ export type { AiModeChipProps, AiModePanelProps } from './ai-modes/AiModeChip.ts
 export { AiModeParams } from './ai-modes/AiModeParams.tsx'
 export type { AiModeParamsProps } from './ai-modes/AiModeParams.tsx'
 export { AiModeNote } from './ai-modes/AiModeNote.tsx'
-export { aiModeGroups, cellValue, groupSummary, phaseLabel } from './ai-modes/model.ts'
+export {
+  aiModeGroups,
+  cellValue,
+  groupSummary,
+  patchCell,
+  phaseLabel,
+  subagentsApply,
+} from './ai-modes/model.ts'
 export type {
   AiModeCell,
   AiModeGroup,

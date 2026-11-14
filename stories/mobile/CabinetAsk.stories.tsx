@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   AiModeChip,
@@ -203,6 +204,28 @@ export const NewWithAiParamsOpen: Story = {
         />
       }
     />
+  ),
+}
+/** #926: the subagents tick on the start form — the install knows the flag (off by default). */
+function SubagentsParams() {
+  const [subagents, setSubagents] = useState<boolean | null>(true)
+  return (
+    <AiModeParamsCard
+      thinking={null}
+      contextTokens={null}
+      subagents={subagents}
+      defaults={{ ...aiDefaults, subagents: false }}
+      modelWindow={400_000}
+      defaultOpen
+      onPickThinking={() => undefined}
+      onPickContext={() => undefined}
+      onToggleSubagents={setSubagents}
+    />
+  )
+}
+export const NewWithSubagents: Story = {
+  render: () => (
+    <NewQuestionScreen status={online} place="acme · shop" params={<SubagentsParams />} />
   ),
 }
 export const ThreadWithAiMode: Story = {

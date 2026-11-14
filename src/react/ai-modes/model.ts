@@ -28,6 +28,8 @@ export interface AiModeCell {
   role: string
   thinking?: string | null
   context_tokens?: number | null
+  /** «Рекомендовать модели субагентов» (#904): NULL — наследуется; у коннектора галочки нет. */
+  subagents?: boolean | null
 }
 
 export interface AiModeGroup {
@@ -71,6 +73,32 @@ export type AiModeSource = 'own' | 'inherited' | 'none'
 export interface AiModeCellView {
   thinking: { value: string; source: AiModeSource }
   context: { value: number; source: AiModeSource }
+  /** `applies` false — у шага нет галочки (Buff Code через коннектор: промпт не наш). */
+  subagents: { value: boolean; source: AiModeSource; applies: boolean }
+}
+
+/** Steps where the subagents flag means something (#904): every one but the connector's. */
+export function subagentsApply(step: string): boolean {
+  return step !== 'ide'
+}
+
+/** A cell to write: this layer's own values kept, the patch on top — so changing one column
+ *  never wipes another (the warehouse replaces a written cell whole). */
+export function patchCell(
+  own: readonly AiModeCell[],
+  step: string,
+  role: string,
+  patch: Partial<Pick<AiModeCell, 'thinking' | 'context_tokens' | 'subagents'>>,
+): AiModeCell {
+  const mine = find(own, step, role)
+  return {
+    step,
+    role,
+    thinking: mine?.thinking ?? null,
+    context_tokens: mine?.context_tokens ?? null,
+    subagents: subagentsApply(step) ? (mine?.subagents ?? null) : null,
+    ...patch,
+  }
 }
 
 function find(cells: readonly AiModeCell[], step: string, role: string): AiModeCell | undefined {
@@ -98,7 +126,14 @@ export function cellValue(
       : above?.context_tokens != null
         ? { value: above.context_tokens, source: 'inherited' as const }
         : { value: 0, source: 'none' as const }
-  return { thinking, context }
+  const applies = subagentsApply(step)
+  const subagents =
+    applies && mine?.subagents != null
+      ? { value: mine.subagents, source: 'own' as const, applies }
+      : applies && above?.subagents != null
+        ? { value: above.subagents, source: 'inherited' as const, applies }
+        : { value: false, source: 'none' as const, applies }
+  return { thinking, context, subagents }
 }
 
 /** Every (step, role) of a group. */
@@ -119,9 +154,10 @@ export function groupSummary(
   const same = views.every(
     (v) => v.thinking.value === first.thinking.value && v.context.value === first.context.value,
   )
-  if (!same) return locale === 'ru' ? 'Разные' : 'Mixed'
+  const flags = views.filter((v) => v.subagents.applies).map((v) => v.subagents.value)
+  if (!same || flags.some((f) => f !== flags[0])) return locale === 'ru' ? 'Разные' : 'Mixed'
   return aiModeSummary(
-    { thinking: first.thinking.value, contextTokens: first.context.value },
+    { thinking: first.thinking.value, contextTokens: first.context.value, subagents: flags[0] },
     locale,
     modelWindow,
   )

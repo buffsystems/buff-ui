@@ -4,7 +4,9 @@
                > button.ui-ai-matrix__head (> .ui-ai-matrix__title + .ui-ai-matrix__summary)
                + content > section.ui-ai-matrix__body > table.ui-ai-matrix__table
                  tr.ui-ai-matrix__bulk — the scenario's first row writes every cell;
-                 tr.ui-ai-matrix__row(--own) — a phase × role; td.ui-ai-matrix__cell--inherited is dimmed
+                 tr.ui-ai-matrix__row(--own) — a phase × role; td.ui-ai-matrix__cell--inherited is dimmed;
+                 the subagents column (#904): a checkbox, .ui-ai-matrix__none where the step has none
+               + p.ui-ai-matrix__note — what the subagents flag costs
     Context: .ui-ai-context > .ui-ai-context__row (select + label.ui-ai-context__custom > input + __unit)
                + .ui-ai-context__note — what will really apply above the model window
     Chip:    button.ui-ai-chip (> svg.ui-ai-chip__icon + .ui-ai-chip__text); .ui-ai-panel in its popover
@@ -81,6 +83,23 @@
   }
   .ui-ai-matrix__cell--inherited .ui-badge {
     margin-top: 0.25rem;
+  }
+  .ui-ai-matrix__cell--inherited .ui-checkbox + .ui-badge {
+    margin-left: 0.375rem;
+    margin-top: 0;
+  }
+  .ui-ai-matrix__table .ui-checkbox {
+    vertical-align: middle;
+  }
+  .ui-ai-matrix__none {
+    color: var(--muted-foreground);
+  }
+  .ui-ai-matrix__note {
+    margin-top: 0.5rem;
+    padding: 0 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 
   .ui-ai-context {

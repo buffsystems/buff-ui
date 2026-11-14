@@ -4,6 +4,7 @@ import { RotateCcw } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible.tsx'
 import { Badge } from '../Badge.tsx'
 import { Button } from '../Button.tsx'
+import { Checkbox } from '../Surface.tsx'
 import { useLocale } from '../locale.tsx'
 import { cx } from '../cx.ts'
 import { AiThinkingSelect } from './AiThinkingSelect.tsx'
@@ -13,10 +14,12 @@ import {
   cellValue,
   groupCells,
   groupSummary,
+  patchCell,
   phaseLabel,
   type AiModeCell,
   type AiModeGroup,
   type AiModeStepDef,
+  subagentsApply,
 } from './model.ts'
 
 export interface AiModeMatrixProps {
@@ -28,7 +31,7 @@ export interface AiModeMatrixProps {
   inherited: readonly AiModeCell[]
   /** The words for an inherited value: «как у установки» / «как у организации». */
   inheritedFrom: string
-  /** Cells to write: a cell with both values null is a reset. */
+  /** Cells to write, each with this layer's other values kept: a cell with every value null is a reset. */
   onChange: (cells: AiModeCell[]) => void
   modelWindow?: number | null
   readOnly?: boolean
@@ -40,8 +43,9 @@ export interface AiModeMatrixProps {
 /**
  * The matrix of AI modes (#783): one card per scenario — «Спросить», «Исследование», «Аудит»,
  * «Code review», «Задача» (its phases inside), «Buff Code» — with a one-line summary; open,
- * a table of phases × roles with two choices each. An inherited value is dimmed and marked
- * where it comes from; an overridden row can be reset; the first row writes the whole scenario.
+ * a table of phases × roles with three choices each — thinking, context and the subagents flag
+ * (#904; not for the connector). An inherited value is dimmed and marked where it comes from; an
+ * overridden row can be reset; the first row writes the whole scenario.
  */
 export function AiModeMatrix({
   steps,
@@ -95,21 +99,40 @@ function GroupCard({
   const title = group.label[locale]
   const cells = groupCells(group)
   const views = cells.map((c) => cellValue(own, inherited, c.step, c.role))
-  const all = (patch: { thinking?: string | null; context_tokens?: number | null }) =>
-    onChange(cells.map((c) => ({ ...c, ...patch })))
+  const flagged = cells.filter((c) => subagentsApply(c.step))
+  const all = (patch: {
+    thinking?: string | null
+    context_tokens?: number | null
+    subagents?: boolean | null
+  }) =>
+    onChange(
+      (patch.subagents !== undefined ? flagged : cells).map((c) =>
+        patchCell(own, c.step, c.role, patch),
+      ),
+    )
   const agreeThinking = views.every((v) => v.thinking.value === views[0].thinking.value)
     ? views[0].thinking.value
     : null
   const agreeContext = views.every((v) => v.context.value === views[0].context.value)
     ? views[0].context.value
     : null
+  const flags = views.filter((v) => v.subagents.applies).map((v) => v.subagents.value)
+  const agreeFlags = flags.every((f) => f === flags[0]) ? (flags[0] ?? false) : null
   const words = {
     thinking: locale === 'ru' ? 'Размышления' : 'Thinking',
     context: locale === 'ru' ? 'Контекст' : 'Context',
+    subagents: locale === 'ru' ? 'Субагенты' : 'Subagents',
+    advise:
+      locale === 'ru' ? 'Рекомендовать модели субагентов' : 'Advise the model to use subagents',
+    cost:
+      locale === 'ru'
+        ? 'Субагенты — модель раздаёт независимые части работы параллельно. Использование субагентов может значительно увеличить расход токенов при решении задач.'
+        : 'Subagents — the model hands independent parts of the work out in parallel. Using subagents may considerably increase token spend on a task.',
     phase: locale === 'ru' ? 'Фаза и роль' : 'Phase and role',
     all: locale === 'ru' ? 'Все фазы и роли' : 'All phases and roles',
     mixed: locale === 'ru' ? 'Разные' : 'Mixed',
     reset: locale === 'ru' ? 'Сбросить' : 'Reset',
+    none: locale === 'ru' ? 'нет' : 'n/a',
   }
   return (
     <Collapsible bordered defaultOpen={defaultOpen} className="ui-ai-matrix__card">
@@ -127,6 +150,11 @@ function GroupCard({
                 <th scope="col">{words.phase}</th>
                 <th scope="col">{words.thinking}</th>
                 <th scope="col">{words.context}</th>
+                {flagged.length > 0 && (
+                  <th scope="col" title={words.advise}>
+                    {words.subagents}
+                  </th>
+                )}
                 <th scope="col" aria-label={words.reset} />
               </tr>
             </thead>
@@ -157,6 +185,19 @@ function GroupCard({
                       placeholder={words.mixed}
                     />
                   </td>
+                  {flagged.length > 0 && (
+                    <td>
+                      <Checkbox
+                        aria-label={`${words.all}: ${words.advise}`}
+                        disabled={readOnly}
+                        checked={agreeFlags === true}
+                        ref={(el: HTMLInputElement | null) => {
+                          if (el) el.indeterminate = agreeFlags == null
+                        }}
+                        onChange={(e) => all({ subagents: e.currentTarget.checked })}
+                      />
+                    </td>
+                  )}
                   <td />
                 </tr>
               )}
@@ -165,12 +206,16 @@ function GroupCard({
                   {step.roles.map((role, i) => {
                     const view = cellValue(own, inherited, step.id, role.id)
                     const overridden =
-                      view.thinking.source === 'own' || view.context.source === 'own'
+                      view.thinking.source === 'own' ||
+                      view.context.source === 'own' ||
+                      view.subagents.source === 'own'
                     const name =
                       step.roles.length > 1
                         ? `${phaseLabel(step, group, locale)} — ${role.label[locale].toLowerCase()}`
                         : phaseLabel(step, group, locale)
                     const mine = own.find((c) => c.step === step.id && c.role === role.id)
+                    const write = (patch: Parameters<typeof patchCell>[3]) =>
+                      onChange([patchCell(own, step.id, role.id, patch)])
                     return (
                       <tr
                         key={role.id}
@@ -200,16 +245,7 @@ function GroupCard({
                             compact
                             disabled={readOnly}
                             value={mine?.thinking ?? null}
-                            onChange={(level) =>
-                              onChange([
-                                {
-                                  step: step.id,
-                                  role: role.id,
-                                  thinking: level,
-                                  context_tokens: mine?.context_tokens ?? null,
-                                },
-                              ])
-                            }
+                            onChange={(level) => write({ thinking: level })}
                             inherited={
                               view.thinking.source === 'inherited' ? view.thinking.value : 'default'
                             }
@@ -233,16 +269,7 @@ function GroupCard({
                             compact
                             disabled={readOnly}
                             value={mine?.context_tokens ?? null}
-                            onChange={(tokens) =>
-                              onChange([
-                                {
-                                  step: step.id,
-                                  role: role.id,
-                                  thinking: mine?.thinking ?? null,
-                                  context_tokens: tokens,
-                                },
-                              ])
-                            }
+                            onChange={(tokens) => write({ context_tokens: tokens })}
                             modelWindow={modelWindow}
                             inherited={view.context.source === 'inherited' ? view.context.value : 0}
                             inheritedFrom={
@@ -255,6 +282,33 @@ function GroupCard({
                             </Badge>
                           )}
                         </td>
+                        {flagged.length > 0 && (
+                          <td
+                            className={cx(
+                              view.subagents.applies &&
+                                view.subagents.source !== 'own' &&
+                                'ui-ai-matrix__cell--inherited',
+                            )}
+                          >
+                            {view.subagents.applies ? (
+                              <>
+                                <Checkbox
+                                  aria-label={`${name}: ${words.advise}`}
+                                  disabled={readOnly}
+                                  checked={view.subagents.value}
+                                  onChange={(e) => write({ subagents: e.currentTarget.checked })}
+                                />
+                                {view.subagents.source === 'inherited' && (
+                                  <Badge size="sm" tone="outline">
+                                    {inheritedFrom}
+                                  </Badge>
+                                )}
+                              </>
+                            ) : (
+                              <span className="ui-ai-matrix__none">{words.none}</span>
+                            )}
+                          </td>
+                        )}
                         <td>
                           {overridden && !readOnly && (
                             <Button
@@ -268,6 +322,7 @@ function GroupCard({
                                     role: role.id,
                                     thinking: null,
                                     context_tokens: null,
+                                    subagents: null,
                                   },
                                 ])
                               }
@@ -283,6 +338,7 @@ function GroupCard({
               ))}
             </tbody>
           </table>
+          {flagged.length > 0 && <p className="ui-ai-matrix__note">{words.cost}</p>}
         </section>
       </CollapsibleContent>
     </Collapsible>

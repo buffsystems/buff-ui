@@ -1,7 +1,7 @@
 /** @jsxRuntime automatic */
 /**
-  «Параметры ИИ» on the phone's cabinet (#840, epic #783): the thinking level and the context
-  window of a session. A folded card on the forms that start a question, a research, a task or
+  «Параметры ИИ» on the phone's cabinet (#840, epic #783): the thinking level, the context
+  window and the subagents flag (#926) of a session. A folded card on the forms that start a question, a research, a task or
   an audit; a chip in an open session's header; a quiet note row in the dialogue when the mode
   changed. The words are the cabinet's (shared/ai-modes), so the phone reads like the web.
 */
@@ -9,6 +9,7 @@ import type { ReactNode } from 'react'
 import { View } from 'react-native'
 import { aiContextLabel, aiModeSummary, aiThinkingWords } from '../../../shared/ai-modes.ts'
 import { Chip } from '../../Chip.tsx'
+import { Choice } from '../../Choice.tsx'
 import { Disclosure } from '../../Disclosure.tsx'
 import { Field, SelectField } from '../../Field.tsx'
 import { Icon } from '../../Icon.tsx'
@@ -18,16 +19,19 @@ import { useLocale, useT, useTheme } from '../../theme.tsx'
 export interface AiModeDefaults {
   thinking: string
   contextTokens: number
+  /** The subagents flag in force (#904, #926); absent — the install has no such choice. */
+  subagents?: boolean
 }
 
 /**
-  The two choices of a session's AI mode, folded to one line with what will apply. `null` is
+  The choices of a session's AI mode, folded to one line with what will apply. `null` is
   «as in the settings»: the field then names the inherited value. The picks themselves are the
-  host's sheets.
+  host's sheets; the subagents flag (#926) is a tick right in the card.
 */
 export function AiModeParamsCard({
   thinking,
   contextTokens,
+  subagents = null,
   defaults,
   modelWindow,
   defaultOpen = false,
@@ -35,6 +39,7 @@ export function AiModeParamsCard({
   note,
   onPickThinking,
   onPickContext,
+  onToggleSubagents,
 }: {
   thinking: string | null
   contextTokens: number | null
@@ -46,12 +51,16 @@ export function AiModeParamsCard({
   note?: string
   onPickThinking?: () => void
   onPickContext?: () => void
+  /** The session's own subagents flag; null — as in the settings. */
+  subagents?: boolean | null
+  onToggleSubagents?: (next: boolean | null) => void
 }) {
   const t = useT()
   const locale = useLocale()
   const effective = {
     thinking: thinking ?? defaults.thinking,
     contextTokens: contextTokens ?? defaults.contextTokens,
+    subagents: subagents ?? defaults.subagents,
   }
   return (
     <Disclosure
@@ -67,6 +76,8 @@ export function AiModeParamsCard({
         disabled={disabled}
         onPickThinking={onPickThinking}
         onPickContext={onPickContext}
+        subagents={subagents}
+        onToggleSubagents={onToggleSubagents}
       />
       <Text variant="caption" tone="muted">
         {note ?? t('cabinet.aiNoteForm')}
@@ -75,23 +86,29 @@ export function AiModeParamsCard({
   )
 }
 
-/** The two fields alone — the card's inside and the session sheet's body. */
+/** The fields alone — the card's inside and the session sheet's body. The subagents tick shows
+ *  only when the install knows the flag and the host takes it; ticking back to the settings'
+ *  value drops the override (null). */
 export function AiModeFields({
   thinking,
   contextTokens,
+  subagents = null,
   defaults,
   modelWindow,
   disabled = false,
   onPickThinking,
   onPickContext,
+  onToggleSubagents,
 }: {
   thinking: string | null
   contextTokens: number | null
+  subagents?: boolean | null
   defaults: AiModeDefaults
   modelWindow?: number
   disabled?: boolean
   onPickThinking?: () => void
   onPickContext?: () => void
+  onToggleSubagents?: (next: boolean | null) => void
 }) {
   const t = useT()
   const locale = useLocale()
@@ -126,6 +143,19 @@ export function AiModeFields({
           disabled={disabled}
         />
       </Field>
+      {defaults.subagents !== undefined && onToggleSubagents ? (
+        <Choice
+          multiple
+          label={t('cabinet.aiSubagents')}
+          hint={t(defaults.subagents ? 'cabinet.aiSubagentsHintOn' : 'cabinet.aiSubagentsHintOff')}
+          picked={subagents ?? defaults.subagents}
+          disabled={disabled}
+          onPress={() => {
+            const on = !(subagents ?? defaults.subagents)
+            onToggleSubagents(on === defaults.subagents ? null : on)
+          }}
+        />
+      ) : null}
     </View>
   )
 }
@@ -134,18 +164,21 @@ export function AiModeFields({
 export function AiModeChip({
   thinking,
   contextTokens,
+  subagents,
   modelWindow,
   onPress,
 }: {
   thinking: string
   contextTokens: number
+  /** The subagents flag in force: true adds «субагенты» to the line (#904). */
+  subagents?: boolean
   modelWindow?: number
   onPress?: () => void
 }) {
   const locale = useLocale()
   return (
     <Chip icon="brain" onPress={onPress}>
-      {aiModeSummary({ thinking, contextTokens }, locale, modelWindow)}
+      {aiModeSummary({ thinking, contextTokens, subagents }, locale, modelWindow)}
     </Chip>
   )
 }

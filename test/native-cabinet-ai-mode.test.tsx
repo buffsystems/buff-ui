@@ -119,3 +119,61 @@ test('the forms and the thread take the AI parameters and the chip as slots', ()
   )
   expect(screen.getByText('CHIP')).toBeTruthy()
 })
+
+test('the subagents tick (#926): offered when the install knows the flag; back to the default drops the override', () => {
+  const onToggle = vi.fn()
+  const { rerender } = render(
+    wrap(
+      <AiModeParamsCard
+        defaultOpen
+        thinking={null}
+        contextTokens={null}
+        subagents={null}
+        defaults={{ ...defaults, subagents: false }}
+        onToggleSubagents={onToggle}
+      />,
+    ),
+  )
+  const box = screen.getByRole('checkbox', { name: 'Рекомендовать модели субагентов' })
+  expect(
+    screen.getByText('Может значительно увеличить расход токенов. По умолчанию — нет.'),
+  ).toBeTruthy()
+  fireEvent.click(box)
+  expect(onToggle).toHaveBeenLastCalledWith(true)
+  rerender(
+    wrap(
+      <AiModeParamsCard
+        defaultOpen
+        thinking={null}
+        contextTokens={null}
+        subagents={true}
+        defaults={{ ...defaults, subagents: false }}
+        onToggleSubagents={onToggle}
+      />,
+    ),
+  )
+  expect(screen.getByRole('button', { name: /Параметры ИИ\. .* · субагенты$/ })).toBeTruthy()
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Рекомендовать модели субагентов' }))
+  expect(onToggle).toHaveBeenLastCalledWith(null)
+})
+
+test('no subagents flag from the install — no tick; the chip names it when on', () => {
+  render(
+    wrap(
+      <>
+        <AiModeParamsCard
+          defaultOpen
+          thinking={null}
+          contextTokens={null}
+          defaults={defaults}
+          onToggleSubagents={() => {}}
+        />
+        <AiModeChip thinking="high" contextTokens={200_000} subagents />
+      </>,
+    ),
+  )
+  expect(screen.queryByRole('checkbox')).toBeNull()
+  expect(
+    screen.getByText('Размышления: высокие · Контекст: средний, 200k · субагенты'),
+  ).toBeTruthy()
+})

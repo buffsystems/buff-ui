@@ -13,7 +13,7 @@ import {
 } from '../src/react/index.ts'
 import type { AiModeCell, AiModeStepDef } from '../src/react/index.ts'
 
-// Режимы ИИ (#832, эпик #783): уровень мышления и окно контекста по шагам и ролям — выбор с
+// Режимы ИИ (#832, эпик #783): уровень мышления, окно контекста и субагенты (#904) по шагам и ролям — выбор с
 // пояснениями, матрица фаз × ролей с наследованием, чип с поповером в шапке сессии, блок
 // «Параметры ИИ» на форме создания и строка-заметка в диалоге. Язык — тумблер в тулбаре.
 
@@ -97,12 +97,15 @@ const INSTALL: AiModeCell[] = [
   { step: 'ask', role: 'responder', thinking: 'medium', context_tokens: 200_000 },
   { step: 'research', role: 'analyst', thinking: 'high', context_tokens: 500_000 },
   { step: 'research', role: 'reviewer', thinking: 'medium', context_tokens: 200_000 },
-  { step: 'audit', role: 'analyst', thinking: 'high', context_tokens: 0 },
+  { step: 'audit', role: 'analyst', thinking: 'high', context_tokens: 0, subagents: true },
+  { step: 'audit', role: 'reviewer', subagents: true },
   { step: 'task_develop', role: 'developer', thinking: 'high', context_tokens: 0 },
 ]
 const ORG: AiModeCell[] = [
   { step: 'ask', role: 'responder', thinking: 'low', context_tokens: null },
   { step: 'task_develop', role: 'developer', thinking: 'max', context_tokens: 500_000 },
+  { step: 'audit', role: 'reviewer', subagents: false },
+  { step: 'research', role: 'analyst', subagents: true },
 ]
 
 /** The matrix as the organisation's owner sees it: the installation's values underneath. */
@@ -126,7 +129,12 @@ function Matrix({
       onChange={(cells) =>
         setOwn((was) => {
           const rest = was.filter((c) => !cells.some((n) => n.step === c.step && n.role === c.role))
-          return [...rest, ...cells.filter((c) => c.thinking != null || c.context_tokens != null)]
+          return [
+            ...rest,
+            ...cells.filter(
+              (c) => c.thinking != null || c.context_tokens != null || c.subagents != null,
+            ),
+          ]
         })
       }
     />
@@ -184,7 +192,8 @@ export const ThinkingAndContext: Story = {
 function SessionHeader() {
   const [thinking, setThinking] = useState<string | null>(null)
   const [tokens, setTokens] = useState<number | null>(null)
-  const defaults = { thinking: 'high', contextTokens: 200_000 }
+  const [subagents, setSubagents] = useState<boolean | null>(null)
+  const defaults = { thinking: 'high', contextTokens: 200_000, subagents: false }
   return (
     <div className="sb-stack" style={{ maxWidth: 560 }}>
       <div className="sb-row">
@@ -192,16 +201,19 @@ function SessionHeader() {
         <AiModeChip
           thinking={thinking ?? defaults.thinking}
           contextTokens={tokens ?? defaults.contextTokens}
+          subagents={subagents ?? defaults.subagents}
           modelWindow={1_048_576}
         >
           <AiModePanel
             thinking={thinking}
             contextTokens={tokens}
+            subagents={subagents}
             defaults={defaults}
             modelWindow={1_048_576}
             onChange={(next) => {
               if ('thinking' in next) setThinking(next.thinking ?? null)
               if ('contextTokens' in next) setTokens(next.contextTokens ?? null)
+              if ('subagents' in next) setSubagents(next.subagents ?? null)
             }}
           />
         </AiModeChip>
@@ -237,7 +249,8 @@ function NewQuestion() {
         defaultOpen
         thinking="max"
         contextTokens={null}
-        defaults={{ thinking: 'medium', contextTokens: 200_000 }}
+        subagents={true}
+        defaults={{ thinking: 'medium', contextTokens: 200_000, subagents: false }}
         onChange={() => {}}
       />
     </div>

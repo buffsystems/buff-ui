@@ -275,9 +275,10 @@ export function aiContextChoiceItems(
   ]
 }
 
-/** One line for a chip or a card summary: «Размышления: высокие · Контекст: средний, 200k». */
+/** One line for a chip or a card summary: «Размышления: высокие · Контекст: средний, 200k»,
+ *  and «· субагенты» when the model is advised to use them (#904). */
 export function aiModeSummary(
-  mode: { thinking: string; contextTokens: number },
+  mode: { thinking: string; contextTokens: number; subagents?: boolean },
   locale: Locale,
   modelWindow?: number | null,
 ): string {
@@ -286,7 +287,9 @@ export function aiModeSummary(
   const window = context.detail
     ? `${context.label.toLowerCase()}, ${context.detail}`
     : context.label.toLowerCase()
-  return locale === 'ru'
-    ? `Размышления: ${thinking} · Контекст: ${window}`
-    : `Thinking: ${thinking} · Context: ${window}`
+  const line =
+    locale === 'ru'
+      ? `Размышления: ${thinking} · Контекст: ${window}`
+      : `Thinking: ${thinking} · Context: ${window}`
+  return mode.subagents ? `${line} · ${locale === 'ru' ? 'субагенты' : 'subagents'}` : line
 }

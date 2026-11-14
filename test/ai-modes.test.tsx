@@ -61,15 +61,27 @@ describe('matrix model', () => {
     expect(cellValue(OWN, INHERITED, 'task_develop', 'developer')).toEqual({
       thinking: { value: 'max', source: 'own' },
       context: { value: 0, source: 'none' },
+      subagents: { value: false, source: 'none', applies: true },
     })
     expect(cellValue(OWN, INHERITED, 'ask', 'responder')).toEqual({
       thinking: { value: 'high', source: 'inherited' },
       context: { value: 200_000, source: 'inherited' },
+      subagents: { value: false, source: 'none', applies: true },
     })
     expect(cellValue(OWN, INHERITED, 'audit', 'analyst')).toEqual({
       thinking: { value: 'default', source: 'none' },
       context: { value: 0, source: 'none' },
+      subagents: { value: false, source: 'none', applies: true },
     })
+    // #904: the flag inherits like the rest; the connector has none
+    expect(
+      cellValue([], [{ step: 'audit', role: 'analyst', subagents: true }], 'audit', 'analyst')
+        .subagents,
+    ).toEqual({ value: true, source: 'inherited', applies: true })
+    expect(
+      cellValue([{ step: 'ide', role: 'developer', subagents: true }], [], 'ide', 'developer')
+        .subagents,
+    ).toEqual({ value: false, source: 'none', applies: false })
   })
 
   test('a group summary names the values when every cell agrees, else says they differ', () => {
@@ -169,8 +181,85 @@ describe('AiModeMatrix', () => {
     expect(resets.length).toBe(1)
     await userEvent.setup().click(resets[0])
     expect(onChange).toHaveBeenCalledWith([
-      { step: 'task_develop', role: 'developer', thinking: null, context_tokens: null },
+      {
+        step: 'task_develop',
+        role: 'developer',
+        thinking: null,
+        context_tokens: null,
+        subagents: null,
+      },
     ])
+  })
+
+  test('the subagents column (#904): inherited flag shown, a tick keeps the other values, the cost is said', async () => {
+    const onChange = vi.fn()
+    const steps: AiModeStepDef[] = [
+      ...STEPS,
+      {
+        id: 'ide',
+        label: { ru: 'Buff Code через коннектор', en: 'Buff Code via the connector' },
+        roles: [DEVELOPER],
+      },
+    ]
+    render(
+      <AiModeMatrix
+        steps={steps}
+        own={[{ step: 'audit', role: 'analyst', thinking: 'max', context_tokens: 64_000 }]}
+        inherited={[{ step: 'audit', role: 'reviewer', subagents: true }]}
+        inheritedFrom="как у установки"
+        onChange={onChange}
+        defaultOpen
+      />,
+    )
+    const audit = screen.getByRole('region', { name: 'Аудит' })
+    const analyst = within(audit).getByRole('checkbox', {
+      name: 'Аудит — аналитик: Рекомендовать модели субагентов',
+    }) as HTMLInputElement
+    const reviewer = within(audit).getByRole('checkbox', {
+      name: 'Аудит — ревьюер: Рекомендовать модели субагентов',
+    }) as HTMLInputElement
+    expect([analyst.checked, reviewer.checked]).toEqual([false, true])
+    expect(within(audit).getByText(/может значительно увеличить расход токенов/)).toBeTruthy()
+    await userEvent.setup().click(analyst)
+    expect(onChange).toHaveBeenLastCalledWith([
+      { step: 'audit', role: 'analyst', thinking: 'max', context_tokens: 64_000, subagents: true },
+    ])
+    // the connector has no flag: no checkbox, no note
+    const ide = screen.getByRole('region', { name: 'Buff Code через коннектор' })
+    expect(within(ide).queryByRole('checkbox')).toBeNull()
+    expect(within(ide).queryByText(/расход токенов/)).toBeNull()
+  })
+
+  test("the bulk row keeps each cell's other values and ticks only the cells that have the flag", async () => {
+    const onChange = vi.fn()
+    render(
+      <AiModeMatrix
+        steps={STEPS}
+        own={[
+          { step: 'task_develop', role: 'developer', thinking: 'max', context_tokens: 500_000 },
+        ]}
+        inherited={[]}
+        inheritedFrom="как у установки"
+        onChange={onChange}
+        defaultOpen
+      />,
+    )
+    const task = screen.getByRole('region', { name: 'Задача' })
+    await userEvent.setup().click(
+      within(task).getByRole('checkbox', {
+        name: 'Все фазы и роли: Рекомендовать модели субагентов',
+      }),
+    )
+    const sent = onChange.mock.calls.at(-1)?.[0] as Record<string, unknown>[]
+    expect(sent).toHaveLength(3)
+    expect(sent.every((c) => c.subagents === true)).toBe(true)
+    expect(sent.find((c) => c.step === 'task_develop')).toEqual({
+      step: 'task_develop',
+      role: 'developer',
+      thinking: 'max',
+      context_tokens: 500_000,
+      subagents: true,
+    })
   })
 
   test('the bulk row of a scenario writes every cell of its phases', async () => {
@@ -232,5 +321,44 @@ describe('AiModeNote and AiModeChip and AiModeParams', () => {
     expect(screen.getByRole('combobox', { name: 'Размышления' }).textContent).toContain(
       'По умолчанию (Высокие)',
     )
+    // no subagents default — no subagents choice
+    expect(screen.queryByRole('checkbox')).toBeNull()
+  })
+
+  test('the session panel offers the subagents flag; ticking back to the default drops the override', async () => {
+    const onChange = vi.fn()
+    const { rerender } = render(
+      <AiModeParams
+        defaultOpen
+        thinking={null}
+        contextTokens={null}
+        subagents={null}
+        defaults={{ thinking: 'high', contextTokens: 200_000, subagents: false }}
+        onChange={onChange}
+      />,
+    )
+    const box = screen.getByRole('checkbox', { name: /Рекомендовать модели субагентов/ })
+    expect(
+      screen.getByText(/Может значительно увеличить расход токенов. По умолчанию — нет./),
+    ).toBeTruthy()
+    await userEvent.setup().click(box)
+    expect(onChange).toHaveBeenLastCalledWith({ subagents: true })
+    rerender(
+      <AiModeParams
+        defaultOpen
+        thinking={null}
+        contextTokens={null}
+        subagents={true}
+        defaults={{ thinking: 'high', contextTokens: 200_000, subagents: false }}
+        onChange={onChange}
+      />,
+    )
+    expect(screen.getByRole('button', { name: /Параметры ИИ/ }).textContent).toContain(
+      '· субагенты',
+    )
+    await userEvent
+      .setup()
+      .click(screen.getByRole('checkbox', { name: /Рекомендовать модели субагентов/ }))
+    expect(onChange).toHaveBeenLastCalledWith({ subagents: null })
   })
 })
