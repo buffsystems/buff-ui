@@ -27,6 +27,41 @@ export const S = defineStrings({
   'common.etaAlmost': { ru: 'почти готово', en: 'almost done' },
   'common.empty': { ru: 'Пока пусто', en: 'Nothing here yet' },
   'common.error': { ru: 'Что-то пошло не так', en: 'Something went wrong' },
+  // #929: why an action failed, by its kind — what happened and what to do.
+  'common.failTimeout': {
+    ru: 'Установка не ответила вовремя. Проверьте, что она в сети, и повторите.',
+    en: 'The install did not answer in time. Check that it is online and retry.',
+  },
+  'common.failInternal': {
+    ru: 'На установке произошла ошибка, действие не выполнено. Повторите позже; если не проходит — напишите в поддержку.',
+    en: 'An error on the install — the action was not done. Retry later; if it keeps failing, contact support.',
+  },
+  'common.failTooLarge': {
+    ru: 'Ответ слишком большой для телефона. Откройте это на компьютере.',
+    en: 'The answer is too large for the phone. Open it on a computer.',
+  },
+  'common.failUnsupported': {
+    ru: 'Это действие пока недоступно с телефона. Обновите установку или откройте его на компьютере.',
+    en: 'This action is not available from the phone yet. Update the install or open it on a computer.',
+  },
+  'common.failUnpaired': {
+    ru: 'Этот телефон больше не подключён к установке. Подключите его заново: «Добавить установку» на главном экране.',
+    en: 'This phone is no longer paired with the install. Pair it again: «Add an install» on the home screen.',
+  },
+  'common.offlineNoData': {
+    ru: 'Установка не в сети, а сохранённых данных на телефоне нет. Они появятся, когда установка подключится.',
+    en: 'The install is offline and the phone has no saved data. It appears once the install connects.',
+  },
+  'common.failGeneric': {
+    ru: 'Не получилось. Повторите; если не проходит — проверьте связь и напишите в поддержку.',
+    en: 'It did not work. Retry; if it keeps failing, check the connection and contact support.',
+  },
+  // #929: the original words of an error, folded under the sentence.
+  'common.errorDetails': { ru: 'Технические детали', en: 'Technical details' },
+  'common.errorDetailsCopy': {
+    ru: 'Нажмите и удерживайте текст, чтобы скопировать его для поддержки.',
+    en: 'Press and hold the text to copy it for support.',
+  },
   'common.all': { ru: 'Все', en: 'All' },
   'common.mine': { ru: 'Мои', en: 'Mine' },
   'common.yes': { ru: 'Да', en: 'Yes' },
@@ -48,6 +83,27 @@ export const S = defineStrings({
   'common.gatewayRefusedSince': {
     ru: 'Шлюз отказал с {time}',
     en: 'The gateway refused since {time}',
+  },
+  // #929: the gateway's reason in words (it goes into common.readOnlyGateway's {detail}).
+  'common.gatewayDown': {
+    ru: 'шлюз временно недоступен',
+    en: 'the gateway is unavailable for now',
+  },
+  'common.gatewayBusy': {
+    ru: 'слишком много подключений подряд',
+    en: 'too many connections in a row',
+  },
+  'common.gatewayUnknownPhone': {
+    ru: 'шлюз не знает этот телефон — если не пройдёт, соедините его с установкой заново',
+    en: 'the gateway does not know this phone — if it persists, pair it with the install again',
+  },
+  'common.gatewayClock': {
+    ru: 'шлюз не принял подпись телефона — проверьте дату и время на телефоне',
+    en: "the gateway did not accept the phone's signature — check the phone's date and time",
+  },
+  'common.gatewayOther': {
+    ru: 'шлюз не пустил телефон',
+    en: 'the gateway did not let the phone in',
   },
   'common.readOnlyGateway': {
     ru: 'Шлюз отказал в подключении: {detail}. Показано последнее известное состояние, действия недоступны. Подключимся сами, когда шлюз пустит.',

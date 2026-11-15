@@ -23,6 +23,24 @@ const OFFLINE_TEXT = {
   unknown: 'common.readOnly',
 }
 
+// #929: the gateway's refusal comes in its own English («relay: unknown peer, register first») —
+// the person reads what it means for them instead.
+const GATEWAY_REASONS: [RegExp, string][] = [
+  [/did not answer|unavailable/i, 'common.gatewayDown'],
+  [/too many requests|limit/i, 'common.gatewayBusy'],
+  [/unknown peer|register/i, 'common.gatewayUnknownPhone'],
+  [/signature|proof|stale|clock|expired/i, 'common.gatewayClock'],
+]
+
+/** Why the gateway refused, in words. */
+export function gatewayReason(
+  t: (key: string, vars?: Record<string, string | number>) => string,
+  detail: string | undefined,
+): string {
+  const hit = GATEWAY_REASONS.find(([re]) => re.test(detail ?? ''))
+  return t(hit ? hit[1] : 'common.gatewayOther')
+}
+
 /** The one-line label of a status, for rows and switchers. */
 export function statusLabel(
   t: (key: string, vars?: Record<string, string | number>) => string,
@@ -83,7 +101,8 @@ export function InstallBanner({
     status.kind === 'offline'
       ? t(OFFLINE_TEXT[status.reason ?? 'unknown'], {
           time: status.since,
-          detail: status.detail ?? '',
+          detail:
+            status.reason === 'gateway' ? gatewayReason(t, status.detail) : (status.detail ?? ''),
         })
       : status.kind === 'incompatible'
         ? t('pair.errIncompatibleText', { version: status.version })

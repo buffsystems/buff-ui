@@ -259,3 +259,30 @@ test('the working line shows under the timeline while the machine works, not und
   rerender(wrap(<SessionScreen {...props} running={false} />))
   expect(screen.queryByText('Работает…')).toBeNull()
 })
+
+// #929: a failed turn reads in words; the original text is folded under «Технические детали».
+test('an error card says what to do and keeps the raw words under the details', () => {
+  render(
+    wrap(
+      <SessionScreen
+        install={install}
+        status={install.status}
+        session={{ id: 's', projectId: 'p', title: 'S', origin: 'phone', when: '', group: 'today' }}
+        project={{ id: 'p', name: 'shop', path: '/w', sessions: 1 }}
+        running={false}
+        items={[
+          {
+            kind: 'error',
+            id: 'e',
+            text: 'Модель недоступна: проверьте, что сервер запущен.',
+            details: 'provider.transport: ConnectionRefused: Unable to connect.',
+          },
+        ]}
+      />,
+    ),
+  )
+  expect(screen.getByText('Модель недоступна: проверьте, что сервер запущен.')).toBeTruthy()
+  expect(screen.queryByText(/ConnectionRefused/)).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Технические детали' }))
+  expect(screen.getByText(/ConnectionRefused/)).toBeTruthy()
+})

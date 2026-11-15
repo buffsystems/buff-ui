@@ -182,6 +182,41 @@ export const S = defineStrings({
   'buffcode.halt': { ru: 'Остановить', en: 'Halt' },
   'buffcode.output': { ru: 'Вывод', en: 'Output' },
   'buffcode.errorTitle': { ru: 'Ошибка', en: 'Error' },
+  // #929: a failed turn in words, when the machine's Buff Code does not explain it itself (older
+  // versions). The original words go under «Technical details».
+  'buffcode.failTransport': {
+    ru: 'Модель недоступна: не удаётся подключиться к её адресу. Проверьте, что сервер модели запущен и адрес верный, затем повторите.',
+    en: "The model is unreachable: cannot connect to its address. Check that the model's server is running and the address is right, then retry.",
+  },
+  'buffcode.failAuth': {
+    ru: 'Провайдер модели отклонил ключ доступа. Замените ключ провайдера в Buff Code на компьютере.',
+    en: "The model provider rejected the access key. Replace the provider's key in Buff Code on the computer.",
+  },
+  'buffcode.failQuota': {
+    ru: 'У провайдера модели закончились средства или квота. Пополните счёт у провайдера или выберите другую модель.',
+    en: 'The model provider account is out of funds or quota. Top it up with the provider or choose another model.',
+  },
+  'buffcode.failRate': {
+    ru: 'Провайдер модели ограничил частоту запросов. Подождите немного и повторите.',
+    en: 'The model provider limited the request rate. Wait a little and retry.',
+  },
+  'buffcode.failServer': {
+    ru: 'Сбой на стороне провайдера модели. Повторите позже.',
+    en: 'Failure on the model provider side. Retry later.',
+  },
+  'buffcode.failFilter': {
+    ru: 'Провайдер модели отклонил запрос своим фильтром содержимого. Переформулируйте запрос.',
+    en: 'The model provider declined the request by its content filter. Rephrase the request.',
+  },
+  'buffcode.failNoRoute': {
+    ru: 'Buff Code не может обратиться к этой модели. Подключите провайдера на компьютере или выберите другую модель.',
+    en: 'Buff Code cannot reach this model. Connect the provider on the computer or choose another model.',
+  },
+  'buffcode.failOther': {
+    ru: 'Ход остановился с ошибкой. Повторите запрос; если ошибка повторяется — отправьте технические детали в поддержку.',
+    en: 'The turn stopped with an error. Repeat the request; if it keeps failing, send the technical details to support.',
+  },
+  'buffcode.goalNotice': { ru: 'Цель', en: 'Goal' },
   'buffcode.filesAnalyze': { ru: 'Анализировать кодом', en: 'Analyse with code' },
   'buffcode.filesModel': { ru: 'Сменить модель', en: 'Switch model' },
   'buffcode.filesWithout': { ru: 'Продолжить без файлов', en: 'Continue without files' },

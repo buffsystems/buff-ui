@@ -138,7 +138,7 @@ describe('native screens render through react-native-web', () => {
       ),
     )
     expect(screen.getByText('Шлюз отказал с 14:20')).toBeTruthy()
-    expect(screen.getByText(/relay limit exceeded, retry later/)).toBeTruthy()
+    expect(screen.getByText(/слишком много подключений подряд/)).toBeTruthy()
     expect(screen.queryByText(/Проверьте интернет/)).toBeNull()
   })
 

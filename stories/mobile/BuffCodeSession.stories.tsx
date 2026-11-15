@@ -10,6 +10,7 @@ import {
   filesRefused,
   git,
   machine,
+  modelUnreachable,
   offline,
   permission,
   permissionEdit,
@@ -185,6 +186,22 @@ export const SubagentReadOnly: Story = {
 export const FilesRefused: Story = {
   render: () => (
     <SessionScreen {...base} running={false} items={filesRefused} onFileChoice={() => undefined} />
+  ),
+}
+/** The model is unreachable (#929): the error in words, its original text folded under the details. */
+export const ModelUnreachable: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      running={false}
+      items={modelUnreachable}
+      goal={{
+        line: 'Цель · итерация 3 · идёт: сними полное видео переключения передач',
+        status: 'active',
+        reason:
+          'litellm недоступен: не удаётся подключиться к его адресу. Проверьте, что сервер провайдера запущен и адрес верный, затем повторите.',
+      }}
+    />
   ),
 }
 export const Empty: Story = {

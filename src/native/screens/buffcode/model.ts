@@ -108,9 +108,10 @@ export type TimelineItem =
   | { kind: 'notice'; id: string; label: string; summary?: string }
   /**
    * A failed turn. `files` (#757): the model refused a request with files — the card offers to
-   * analyse them with code, switch the model or go on without them.
+   * analyse them with code, switch the model or go on without them. `details` (#929): the original
+   * words, folded under «Technical details» — the text says what happened and what to do.
    */
-  | { kind: 'error'; id: string; text: string; files?: { names: string[] } }
+  | { kind: 'error'; id: string; text: string; details?: string; files?: { names: string[] } }
   /**
    * A context compaction (#761): its summary for the model, clipped as the timeline comes; the
    * whole text is fetched when the person opens it. No status — an old service.

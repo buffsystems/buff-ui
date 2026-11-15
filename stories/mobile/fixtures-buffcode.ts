@@ -677,3 +677,25 @@ export const filesRefused: TimelineItem[] = [
     files: { names: ['brand.png', 'brand.pdf'] },
   },
 ]
+
+/**
+ * The model cannot be reached (#929): the turn's error in words — what happened and what to do —
+ * the machine's original words under «Technical details»; the goal's note says the same.
+ */
+export const modelUnreachable: TimelineItem[] = [
+  { kind: 'user', id: 'mu-u', text: 'Сними полное видео переключения передач', when: '11:52' },
+  {
+    kind: 'error',
+    id: 'mu-e',
+    text: 'litellm недоступен: не удаётся подключиться к его адресу. Проверьте, что сервер провайдера запущен и адрес верный, затем повторите.',
+    details:
+      'Тип: provider.transport\nСообщение: ConnectionRefused: Unable to connect. Is the computer able to access the url?',
+  },
+  {
+    kind: 'notice',
+    id: 'mu-g',
+    label: 'Цель',
+    summary:
+      'Итерация 2: litellm недоступен: не удаётся подключиться к его адресу. Проверьте, что сервер провайдера запущен и адрес верный, затем повторите.',
+  },
+]

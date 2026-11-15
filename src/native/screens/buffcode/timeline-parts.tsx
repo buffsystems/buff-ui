@@ -2,6 +2,7 @@
 import { View } from 'react-native'
 import { StatusDot } from '../../Badge.tsx'
 import { Button } from '../../Button.tsx'
+import { ErrorDetails } from '../../ErrorDetails.tsx'
 import { Callout } from '../../Feedback.tsx'
 import { Icon } from '../../Icon.tsx'
 import type { Attachment } from '../../model.ts'
@@ -239,6 +240,8 @@ function PartBody({
                   </Button>
                 ))}
               </View>
+            ) : item.details ? (
+              <ErrorDetails details={item.details} />
             ) : undefined
           }
         >
