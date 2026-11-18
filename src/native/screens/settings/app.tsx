@@ -29,6 +29,12 @@ export function AppSettingsScreen({
   onVersionLongPress,
   update,
   onUpdate,
+  onTour,
+  store,
+  onRate,
+  onShare,
+  onContact,
+  onSite,
   onBack,
 }: {
   theme?: ThemeChoice
@@ -52,10 +58,69 @@ export function AppSettingsScreen({
   update?: string
   /** Where to get it: the store or the site's download block. */
   onUpdate?: () => void
+  /** The first-launch tour again (#931). */
+  onTour?: () => void
+  /** The store this build was installed from, by its name (#933); a build from none has none. */
+  store?: string
+  /** The store's page of the app, where a review is left; absent — nowhere to rate. */
+  onRate?: () => void
+  onShare?: () => void
+  onContact?: () => void
+  onSite?: () => void
   onBack?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
+  const feedback = [
+    onTour && (
+      <Row
+        key="tour"
+        icon="sparkles"
+        title={t('tour.replay')}
+        subtitle={t('tour.replayHint')}
+        chevron
+        onPress={onTour}
+      />
+    ),
+    onRate && (
+      <Row
+        key="rate"
+        icon="star"
+        title={t('settings.rate')}
+        subtitle={store ? t('settings.rateIn', { store }) : undefined}
+        chevron
+        onPress={onRate}
+      />
+    ),
+    onShare && (
+      <Row
+        key="share"
+        icon="share"
+        title={t('settings.shareApp')}
+        subtitle={t('settings.shareAppHint')}
+        onPress={onShare}
+      />
+    ),
+    onContact && (
+      <Row
+        key="contact"
+        icon="mail"
+        title={t('settings.contact')}
+        subtitle={t('settings.contactHint')}
+        onPress={onContact}
+      />
+    ),
+    onSite && (
+      <Row
+        key="site"
+        icon="globe"
+        title={t('settings.site')}
+        subtitle="buff.systems"
+        chevron
+        onPress={onSite}
+      />
+    ),
+  ].filter(Boolean)
   return (
     <>
       <TopBar title={t('settings.title')} onBack={onBack} />
@@ -114,6 +179,7 @@ export function AppSettingsScreen({
                 onChange={(id) => onLocale?.(id as Locale)}
               />
             </View>
+            {feedback.length > 0 && <RowGroup title={t('settings.feedback')}>{feedback}</RowGroup>}
             <RowGroup title={t('settings.about')}>
               {[
                 <Pressable

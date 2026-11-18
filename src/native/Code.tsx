@@ -110,7 +110,7 @@ export function Terminal({
   )
 }
 
-function tokenColor(theme: NativeTheme, kind: TokenKind): string {
+export function tokenColor(theme: NativeTheme, kind: TokenKind): string {
   const c = theme.colors
   switch (kind) {
     case 'comment':

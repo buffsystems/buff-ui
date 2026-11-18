@@ -40,8 +40,14 @@ export type {
   WorkflowRun,
 } from './model.ts'
 export { Eyebrow, Gutter, isLive, MachineShell, ORIGIN_ICON, originLabel } from './shell.tsx'
-export { ProjectRow, ProjectsScreen } from './projects.tsx'
-export { DeleteSessionSheet, SessionActionsSheet, SessionRow, SessionsScreen } from './sessions.tsx'
+export { ProjectRow, ProjectsScreen, type ProjectSort, type ProjectsView } from './projects.tsx'
+export {
+  DeleteSessionSheet,
+  SessionActionsSheet,
+  SessionGroups,
+  SessionRow,
+  SessionsScreen,
+} from './sessions.tsx'
 export { MODE_KEY, NewSessionScreen, PermissionModeControl } from './new-session.tsx'
 export { PickerSheet } from './picker.tsx'
 export { variantHint, variantLabel } from './variant.ts'

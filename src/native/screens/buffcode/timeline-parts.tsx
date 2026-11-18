@@ -1,4 +1,5 @@
 /** @jsxRuntime automatic */
+import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { StatusDot } from '../../Badge.tsx'
 import { Button } from '../../Button.tsx'
@@ -127,9 +128,14 @@ type PartProps = {
   onOpenCompaction?: (id: string) => void
 }
 
+/** How long the whole of a cut item may take to come before «Show all» is offered by hand. */
+const WHOLE_WAIT_MS = 8000
+
 /**
- * One item of the timeline by its kind. What the timeline holds only the start of (#903) offers
- * «Show all»: the screen fetches the whole and the item comes back uncut.
+ * One item of the timeline by its kind. An item the timeline holds only the start of (#903) is
+ * never left cut (#937): what is read as text asks for its whole as soon as it shows, a tool's
+ * output — when its card is opened. Nothing is offered meanwhile; only if the whole has not come
+ * after a while — the phone is offline, the machine is an old one — «Show all» asks again by hand.
  */
 export function TimelinePart({
   onShowAll,
@@ -138,13 +144,45 @@ export function TimelinePart({
   const t = useT()
   const theme = useTheme()
   const item = props.item
-  const body = <PartBody {...props} />
-  if (!onShowAll || !('clipped' in item) || !item.clipped) return body
+  const cut = !!onShowAll && 'clipped' in item && !!item.clipped
+  const tool = item.kind === 'tool'
+  const [asked, setAsked] = useState(false)
+  const [late, setLate] = useState(false)
+  const ask = useRef(onShowAll)
+  ask.current = onShowAll
+  const whole = useRef(item)
+  whole.current = item
+  // Text asks at once; the request is the screen's, made once for a cut item.
+  useEffect(() => {
+    if (!cut || tool) return
+    ask.current?.(whole.current)
+    setAsked(true)
+  }, [cut, tool, item.id])
+  useEffect(() => {
+    setLate(false)
+    if (!cut || !asked) return
+    const timer = setTimeout(() => setLate(true), WHOLE_WAIT_MS)
+    return () => clearTimeout(timer)
+  }, [cut, asked, item.id])
+  const body = (
+    <PartBody
+      {...props}
+      {...(cut && tool
+        ? {
+            onToolOpen: () => {
+              onShowAll?.(item)
+              setAsked(true)
+            },
+          }
+        : {})}
+    />
+  )
+  if (!cut || !late) return body
   return (
     <View style={{ gap: theme.space(1) }}>
       {body}
       <View style={{ alignItems: 'flex-start' }}>
-        <Button size="sm" variant="ghost" onPress={() => onShowAll(item)}>
+        <Button size="sm" variant="ghost" onPress={() => onShowAll?.(item)}>
           {t('common.showAll')}
         </Button>
       </View>
@@ -159,7 +197,8 @@ function PartBody({
   onOpenSubagent,
   onFileChoice,
   onOpenCompaction,
-}: PartProps) {
+  onToolOpen,
+}: PartProps & { onToolOpen?: () => void }) {
   const t = useT()
   switch (item.kind) {
     case 'user':
@@ -177,6 +216,7 @@ function PartBody({
           detail={item.detail}
           input={item.input}
           output={item.output}
+          {...(onToolOpen ? { onOpen: onToolOpen } : {})}
         />
       )
     case 'reasoning':

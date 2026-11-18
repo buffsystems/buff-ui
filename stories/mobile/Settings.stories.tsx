@@ -55,6 +55,12 @@ export const App: Story = {
       installs={installs.length}
       theme="system"
       onDemo={() => undefined}
+      onTour={() => undefined}
+      store="Google Play"
+      onRate={() => undefined}
+      onShare={() => undefined}
+      onContact={() => undefined}
+      onSite={() => undefined}
     />
   ),
 }

@@ -2,6 +2,7 @@
 import { Fragment, useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, IconButton } from '../../Button.tsx'
+import { useKeyboardShown } from '../../keyboard.ts'
 import { useFollowEnd } from '../../follow-end.ts'
 import { useNearTop } from '../../near-top.ts'
 import type { Attachment, Install, InstallStatus } from '../../model.ts'
@@ -130,6 +131,8 @@ export interface SessionScreenProps {
   onTerminalRun?: () => void
   onTerminalInterrupt?: () => void
   onShareFile?: () => void
+  /** The open file's whole text goes to the clipboard (#936). */
+  onCopyFile?: () => void
   onGoalPause?: () => void
   onGoalResume?: () => void
   onGoalClear?: () => void
@@ -231,6 +234,7 @@ export function SessionScreen(p: SessionScreenProps) {
   const tr = useT()
   const live = isLive(p.status)
   const view = p.view ?? 'session'
+  const keyboard = useKeyboardShown()
   // The timeline opens at the latest message, keeps up with the agent while the reader is at the
   // bottom (#703) and offers a way back to it once scrolled up.
   const follow = useFollowEnd(p.initialScroll === 'top' ? 'top' : 'end')
@@ -274,6 +278,7 @@ export function SessionScreen(p: SessionScreenProps) {
           disabled={!live}
           onBack={p.onCloseFile}
           onShare={p.onShareFile}
+          onCopy={p.onCopyFile}
           onPreview={p.onPreviewFile}
           onAddToChat={p.onAddFileToChat}
         />
@@ -300,6 +305,10 @@ export function SessionScreen(p: SessionScreenProps) {
             ref={follow.ref}
             style={{ flex: 1 }}
             contentContainerStyle={{ padding: t.space(4), gap: t.space(4) }}
+            // Dragging the conversation puts the keyboard away (#935); a tap on a button in it
+            // still acts at once.
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
             scrollEventThrottle={100}
             onScroll={(e) => {
               follow.onScroll(e)
@@ -375,8 +384,11 @@ export function SessionScreen(p: SessionScreenProps) {
           {p.readOnly ? (
             <ReadOnlyNote />
           ) : p.dock ? (
-            // A dock waits for the person: the chat input would compete with it.
-            <WaitingAboveNote />
+            // A dock waits for the person: the chat input would compete with it. While they type
+            // into the dock the note gives its room to it (#935).
+            keyboard ? null : (
+              <WaitingAboveNote />
+            )
           ) : (
             <>
               {p.git && p.onGit && (

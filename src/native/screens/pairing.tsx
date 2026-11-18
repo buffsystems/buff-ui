@@ -19,6 +19,7 @@ export function WelcomeScreen({
   onBack,
   onOpen,
   onDemo,
+  onTour,
 }: {
   onScan?: () => void
   onEnterCode?: () => void
@@ -27,6 +28,8 @@ export function WelcomeScreen({
   /** Nothing paired yet (#745): where to get Buff Code and Buff Community, and the demo in one tap. */
   onOpen?: (link: StarterLink) => void
   onDemo?: () => void
+  /** The first-launch tour again (#931). */
+  onTour?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
@@ -44,6 +47,11 @@ export function WelcomeScreen({
         <Button variant="ghost" leadingIcon="link" onPress={onEnterCode}>
           {t('pair.enterCode')}
         </Button>
+        {onTour && (
+          <Button variant="ghost" leadingIcon="sparkles" onPress={onTour}>
+            {t('tour.replay')}
+          </Button>
+        )}
       </View>
       {starter && <StarterCards onOpen={onOpen} onDemo={onDemo} />}
     </Screen>

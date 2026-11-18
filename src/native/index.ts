@@ -74,6 +74,7 @@ export { S as homeStrings } from './strings/home.ts'
 export { S as statusStrings } from './strings/status.ts'
 export { S as settingsStrings } from './strings/settings.ts'
 export { S as starterStrings } from './strings/starter.ts'
+export { S as tourStrings } from './strings/tour.ts'
 export { S as sidebarStrings } from './strings/sidebar.ts'
 export { InstallBanner, RevokedScreen, statusLabel, statusTone } from './screens/status.tsx'
 export { SidebarDrawer } from './screens/sidebar.tsx'
@@ -94,6 +95,7 @@ export {
 } from './screens/pairing.tsx'
 export type { PairError } from './screens/pairing.tsx'
 export { StarterCards } from './screens/starter.tsx'
+export { TourScreen } from './screens/tour.tsx'
 export type { StarterLink } from './screens/starter.tsx'
 export {
   AttentionRow,

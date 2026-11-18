@@ -22,7 +22,9 @@ type Story = StoryObj<typeof meta>
 export const Welcome: Story = { render: () => <WelcomeScreen /> }
 /** Nothing paired (#745): where to get Buff Code and Buff Community, and the demo in one tap. */
 export const WelcomeStarter: Story = {
-  render: () => <WelcomeScreen onOpen={() => undefined} onDemo={() => undefined} />,
+  render: () => (
+    <WelcomeScreen onOpen={() => undefined} onDemo={() => undefined} onTour={() => undefined} />
+  ),
 }
 export const WelcomeStarterNoDemo: Story = {
   render: () => <WelcomeScreen onOpen={() => undefined} />,

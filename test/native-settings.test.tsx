@@ -26,9 +26,9 @@ const wrap = (children: ReactNode) => (
 
 test('the demo install hides until the app offers it', () => {
   const { rerender } = render(wrap(<AppSettingsScreen version="1.0.0" installs={1} />))
-  expect(screen.queryByText('Посмотреть на демо')).toBeNull()
+  expect(screen.queryByText('Посмотреть демо')).toBeNull()
   rerender(wrap(<AppSettingsScreen version="1.0.0" installs={1} onDemo={() => undefined} />))
-  expect(screen.getByText('Посмотреть на демо')).toBeTruthy()
+  expect(screen.getByText('Посмотреть демо')).toBeTruthy()
 })
 
 test('the installs row says how many, aloud too (#691)', () => {
@@ -74,4 +74,38 @@ test('«About» names a newer app version and leads to it; none — no row', () 
   )
   fireEvent.click(screen.getByRole('button', { name: /Доступна версия 0\.24\.1/ }))
   expect(opened).toEqual(['update'])
+})
+
+// #933: rate, share, write to us and the site — each row only where the app wires it (a build
+// from no store has nowhere to rate).
+test('«Help and feedback» shows the rows the app wires, and each leads where it says', () => {
+  const done: string[] = []
+  const { rerender } = render(wrap(<AppSettingsScreen version="1.0.0" installs={1} />))
+  expect(screen.queryByText('Помощь и отзывы')).toBeNull()
+  expect(screen.queryByText('Оценить приложение')).toBeNull()
+  rerender(
+    wrap(
+      <AppSettingsScreen
+        version="1.0.0"
+        installs={1}
+        onTour={() => done.push('tour')}
+        onRate={() => done.push('rate')}
+        onShare={() => done.push('share')}
+        onContact={() => done.push('contact')}
+        onSite={() => done.push('site')}
+      />,
+    ),
+  )
+  for (const name of [
+    'Знакомство с Buff',
+    'Оценить приложение',
+    'Поделиться приложением',
+    'Написать нам',
+    'Сайт Buff',
+  ])
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(name) }))
+  expect(done).toEqual(['tour', 'rate', 'share', 'contact', 'site'])
+  rerender(wrap(<AppSettingsScreen version="1.0.0" installs={1} onShare={() => undefined} />))
+  expect(screen.queryByText('Оценить приложение')).toBeNull()
+  expect(screen.getByText('Поделиться приложением')).toBeTruthy()
 })

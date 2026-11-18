@@ -31,6 +31,23 @@ export const S = defineStrings({
   'buffcode.redo': { ru: 'Вернуть отменённое', en: 'Redo' },
   'buffcode.rename': { ru: 'Переименовать', en: 'Rename' },
   'buffcode.older': { ru: 'Раньше', en: 'Earlier' },
+  // #938: the machine's main screen — recent sessions of all projects, or the projects in an order.
+  'buffcode.recent': { ru: 'Недавние', en: 'Recent' },
+  'buffcode.view': { ru: 'Вид списка', en: 'List view' },
+  'buffcode.groupWaiting': { ru: 'Ждут вас', en: 'Waiting for you' },
+  'buffcode.groupRunning': { ru: 'В работе', en: 'Running' },
+  'buffcode.searchRecent': {
+    ru: 'Поиск по сессиям и проектам',
+    en: 'Search sessions and projects',
+  },
+  'buffcode.sort': { ru: 'Сортировка', en: 'Sort' },
+  'buffcode.sortRecent': { ru: 'По последней сессии', en: 'By last session' },
+  'buffcode.sortRecentHint': {
+    ru: 'Выше проект, в сессии которого было самое свежее сообщение',
+    en: 'The project whose session had the latest message goes first',
+  },
+  'buffcode.sortName': { ru: 'По названию', en: 'By name' },
+  'buffcode.sortNameHint': { ru: 'По алфавиту', en: 'Alphabetically' },
   'buffcode.originWindow': { ru: 'окно', en: 'window' },
   'buffcode.originConsole': { ru: 'консоль', en: 'console' },
   'buffcode.originPhone': { ru: 'телефон', en: 'phone' },
@@ -259,6 +276,8 @@ export const S = defineStrings({
   'buffcode.preview': { ru: 'Просмотр', en: 'Preview' },
   // #808: a page shown rendered or as its source.
   'buffcode.viewCode': { ru: 'Код', en: 'Code' },
+  'buffcode.viewText': { ru: 'Текст', en: 'Text' },
+  'buffcode.copyFile': { ru: 'Скопировать текст файла', en: 'Copy the file’s text' },
   'buffcode.goalPause': { ru: 'Пауза', en: 'Pause' },
   'buffcode.goalResume': { ru: 'Продолжить', en: 'Resume' },
   'buffcode.goalReset': { ru: 'Сбросить', en: 'Reset' },

@@ -36,6 +36,7 @@ export function ToolCall({
   input,
   output,
   expanded: initial = false,
+  onOpen,
 }: {
   tool: string
   title: string
@@ -44,6 +45,8 @@ export function ToolCall({
   input?: string
   output?: string
   expanded?: boolean
+  /** The card is opened: the screen may have only the start of its output (#937). */
+  onOpen?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
@@ -69,7 +72,10 @@ export function ToolCall({
         accessibilityRole="button"
         accessibilityLabel={`${tool}: ${title}`}
         accessibilityState={{ expanded: open }}
-        onPress={() => setOpen((v) => !v)}
+        onPress={() => {
+          if (!open) onOpen?.()
+          setOpen(!open)
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',

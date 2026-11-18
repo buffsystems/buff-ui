@@ -5,6 +5,7 @@ export const S = defineStrings({
   'common.ok': { ru: 'Готово', en: 'Done' },
   'common.cancel': { ru: 'Отмена', en: 'Cancel' },
   'common.close': { ru: 'Закрыть', en: 'Close' },
+  'common.hideKeyboard': { ru: 'Скрыть клавиатуру', en: 'Hide the keyboard' },
   'common.back': { ru: 'Назад', en: 'Back' },
   'common.retry': { ru: 'Повторить', en: 'Retry' },
   'common.save': { ru: 'Сохранить', en: 'Save' },

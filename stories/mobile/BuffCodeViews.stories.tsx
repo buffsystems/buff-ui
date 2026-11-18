@@ -46,6 +46,22 @@ export const ChangesEmpty: Story = {
   render: () => <SessionScreen {...base} view="changes" changes={[]} />,
 }
 export const Files: Story = { render: () => <SessionScreen {...base} view="files" /> }
+/** #936: Markdown читается как документ; «Текст» — исходник, который выделяется целиком. */
+export const FileMarkdown: Story = {
+  render: () => (
+    <SessionScreen
+      {...base}
+      view="files"
+      onCopyFile={() => undefined}
+      openFile={{
+        path: 'README.md',
+        language: 'markdown',
+        content:
+          "# notes-api\n\nСервис заметок: **поиск**, теги и напоминания.\n\n## Запуск\n\n1. `npm install`\n2. `npm test`\n\n> Поиск не зависит от регистра.\n\n| Метод | Путь |\n| --- | --- |\n| GET | `/notes` |\n| GET | `/search` |\n\n```js\nsearch(notes, 'молоко')\n```\n",
+      }}
+    />
+  ),
+}
 export const FileOpen: Story = {
   render: () => (
     <SessionScreen

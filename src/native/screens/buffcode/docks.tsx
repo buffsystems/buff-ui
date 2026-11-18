@@ -1,69 +1,15 @@
 /** @jsxRuntime automatic */
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { View } from 'react-native'
-import { Badge } from '../../Badge.tsx'
 import { Button } from '../../Button.tsx'
 import { Chip } from '../../Chip.tsx'
 import { Input } from '../../Field.tsx'
-import { Icon } from '../../Icon.tsx'
-import type { IconName } from '../../icons.ts'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
+import { DockFrame } from './dock-frame.tsx'
 import type { PermissionRequest } from './model.ts'
 
-/** The frame of a dock above the composer: a tinted card with a title row, body and actions. */
-export function DockFrame({
-  icon,
-  title,
-  badge,
-  warning = false,
-  children,
-  footer,
-}: {
-  icon: IconName
-  title: string
-  badge?: string
-  warning?: boolean
-  children?: ReactNode
-  footer: ReactNode
-}) {
-  const theme = useTheme()
-  const c = theme.colors
-  return (
-    <View
-      accessibilityRole="alert"
-      style={{
-        marginHorizontal: theme.space(3),
-        marginBottom: theme.space(2),
-        borderRadius: theme.radius.lg,
-        borderWidth: 1,
-        borderColor: warning ? c.warning : c.borderStrong,
-        backgroundColor: c.popover,
-        padding: theme.space(3),
-        gap: theme.space(3),
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space(2) }}>
-        <Icon name={icon} size={18} color={warning ? c.warning : c.primary} />
-        <Text variant="label" style={{ flex: 1, fontWeight: '600' }}>
-          {title}
-        </Text>
-        {badge && <Badge tone="neutral">{badge}</Badge>}
-      </View>
-      {children}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          gap: theme.space(2),
-          flexWrap: 'wrap',
-        }}
-      >
-        {footer}
-      </View>
-    </View>
-  )
-}
+export { DockFrame }
 
 /** «May I run this?» — allow once, always (within the mode's scope), or deny with a reason. */
 export function PermissionDock({

@@ -10,6 +10,8 @@ import { storyIcons } from './icons.ts'
 export const DEVICES = {
   iphone: { width: 390, height: 844, label: 'iPhone 390×844' },
   android: { width: 360, height: 800, label: 'Android 360×800' },
+  small: { width: 360, height: 640, label: 'Small 360×640' },
+  tablet: { width: 834, height: 1194, label: 'Tablet 834×1194' },
 } as const
 
 export type Device = keyof typeof DEVICES
@@ -112,3 +114,12 @@ export const withPhone: Decorator = (Story, context) => (
     <Story />
   </PhoneFrame>
 )
+
+/** A story that is about one device — a tablet's layout, the smallest phone — whatever the toolbar says. */
+export const withDevice =
+  (device: Device): Decorator =>
+  (Story, context) => (
+    <PhoneFrame device={device} locale={(context.globals.locale as Locale) ?? 'ru'}>
+      <Story />
+    </PhoneFrame>
+  )

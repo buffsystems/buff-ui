@@ -15,7 +15,7 @@ export const S = defineStrings({
   },
   'starter.site': { ru: 'Сайт', en: 'Website' },
   'starter.github': { ru: 'GitHub', en: 'GitHub' },
-  'starter.demo': { ru: 'Посмотреть на демо', en: 'Try the demo' },
+  'starter.demo': { ru: 'Посмотреть демо', en: 'Try the demo' },
   'starter.demoText': {
     ru: 'Готовые проекты, задачи и сессии Buff Code на buff.systems — без регистрации, только чтение.',
     en: 'Ready projects, tasks and Buff Code sessions on buff.systems — no sign-up, read-only.',

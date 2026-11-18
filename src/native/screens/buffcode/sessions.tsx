@@ -62,6 +62,58 @@ export function SessionRow({
   )
 }
 
+/**
+ * Sessions under day captions. `lead` (#938) — where the list spans projects: the ones that wait
+ * for the person, then the running ones go first, each under its own caption.
+ */
+export function SessionGroups({
+  sessions,
+  lead = false,
+  onOpen,
+  onMore,
+}: {
+  sessions: BcSession[]
+  lead?: boolean
+  onOpen?: (id: string) => void
+  onMore?: (id: string) => void
+}) {
+  const t = useT()
+  const theme = useTheme()
+  const waiting = lead ? sessions.filter((s) => s.attention) : []
+  const running = lead ? sessions.filter((s) => s.running && !s.attention) : []
+  const rest = lead ? sessions.filter((s) => !s.running && !s.attention) : sessions
+  const blocks = [
+    { key: 'waiting', title: t('buffcode.groupWaiting'), items: waiting },
+    { key: 'running', title: t('buffcode.groupRunning'), items: running },
+    ...GROUPS.map((group) => ({
+      key: group,
+      title: t(GROUP_KEY[group]),
+      items: rest.filter((s) => s.group === group),
+    })),
+  ]
+  return (
+    <>
+      {blocks.map(({ key, title, items }) =>
+        items.length === 0 ? null : (
+          <Gutter key={key} gap={theme.space(2)}>
+            <Eyebrow>{title}</Eyebrow>
+            <RowGroup>
+              {items.map((session) => (
+                <SessionRow
+                  key={session.id}
+                  session={session}
+                  onPress={() => onOpen?.(session.id)}
+                  onMore={onMore ? () => onMore(session.id) : undefined}
+                />
+              ))}
+            </RowGroup>
+          </Gutter>
+        ),
+      )}
+    </>
+  )
+}
+
 /** The sessions of one project: existing ones continue (from any client), a new one starts. */
 export function SessionsScreen({
   install,
@@ -141,25 +193,7 @@ export function SessionsScreen({
               {t('buffcode.noResults')}
             </Text>
           ) : (
-            GROUPS.map((group) => {
-              const items = sessions.filter((s) => s.group === group)
-              if (items.length === 0) return null
-              return (
-                <Gutter key={group} gap={theme.space(2)}>
-                  <Eyebrow>{t(GROUP_KEY[group])}</Eyebrow>
-                  <RowGroup>
-                    {items.map((session) => (
-                      <SessionRow
-                        key={session.id}
-                        session={session}
-                        onPress={() => onOpen?.(session.id)}
-                        onMore={live && onMore ? () => onMore(session.id) : undefined}
-                      />
-                    ))}
-                  </RowGroup>
-                </Gutter>
-              )
-            })
+            <SessionGroups sessions={sessions} onOpen={onOpen} onMore={live ? onMore : undefined} />
           )}
         </View>
       )}
