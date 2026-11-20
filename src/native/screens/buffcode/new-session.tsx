@@ -3,13 +3,15 @@ import { View } from 'react-native'
 import { Button } from '../../Button.tsx'
 import { Chip } from '../../Chip.tsx'
 import { Field, Input, Segmented, SelectField } from '../../Field.tsx'
-import type { Install, InstallStatus } from '../../model.ts'
+import type { Attachment, Install, InstallStatus } from '../../model.ts'
+import { RowGroup } from '../../Row.tsx'
 import { Text } from '../../Text.tsx'
 import { useLocale, useT, useTheme } from '../../theme.tsx'
 import type { BcAgent, BcModel, BcProject, PermissionMode } from './model.ts'
 import { Gutter, isLive, MachineShell } from './shell.tsx'
 import { variantHint, variantLabel } from './variant.ts'
 import { contextLabel } from './context.ts'
+import { AttachmentRow } from '../cabinet/attachments.tsx'
 import { WorkModeControl, type WorkMode } from './work-mode.tsx'
 
 export const MODE_KEY: Record<PermissionMode, string> = {
@@ -99,6 +101,9 @@ export function NewSessionScreen({
   onMode,
   onPlan,
   onPrompt,
+  staged = [],
+  onAttach,
+  onRemoveStaged,
   onStart,
   onRepair,
 }: {
@@ -132,6 +137,10 @@ export function NewSessionScreen({
   onMode?: (mode: PermissionMode) => void
   onPlan?: () => void
   onPrompt?: (text: string) => void
+  /** Files for the first message (#943); no handler — the page attaches nothing. */
+  staged?: Attachment[]
+  onAttach?: () => void
+  onRemoveStaged?: (id: string) => void
   onStart?: () => void
   onRepair?: () => void
 }) {
@@ -241,6 +250,25 @@ export function NewSessionScreen({
             onChangeText={onPrompt}
             editable={live}
           />
+          {staged.length > 0 && (
+            <RowGroup title={t('cabinet.attachments')}>
+              {staged.map((a) => (
+                <AttachmentRow
+                  key={a.id}
+                  attachment={a}
+                  onRemove={() => onRemoveStaged?.(a.id)}
+                  disabled={!live}
+                />
+              ))}
+            </RowGroup>
+          )}
+          {onAttach && (
+            <View style={{ alignItems: 'flex-start' }}>
+              <Button variant="ghost" leadingIcon="paperclip" onPress={onAttach} disabled={!live}>
+                {t('cabinet.attach')}
+              </Button>
+            </View>
+          )}
         </Gutter>
       </View>
     </MachineShell>
