@@ -109,5 +109,6 @@ test('a statement does not repeat the screen title as its first heading (#692)',
       />,
     ),
   )
-  expect(container.textContent).toBe('Текст.Детали')
+  // The heading after the text stands an empty line below it, in the same selectable text (#947).
+  expect(container.textContent?.replace(/\s+/g, ' ')).toBe('Текст. Детали')
 })

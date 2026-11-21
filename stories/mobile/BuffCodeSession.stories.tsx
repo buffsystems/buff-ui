@@ -49,6 +49,9 @@ export const base: SessionScreenProps = {
   agent: 'build',
   mode: 'edit',
   commands,
+  // #947: the actions under a message.
+  onCopyMessage: () => {},
+  onShareMessage: () => {},
 }
 
 /** The machine works on the turn: the breathing brain and the timer under the timeline (#742). */

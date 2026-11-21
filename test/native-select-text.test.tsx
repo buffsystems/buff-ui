@@ -16,7 +16,14 @@ const icons = Object.fromEntries(
   ICON_NAMES.map((name) => [name, () => <span data-icon={name} />]),
 ) as unknown as IconSet
 
-const selectable = (text: string) => getComputedStyle(screen.getByText(text)).userSelect
+/** Whether the text can be selected: by itself or as a part of a selectable text (#947). */
+const selectable = (text: string): string => {
+  for (let el: HTMLElement | null = screen.getByText(text); el; el = el.parentElement) {
+    const value = getComputedStyle(el).userSelect
+    if (value && value !== 'auto') return value
+  }
+  return ''
+}
 
 test('prose, its headings and its code are selectable', () => {
   render(
@@ -24,7 +31,10 @@ test('prose, its headings and its code are selectable', () => {
       <Prose markdown={'## Итог\n\nСтены пудровые.\n\n- пункт\n\n```\nconst a = 1\n```'} />
     </NativeProvider>,
   )
-  for (const text of ['Итог', 'Стены пудровые.', 'пункт']) expect(selectable(text)).toBe('text')
+  // Heading, paragraph and list are one selectable text (#947).
+  const flow = screen.getByTestId('prose-flow')
+  expect(getComputedStyle(flow).userSelect).toBe('text')
+  for (const text of ['Итог', 'Стены пудровые.', 'пункт']) expect(flow.textContent).toContain(text)
   // A code line is one text of coloured tokens.
   const line = screen.getByText('const').parentElement
   expect(line && getComputedStyle(line).userSelect).toBe('text')

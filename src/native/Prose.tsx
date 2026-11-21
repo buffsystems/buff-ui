@@ -1,29 +1,32 @@
 /** @jsxRuntime automatic */
 import { ScrollView, View } from 'react-native'
-import { CodeBlock, InlineCode } from './Code.tsx'
-import { columnWidths, parseMarkdown } from './markdown.ts'
+import { CodeBlock } from './Code.tsx'
+import { columnWidths, parseMarkdown, type Block } from './markdown.ts'
+import { InlineSpans, isFlow, SelectableFlow, type FlowBlock } from './SelectableFlow.tsx'
 import { Text } from './Text.tsx'
 import { useTheme } from './theme.tsx'
 
-/** Inline: **bold** and `code`; the rest stays plain. Selectable, like every word of prose:
- *  an answer is there to be copied (#696). */
+/** Inline text of a table cell or a quote — selectable, like every word of prose (#696). */
 function Inline({ text, tone }: { text: string; tone?: 'fg' | 'fg2' }) {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean)
   return (
     <Text tone={tone} selectable>
-      {parts.map((part, i) => {
-        if (part.startsWith('**')) {
-          return (
-            <Text key={i} style={{ fontWeight: '600' }}>
-              {part.slice(2, -2)}
-            </Text>
-          )
-        }
-        if (part.startsWith('`')) return <InlineCode key={i}>{part.slice(1, -1)}</InlineCode>
-        return part
-      })}
+      <InlineSpans text={text} />
     </Text>
   )
+}
+
+/** Blocks in order, the runs of running text gathered into one flow each (#947). */
+type Piece = { kind: 'flow'; blocks: FlowBlock[] } | Exclude<Block, FlowBlock>
+
+function pieces(blocks: Block[]): Piece[] {
+  const out: Piece[] = []
+  for (const block of blocks) {
+    const last = out[out.length - 1]
+    if (!isFlow(block)) out.push(block)
+    else if (last?.kind === 'flow') last.blocks.push(block)
+    else out.push({ kind: 'flow', blocks: [block] })
+  }
+  return out
 }
 
 /** The same words, case and spacing aside. */
@@ -43,34 +46,23 @@ export function Prose({ markdown, title }: { markdown: string; title?: string })
     title && lead?.kind === 'heading' && same(lead.text, title) ? parsed.slice(1) : parsed
   return (
     <View style={{ gap: theme.space(3) }}>
-      {blocks.map((block, i) => {
+      {pieces(blocks).map((block, i) => {
         switch (block.kind) {
-          case 'heading':
+          case 'flow':
+            return <SelectableFlow key={i} blocks={block.blocks} />
+          case 'rule':
+            // A thematic break (#948): a hairline in the border's colour, the text's whole width.
             return (
-              <Text
+              <View
                 key={i}
-                selectable
-                variant={block.level === 1 ? 'heading' : 'label'}
-                style={[
-                  { marginTop: i === 0 ? 0 : theme.space(2) },
-                  block.level > 1 && { fontSize: 15, lineHeight: 20, fontWeight: '600' },
-                ]}
-              >
-                {block.text}
-              </Text>
-            )
-          case 'list':
-            return (
-              <View key={i} style={{ gap: 4, paddingLeft: theme.space(2) }}>
-                {block.items.map((item, j) => (
-                  <View key={j} style={{ flexDirection: 'row', gap: 8 }}>
-                    <Text tone="muted">{block.ordered ? `${j + 1}.` : '•'}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Inline text={item} />
-                    </View>
-                  </View>
-                ))}
-              </View>
+                testID="prose-rule"
+                accessibilityRole="none"
+                style={{
+                  height: 1,
+                  backgroundColor: theme.colors.border,
+                  marginVertical: theme.space(1),
+                }}
+              />
             )
           case 'code':
             return <CodeBlock key={i} code={block.code} language={block.language} />
@@ -135,8 +127,6 @@ export function Prose({ markdown, title }: { markdown: string; title?: string })
                 <Inline text={block.text} tone="fg2" />
               </View>
             )
-          default:
-            return <Inline key={i} text={block.text} />
         }
       })}
     </View>

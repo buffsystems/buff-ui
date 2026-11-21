@@ -41,6 +41,8 @@ export function AskThreadScreen({
   onRetry,
   onDraft,
   onFree,
+  onCopyMessage,
+  onShareMessage,
   cost,
   chip,
 }: {
@@ -66,6 +68,10 @@ export function AskThreadScreen({
   onDraft?: (text: string) => void
   /** The person's own answer to Buff's question. */
   onFree?: (questionId: string, text: string) => void
+  /** Copy a turn (#947): its text or Markdown. */
+  onCopyMessage?: (text: string) => void
+  /** Share a turn (#947): a public link with this turn picked. */
+  onShareMessage?: (id: string) => void
   /** What the thread cost so far: «12 ₽ · 41 тыс. токенов». */
   cost?: string
   /** The session's AI mode chip (#840), when the install has the feature. */
@@ -90,6 +96,8 @@ export function AskThreadScreen({
       onFree={onFree}
       onAnswer={onAnswer}
       onOpenAttachment={onOpenAttachment}
+      onCopyMessage={onCopyMessage}
+      onShareMessage={onShareMessage}
     />
   )
   const pending = thread?.status === 'waiting'
@@ -154,6 +162,8 @@ function ThreadBody({
   onFree,
   onAnswer,
   onOpenAttachment,
+  onCopyMessage,
+  onShareMessage,
 }: {
   thread: AskThread
   picks?: Picks
@@ -163,6 +173,8 @@ function ThreadBody({
   onFree?: (questionId: string, text: string) => void
   onAnswer?: () => void
   onOpenAttachment?: (id: string) => void
+  onCopyMessage?: (text: string) => void
+  onShareMessage?: (id: string) => void
 }) {
   const t = useT()
   const theme = useTheme()
@@ -170,7 +182,12 @@ function ThreadBody({
   const asked = thread.status === 'waiting' && last?.role === 'assistant' && last.questions
   return (
     <>
-      <MessageList messages={thread.messages} onOpenAttachment={onOpenAttachment} />
+      <MessageList
+        messages={thread.messages}
+        onOpenAttachment={onOpenAttachment}
+        onCopyMessage={onCopyMessage}
+        onShareMessage={onShareMessage}
+      />
       {(thread.status === 'running' || thread.status === 'answering') && (
         <ThinkingLine elapsed={thread.elapsed} reasoning={thread.liveReasoning} />
       )}

@@ -6,8 +6,10 @@ import { Button } from '../../Button.tsx'
 import { ErrorDetails } from '../../ErrorDetails.tsx'
 import { Callout } from '../../Feedback.tsx'
 import { Icon } from '../../Icon.tsx'
+import { MessageActions } from '../../MessageActions.tsx'
 import type { Attachment } from '../../model.ts'
 import { Prose } from '../../Prose.tsx'
+import { SelectableText } from '../../SelectableFlow.tsx'
 import { Text } from '../../Text.tsx'
 import { useT, useTheme } from '../../theme.tsx'
 import type { FileChoice, TimelineItem } from './model.ts'
@@ -16,15 +18,20 @@ import { Reasoning } from './reasoning.tsx'
 import { SentFile } from './sent-file.tsx'
 import { BackgroundWork, SubagentCard, TodoCard, ToolCall } from './tool-parts.tsx'
 
-/** What the person said; attachments as chips under the text. */
+/** What the person said; attachments as chips under the text, its time and actions (#947) under the bubble. */
 export function UserTurn({
   text,
   when,
   attachments = [],
+  onCopy,
+  onShare,
 }: {
   text: string
   when: string
   attachments?: Attachment[]
+  /** Copy the message: the host gets its text. */
+  onCopy?: (text: string) => void
+  onShare?: () => void
 }) {
   const theme = useTheme()
   return (
@@ -39,9 +46,7 @@ export function UserTurn({
           gap: theme.space(2),
         }}
       >
-        <Text selectable style={{ color: theme.colors.brandSoftForeground }}>
-          {text}
-        </Text>
+        <SelectableText text={text} color={theme.colors.brandSoftForeground} />
         {attachments.map((a) => (
           <View key={a.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <Icon
@@ -55,22 +60,33 @@ export function UserTurn({
           </View>
         ))}
       </View>
-      <Text variant="caption" tone="muted">
-        {when}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space(1) }}>
+        <Text variant="caption" tone="muted">
+          {when}
+        </Text>
+        <MessageActions
+          {...(onCopy ? { onCopy: () => onCopy(text) } : {})}
+          {...(onShare ? { onShare } : {})}
+        />
+      </View>
     </View>
   )
 }
 
-/** The assistant's answer as Markdown; a shimmer line while it streams. */
+/** The assistant's answer as Markdown; a shimmer line while it streams, then its actions (#947). */
 export function AssistantTurn({
   markdown,
   model,
   streaming = false,
+  onCopy,
+  onShare,
 }: {
   markdown: string
   model?: string
   streaming?: boolean
+  /** Copy the answer: the host gets its Markdown. */
+  onCopy?: (markdown: string) => void
+  onShare?: () => void
 }) {
   const t = useT()
   const theme = useTheme()
@@ -79,7 +95,13 @@ export function AssistantTurn({
       <Prose markdown={markdown} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space(2) }}>
         {streaming && <StatusDot tone="info" pulse size={6} />}
-        <Text variant="caption" tone="muted">
+        {!streaming && (
+          <MessageActions
+            {...(onCopy ? { onCopy: () => onCopy(markdown) } : {})}
+            {...(onShare ? { onShare } : {})}
+          />
+        )}
+        <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
           {streaming ? t('buffcode.thinking') : (model ?? '')}
         </Text>
       </View>
@@ -126,6 +148,10 @@ type PartProps = {
   onFileChoice?: (choice: FileChoice, id: string) => void
   /** A compaction's summary was opened (#761): the screen fetches the whole text. */
   onOpenCompaction?: (id: string) => void
+  /** Copy a message (#947): its text or Markdown. */
+  onCopyMessage?: (text: string) => void
+  /** Share a message (#947): a public link with this message picked. */
+  onShareMessage?: (id: string) => void
 }
 
 /** How long the whole of a cut item may take to come before «Show all» is offered by hand. */
@@ -197,15 +223,33 @@ function PartBody({
   onOpenSubagent,
   onFileChoice,
   onOpenCompaction,
+  onCopyMessage,
+  onShareMessage,
   onToolOpen,
 }: PartProps & { onToolOpen?: () => void }) {
   const t = useT()
+  const actions = (id: string) => ({
+    ...(onCopyMessage ? { onCopy: onCopyMessage } : {}),
+    ...(onShareMessage ? { onShare: () => onShareMessage(id) } : {}),
+  })
   switch (item.kind) {
     case 'user':
-      return <UserTurn text={item.text} when={item.when} attachments={item.attachments} />
+      return (
+        <UserTurn
+          text={item.text}
+          when={item.when}
+          attachments={item.attachments}
+          {...actions(item.id)}
+        />
+      )
     case 'assistant':
       return (
-        <AssistantTurn markdown={item.markdown} model={item.model} streaming={item.streaming} />
+        <AssistantTurn
+          markdown={item.markdown}
+          model={item.model}
+          streaming={item.streaming}
+          {...actions(item.id)}
+        />
       )
     case 'tool':
       return (

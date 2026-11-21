@@ -165,6 +165,10 @@ export interface SessionScreenProps {
   onOpenCompaction?: (id: string) => void
   /** «Show all» under an item the timeline holds only the start of (#903). */
   onShowAll?: (item: TimelineItem) => void
+  /** Copy a message (#947): its text or Markdown. */
+  onCopyMessage?: (text: string) => void
+  /** Share a message (#947): a public link with this message picked. */
+  onShareMessage?: (id: string) => void
   onCloseFile?: () => void
   onRepair?: () => void
 }
@@ -248,6 +252,8 @@ export function SessionScreen(p: SessionScreenProps) {
       onFileChoice={p.onFileChoice}
       onOpenCompaction={p.onOpenCompaction}
       onShowAll={p.onShowAll}
+      onCopyMessage={p.onCopyMessage}
+      onShareMessage={p.onShareMessage}
     />
   )
   // The working subagents (#762): the composer's icon and its list.

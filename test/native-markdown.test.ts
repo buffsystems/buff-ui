@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 import { columnWidths, parseMarkdown } from '../src/native/markdown.ts'
 
 describe('parseMarkdown', () => {
@@ -112,3 +112,20 @@ process.stdout.write(JSON.stringify(parseMarkdown(${JSON.stringify(source)})))`,
   if (run.status !== 0) throw new Error(`parse did not finish (${run.signal ?? run.stderr})`)
   return JSON.parse(run.stdout) as ReturnType<typeof parseMarkdown>
 }
+
+// #948: a thematic break is a line, not the text «---».
+test('a line of three or more - * _ alone is a rule; a code fence keeps it as text', () => {
+  for (const rule of ['---', '***', '___', '- - -', '* * *', '-----', ' --- '])
+    expect(parseMarkdown(`Первый\n\n${rule}\n\nВторой`)).toEqual([
+      { kind: 'paragraph', text: 'Первый' },
+      { kind: 'rule' },
+      { kind: 'paragraph', text: 'Второй' },
+    ])
+  expect(parseMarkdown('```\n---\n```')).toEqual([{ kind: 'code', code: '---' }])
+  expect(parseMarkdown('Текст\n---\nДальше')).toEqual([
+    { kind: 'paragraph', text: 'Текст' },
+    { kind: 'rule' },
+    { kind: 'paragraph', text: 'Дальше' },
+  ])
+  expect(parseMarkdown('-- не черта')).toEqual([{ kind: 'paragraph', text: '-- не черта' }])
+})

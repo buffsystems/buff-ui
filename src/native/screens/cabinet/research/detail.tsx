@@ -10,6 +10,7 @@ import { Button, IconButton } from '../../../Button.tsx'
 import { Card } from '../../../Card.tsx'
 import { Callout, Skeleton } from '../../../Feedback.tsx'
 import type { Attachment, InstallStatus } from '../../../model.ts'
+import { MessageActions } from '../../../MessageActions.tsx'
 import { Prose } from '../../../Prose.tsx'
 import { Screen, TopBar } from '../../../Screen.tsx'
 import { ConfirmSheet } from '../../../Sheet.tsx'
@@ -56,6 +57,8 @@ export function ResearchScreen({
   onRetry,
   onContinue,
   onFailure,
+  onCopyText,
+  onShareTurn,
   cost,
   notice,
   chip,
@@ -75,6 +78,10 @@ export function ResearchScreen({
   onExport?: () => void
   /** A public link to the research (#821). */
   onShare?: () => void
+  /** Copy the report or a turn of the dialog (#947): its Markdown. */
+  onCopyText?: (markdown: string) => void
+  /** Share the report (`document`) or a turn (its id) (#947): a public link with it picked. */
+  onShareTurn?: (id: string) => void
   onPause?: () => void
   onResume?: () => void
   onStop?: () => void
@@ -104,6 +111,12 @@ export function ResearchScreen({
   const last = research?.dialog[research.dialog.length - 1]
   const pending = research?.status === 'waiting' && last?.role === 'clarify' ? last : undefined
   const turns = research?.dialog.filter((x) => x !== pending) ?? []
+  const actions = (id: string, markdown: string) => (
+    <MessageActions
+      {...(onCopyText ? { onCopy: () => onCopyText(markdown) } : {})}
+      {...(onShareTurn ? { onShare: () => onShareTurn(id) } : {})}
+    />
+  )
   return (
     <>
       <TopBar
@@ -208,8 +221,9 @@ export function ResearchScreen({
               />
             )}
             {hasDoc ? (
-              <Card>
+              <Card style={{ gap: theme.space(2) }}>
                 <Prose markdown={documentBody(research.document, title)} />
+                {actions('document', research.document)}
               </Card>
             ) : (
               !pending && (
@@ -239,7 +253,10 @@ export function ResearchScreen({
                 {turn.role === 'clarify' && turn.questions ? (
                   <AskedQuestions questions={turn.questions} />
                 ) : (
-                  <Prose markdown={turn.body} />
+                  <>
+                    <Prose markdown={turn.body} />
+                    {actions(turn.id, turn.body)}
+                  </>
                 )}
               </View>
             ))}

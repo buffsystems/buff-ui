@@ -9,6 +9,8 @@ export type Block =
   | { kind: 'code'; language?: string; code: string }
   | { kind: 'quote'; text: string }
   | { kind: 'table'; header: string[]; rows: string[][] }
+  /** A thematic break (#948): `---`, `***`, `___`, spaced or not. */
+  | { kind: 'rule' }
 
 /**
  * One width per column, so the rows line up: the longest cell's length decides, within bounds
@@ -35,6 +37,9 @@ const cells = (line: string): string[] =>
     .map((c) => c.trim())
 const isAlignRow = (line: string | undefined): boolean =>
   line !== undefined && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$/.test(line)
+
+/** Three or more of one of - * _ alone on a line, spaces between allowed. */
+const RULE = /^ {0,3}([-*_])( *\1){2,} *$/
 
 export function parseMarkdown(source: string): Block[] {
   const blocks: Block[] = []
@@ -74,6 +79,12 @@ export function parseMarkdown(source: string): Block[] {
       blocks.push({ kind: 'table', header, rows })
       continue
     }
+    // Before the list: «- - -» is a rule, not an item.
+    if (RULE.test(line)) {
+      blocks.push({ kind: 'rule' })
+      i += 1
+      continue
+    }
     const heading = /^(#{1,3})\s+(.*)$/.exec(line)
     if (heading) {
       blocks.push({ kind: 'heading', level: heading[1].length as 1 | 2 | 3, text: heading[2] })
@@ -105,6 +116,7 @@ export function parseMarkdown(source: string): Block[] {
     while (
       i < lines.length &&
       lines[i].trim() !== '' &&
+      !RULE.test(lines[i]) &&
       !/^(#{1,3}\s|```|>|\s*([-*]|\d+\.)\s)/.test(lines[i])
     ) {
       paragraph.push(lines[i++])

@@ -10,7 +10,9 @@ import { Badge } from '../../../Badge.tsx'
 import { Spinner } from '../../../Feedback.tsx'
 import { Icon } from '../../../Icon.tsx'
 import type { Attachment } from '../../../model.ts'
+import { MessageActions } from '../../../MessageActions.tsx'
 import { Prose } from '../../../Prose.tsx'
+import { SelectableText } from '../../../SelectableFlow.tsx'
 import { RowGroup } from '../../../Row.tsx'
 import { Text } from '../../../Text.tsx'
 import { useT, useTheme } from '../../../theme.tsx'
@@ -63,13 +65,25 @@ function Attachments({ items, onOpen }: { items: Attachment[]; onOpen?: (id: str
 export function MessageList({
   messages,
   onOpenAttachment,
+  onCopyMessage,
+  onShareMessage,
 }: {
   messages: AskMessage[]
   onOpenAttachment?: (id: string) => void
+  /** Copy a turn (#947): its text or Markdown. */
+  onCopyMessage?: (text: string) => void
+  /** Share a turn (#947): a public link with this turn picked. */
+  onShareMessage?: (id: string) => void
 }) {
   const t = useT()
   const theme = useTheme()
   const c = theme.colors
+  const actions = (m: AskMessage) => (
+    <MessageActions
+      {...(onCopyMessage ? { onCopy: () => onCopyMessage(m.content) } : {})}
+      {...(onShareMessage ? { onShare: () => onShareMessage(m.id) } : {})}
+    />
+  )
   return (
     <View
       style={{ gap: theme.space(3), paddingHorizontal: theme.space(4), paddingTop: theme.space(2) }}
@@ -88,16 +102,14 @@ export function MessageList({
                 backgroundColor: c.brandSoft,
               }}
             >
-              <Text selectable style={{ color: c.brandSoftForeground }}>
-                {m.content}
-              </Text>
+              <SelectableText text={m.content} color={c.brandSoftForeground} />
             </View>
             {m.attachments && m.attachments.length > 0 && (
               <View style={{ width: '88%' }}>
                 <Attachments items={m.attachments} onOpen={onOpenAttachment} />
               </View>
             )}
-            {m.queued && <Badge icon="clock">{t('ask.queued')}</Badge>}
+            {m.queued ? <Badge icon="clock">{t('ask.queued')}</Badge> : actions(m)}
           </View>
         ) : (
           <View key={m.id} style={{ gap: 8 }}>
@@ -106,6 +118,7 @@ export function MessageList({
             {m.attachments && m.attachments.length > 0 && (
               <Attachments items={m.attachments} onOpen={onOpenAttachment} />
             )}
+            {actions(m)}
           </View>
         ),
       )}

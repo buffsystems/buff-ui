@@ -55,6 +55,7 @@ export { CodeBlock, DiffView, HighlightedCode, InlineCode, Terminal } from './Co
 export { highlight, highlightLine } from './highlight.ts'
 export type { Token, TokenKind } from './highlight.ts'
 export { Prose } from './Prose.tsx'
+export { MessageActions } from './MessageActions.tsx'
 export { parseMarkdown } from './markdown.ts'
 export type { Block as MarkdownBlock } from './markdown.ts'
 export { CodeInput, QrPlaceholder, SasCode, ScannerFrame } from './Pairing.tsx'

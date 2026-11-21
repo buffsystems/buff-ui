@@ -90,4 +90,8 @@ export const S = defineStrings({
   },
   'share.deleted': { ru: 'Ссылка удалена', en: 'Link deleted' },
   'share.saved': { ru: 'Сохранено', en: 'Saved' },
+  // #947: the actions under a message.
+  'message.copy': { ru: 'Скопировать сообщение', en: 'Copy the message' },
+  'message.copied': { ru: 'Скопировано', en: 'Copied' },
+  'message.share': { ru: 'Поделиться сообщением', en: 'Share the message' },
 })
